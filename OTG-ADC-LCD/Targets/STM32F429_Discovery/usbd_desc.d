@@ -5,7 +5,7 @@
 .\targets\stm32f429_discovery\usbd_desc.o: ..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_conf.h
 .\targets\stm32f429_discovery\usbd_desc.o: ..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
 .\targets\stm32f429_discovery\usbd_desc.o: ..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Include\core_cm4.h
-.\targets\stm32f429_discovery\usbd_desc.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\targets\stm32f429_discovery\usbd_desc.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\targets\stm32f429_discovery\usbd_desc.o: ..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Include\core_cmInstr.h
 .\targets\stm32f429_discovery\usbd_desc.o: ..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Include\core_cmFunc.h
 .\targets\stm32f429_discovery\usbd_desc.o: ..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Include\core_cmSimd.h
@@ -42,7 +42,7 @@
 .\targets\stm32f429_discovery\usbd_desc.o: ..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_ltdc.h
 .\targets\stm32f429_discovery\usbd_desc.o: ..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_sai.h
 .\targets\stm32f429_discovery\usbd_desc.o: .\User\defines.h
-.\targets\stm32f429_discovery\usbd_desc.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\targets\stm32f429_discovery\usbd_desc.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 .\targets\stm32f429_discovery\usbd_desc.o: ..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_regs.h
 .\targets\stm32f429_discovery\usbd_desc.o: ..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_defines.h
 .\targets\stm32f429_discovery\usbd_desc.o: ..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_def.h
