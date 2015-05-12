@@ -1,9 +1,8 @@
 .\targets\stm32f429_discovery\main.o: User\main.c
 .\targets\stm32f429_discovery\main.o: User\defines.h
-.\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\tm_stm32f4_usb_vcp.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Include\core_cm4.h
-.\targets\stm32f429_discovery\main.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\targets\stm32f429_discovery\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Include\core_cmInstr.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Include\core_cmFunc.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Include\core_cmSimd.h
@@ -39,12 +38,13 @@
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fmc.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_ltdc.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_sai.h
+.\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\tm_stm32f4_usb_vcp.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_cdc_core.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_ioreq.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_def.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_conf.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_conf.h
-.\targets\stm32f429_discovery\main.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\targets\stm32f429_discovery\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_core.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_dcd.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_core.h
@@ -57,3 +57,10 @@
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\attributes.h
 .\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\tm_stm32f4_adc.h
+.\targets\stm32f429_discovery\main.o: User\button_back.h
+.\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\tm_stm32f4_ili9341.h
+.\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\tm_stm32f4_spi.h
+.\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\tm_stm32f4_fonts.h
+.\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\tm_stm32f4_stmpe811.h
+.\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\tm_stm32f4_i2c.h
+.\targets\stm32f429_discovery\main.o: ..\00-STM32F429_LIBRARIES\tm_stm32f4_ili9341_button.h
