@@ -52,7 +52,7 @@
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
           <DebugInformation>0</DebugInformation>
-          <BrowseInformation>0</BrowseInformation>
+          <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -585,11 +585,6 @@
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_adc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_adc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_i2c.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_i2c.c</FilePath>
@@ -605,14 +600,9 @@
           <GroupName>TM</GroupName>
           <Files>
             <File>
-              <FileName>tm_stm32f4_delay.h</FileName>
+              <FileName>stm32f4xx_adc.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.h</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.c</FilePath>
+              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h</FilePath>
             </File>
             <File>
               <FileName>tm_stm32f4_disco.h</FileName>
@@ -655,9 +645,14 @@
               <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_adc.h</FilePath>
             </File>
             <File>
-              <FileName>tm_stm32f4_bmp180.c</FileName>
+              <FileName>tm_stm32f4_delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_bmp180.c</FilePath>
+              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>tm_stm32f4_delay.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.h</FilePath>
             </File>
             <File>
               <FileName>tm_stm32f4_fonts.c</FileName>
@@ -733,6 +728,49 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\main.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>0</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>2</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <useXO>2</useXO>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
               <FileName>defines.h</FileName>
@@ -758,6 +796,11 @@
               <FileName>system_stm32f4xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\system_stm32f4xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>main407.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\main407.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1519,11 +1562,6 @@
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_adc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_adc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_i2c.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_i2c.c</FilePath>
@@ -1539,14 +1577,9 @@
           <GroupName>TM</GroupName>
           <Files>
             <File>
-              <FileName>tm_stm32f4_delay.h</FileName>
+              <FileName>stm32f4xx_adc.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.h</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.c</FilePath>
+              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h</FilePath>
             </File>
             <File>
               <FileName>tm_stm32f4_disco.h</FileName>
@@ -1589,9 +1622,14 @@
               <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_adc.h</FilePath>
             </File>
             <File>
-              <FileName>tm_stm32f4_bmp180.c</FileName>
+              <FileName>tm_stm32f4_delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_bmp180.c</FilePath>
+              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>tm_stm32f4_delay.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.h</FilePath>
             </File>
             <File>
               <FileName>tm_stm32f4_fonts.c</FileName>
@@ -1692,6 +1730,54 @@
               <FileName>system_stm32f4xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\system_stm32f4xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>main407.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\main407.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>0</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>2</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <useXO>2</useXO>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -2453,11 +2539,6 @@
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_adc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_adc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_i2c.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_i2c.c</FilePath>
@@ -2473,14 +2554,9 @@
           <GroupName>TM</GroupName>
           <Files>
             <File>
-              <FileName>tm_stm32f4_delay.h</FileName>
+              <FileName>stm32f4xx_adc.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.h</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.c</FilePath>
+              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h</FilePath>
             </File>
             <File>
               <FileName>tm_stm32f4_disco.h</FileName>
@@ -2523,9 +2599,14 @@
               <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_adc.h</FilePath>
             </File>
             <File>
-              <FileName>tm_stm32f4_bmp180.c</FileName>
+              <FileName>tm_stm32f4_delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_bmp180.c</FilePath>
+              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>tm_stm32f4_delay.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.h</FilePath>
             </File>
             <File>
               <FileName>tm_stm32f4_fonts.c</FileName>
@@ -2626,6 +2707,11 @@
               <FileName>system_stm32f4xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\system_stm32f4xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>main407.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\main407.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3387,11 +3473,6 @@
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_adc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_adc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_i2c.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_i2c.c</FilePath>
@@ -3407,14 +3488,9 @@
           <GroupName>TM</GroupName>
           <Files>
             <File>
-              <FileName>tm_stm32f4_delay.h</FileName>
+              <FileName>stm32f4xx_adc.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.h</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.c</FilePath>
+              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h</FilePath>
             </File>
             <File>
               <FileName>tm_stm32f4_disco.h</FileName>
@@ -3457,9 +3533,14 @@
               <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_adc.h</FilePath>
             </File>
             <File>
-              <FileName>tm_stm32f4_bmp180.c</FileName>
+              <FileName>tm_stm32f4_delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_bmp180.c</FilePath>
+              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>tm_stm32f4_delay.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.h</FilePath>
             </File>
             <File>
               <FileName>tm_stm32f4_fonts.c</FileName>
@@ -3560,6 +3641,11 @@
               <FileName>system_stm32f4xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\system_stm32f4xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>main407.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\main407.c</FilePath>
             </File>
           </Files>
         </Group>
