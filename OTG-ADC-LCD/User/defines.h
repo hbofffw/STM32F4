@@ -34,6 +34,7 @@
 /* If you want to use this on STM32F429-Discovery, uncomment line below */
 /* I set this in target C/C++ preprocessor defines */
 //#define USE_USB_OTG_HS
+//
 
 #endif
 
