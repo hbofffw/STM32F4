@@ -21,6 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{c9f05f1c-4f8c-4e4f-9146-1ee030b4a357}</ProjectGuid>
     <Keyword>MakeFileProj</Keyword>
+    <ProjectName>VCP-VS</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='STM32F4-Discovery|Win32'" Label="Configuration">
@@ -78,14 +79,25 @@
     <IncludePath>..\User;..\..\TM;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include;..\..\00-STM32F429_LIBRARIES;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Include;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm;..\..\00-STM32F429_LIBRARIES\usb_cdc_device;</IncludePath>
     <NMakeBuildCommandLine>"D:\Keil_v5\UV4\UV4.exe " -b ..\project.uvprojx -t "Nucleo-F401" -j0 -o Build.log</NMakeBuildCommandLine>
   </PropertyGroup>
-  <ItemDefinitionGroup></ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h" />
     <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h" />
-    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f40_41xxx.s" />
-    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f401xx.s" />
-    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f411xe.s" />
-    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f429_439xx.s" />
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f40_41xxx.s">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='STM32F429-Discovery|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f401xx.s">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='STM32F429-Discovery|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='STM32F4-Discovery|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f411xe.s">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='STM32F429-Discovery|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='STM32F4-Discovery|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f429_439xx.s">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='STM32F4-Discovery|Win32'">true</ExcludedFromBuild>
+    </None>
     <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h" />
     <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_disco.h" />
     <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_usb_vcp.h" />
@@ -156,5 +168,6 @@
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_usr.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets"></ImportGroup>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
 </Project>

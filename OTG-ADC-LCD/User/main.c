@@ -149,7 +149,7 @@ int main(void) {
                 
                 if (TM_USB_VCP_GetStatus() == TM_USB_VCP_CONNECTED) {
                     /*USB OK, drivers OK*/
-                    TM_DISCO_LedOn(LED_GREEN);
+					TM_DISCO_LedOn(LED_GREEN);
                     TM_ILI9341_Puts(10, 220, "UART pressed             \n", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_GRAY);
                     printf("ADC channel 0/3: %4d/%4d \n", TM_ADC_Read(ADC1, ADC_Channel_0), TM_ADC_Read(ADC1, ADC_Channel_3));
                 }else {
