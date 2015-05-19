@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="STM32F4-Discovery|Win32">
+      <Configuration>STM32F4-Discovery</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="STM32F429-Discovery|Win32">
+      <Configuration>STM32F429-Discovery</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Nucleo-F411|Win32">
+      <Configuration>Nucleo-F411</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Nucleo-F401|Win32">
+      <Configuration>Nucleo-F401</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{c9f05f1c-4f8c-4e4f-9146-1ee030b4a357}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='STM32F4-Discovery|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='STM32F429-Discovery|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nucleo-F411|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nucleo-F401|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='STM32F4-Discovery|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='STM32F429-Discovery|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Nucleo-F411|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Nucleo-F401|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='STM32F4-Discovery|Win32'">
+    <NMakeOutput>project.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>STM32F40_41xxx,USE_STDPERIPH_DRIVER,STM32F4XX,__ASSEMBLY__,KEIL_IDE,TM_DISCO_STM32F4_DISCOVERY</NMakePreprocessorDefinitions>
+    <IncludePath>..\User;..\..\TM;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include;..\..\00-STM32F429_LIBRARIES;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Include;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm;..\..\00-STM32F429_LIBRARIES\usb_cdc_device;</IncludePath>
+    <NMakeBuildCommandLine>"D:\Keil_v5\UV4\UV4.exe " -b ..\project.uvprojx -t "STM32F4-Discovery" -j0 -o Build.log</NMakeBuildCommandLine>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='STM32F429-Discovery|Win32'">
+    <NMakeOutput>project.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>STM32F429_439xx,USE_STDPERIPH_DRIVER,STM32F4XX,__ASSEMBLY__,KEIL_IDE,TM_DISCO_STM32F429_DISCOVERY,USE_USB_OTG_HS</NMakePreprocessorDefinitions>
+    <IncludePath>..\User;..\..\TM;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include;..\..\00-STM32F429_LIBRARIES;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Include;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm;..\..\00-STM32F429_LIBRARIES\usb_cdc_device;</IncludePath>
+    <NMakeBuildCommandLine>"D:\Keil_v5\UV4\UV4.exe " -b ..\project.uvprojx -t "STM32F429-Discovery" -j0 -o Build.log</NMakeBuildCommandLine>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nucleo-F411|Win32'">
+    <NMakeOutput>project.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>STM32F411xE,USE_STDPERIPH_DRIVER,STM32F4XX,__ASSEMBLY__,KEIL_IDE,TM_DISCO_NUCLEO_F411</NMakePreprocessorDefinitions>
+    <IncludePath>..\User;..\..\TM;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include;..\..\00-STM32F429_LIBRARIES;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Include;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm;..\..\00-STM32F429_LIBRARIES\usb_cdc_device;</IncludePath>
+    <NMakeBuildCommandLine>"D:\Keil_v5\UV4\UV4.exe " -b ..\project.uvprojx -t "Nucleo-F411" -j0 -o Build.log</NMakeBuildCommandLine>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nucleo-F401|Win32'">
+    <NMakeOutput>project.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>STM32F401xx,USE_STDPERIPH_DRIVER,STM32F4XX,__ASSEMBLY__,KEIL_IDE,TM_DISCO_NUCLEO_F401</NMakePreprocessorDefinitions>
+    <IncludePath>..\User;..\..\TM;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include;..\..\00-STM32F429_LIBRARIES;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Include;..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm;..\..\00-STM32F429_LIBRARIES\usb_cdc_device;</IncludePath>
+    <NMakeBuildCommandLine>"D:\Keil_v5\UV4\UV4.exe " -b ..\project.uvprojx -t "Nucleo-F401" -j0 -o Build.log</NMakeBuildCommandLine>
+  </PropertyGroup>
+  <ItemDefinitionGroup></ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h" />
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h" />
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f40_41xxx.s" />
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f401xx.s" />
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f411xe.s" />
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f429_439xx.s" />
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_disco.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_usb_vcp.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_gpio.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_adc.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_fonts.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_i2c.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_ili9341.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_ili9341_button.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_spi.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_stmpe811.h" />
+    <None Include="..\User\main.h" />
+    <None Include="..\User\defines.h" />
+    <None Include="..\User\stm32f4xx_conf.h" />
+    <None Include="..\User\stm32f4xx_it.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_bsp.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_conf.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_core.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_dcd.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_dcd_int.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_defines.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_regs.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_cdc_core.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_cdc_vcp.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_conf.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_core.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_def.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_desc.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_ioreq.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_req.h" />
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_usr.h" />
+    <None Include="Readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\misc.c" />
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rcc.c" />
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_gpio.c" />
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_exti.c" />
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_adc.c" />
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_i2c.c" />
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_spi.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_disco.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_usb_vcp.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_gpio.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_adc.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_fonts.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_i2c.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_ili9341.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_ili9341_button.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_spi.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_stmpe811.c" />
+    <ClCompile Include="..\User\main.c" />
+    <ClCompile Include="..\User\stm32f4xx_it.c" />
+    <ClCompile Include="..\User\system_stm32f4xx.c" />
+    <ClCompile Include="..\User\main407.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_bsp.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_core.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_dcd.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_dcd_int.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_cdc_core.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_cdc_vcp.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_core.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_desc.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_ioreq.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_req.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_usr.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets"></ImportGroup>
+</Project>

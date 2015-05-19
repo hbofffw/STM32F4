@@ -1,0 +1,9 @@
+﻿Build started 5/19/2015 15:13:09.
+     1>Project "E:\stm32\github\STM32F4\OTG-ADC-LCD\Visual Studio Project\project.vcxproj" on node 2 (Build target(s)).
+     1>Build:
+         "D:\Keil_v5\UV4\UV4.exe " -b ..\project.uvprojx -t "STM32F429-Discovery" -j0 -o Build.log
+     1>Done Building Project "E:\stm32\github\STM32F4\OTG-ADC-LCD\Visual Studio Project\project.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:04.52
