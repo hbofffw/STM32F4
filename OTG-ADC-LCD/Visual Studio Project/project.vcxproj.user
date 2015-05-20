@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='STM32F4-Discovery|Win32'">
+    <LocalDebuggerCommand>D:\Keil_v5\UV4\UV4.exe </LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>-d project.uvproj -t "STM32F4-Discovery"</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>..\</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='STM32F429-Discovery|Win32'">
+    <LocalDebuggerCommand>D:\Keil_v5\UV4\UV4.exe </LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>-d project.uvprojx -t "STM32F429-Discovery"</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>..\</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nucleo-F411|Win32'">
+    <LocalDebuggerCommand>D:\Keil_v5\UV4\UV4.exe </LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>-d project.uvproj -t "Nucleo-F411"</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>..\</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nucleo-F401|Win32'">
+    <LocalDebuggerCommand>D:\Keil_v5\UV4\UV4.exe </LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>-d project.uvproj -t "Nucleo-F401"</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>..\</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+</Project>

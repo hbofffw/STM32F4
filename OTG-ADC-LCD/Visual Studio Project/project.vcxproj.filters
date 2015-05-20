@@ -1,0 +1,251 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{893cdf13-943a-4875-82b3-73c7922f25b6}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\CMSIS">
+      <UniqueIdentifier>{03c6135d-4482-408a-afa6-5e36cd808a29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Startup">
+      <UniqueIdentifier>{87ee913b-4b27-4fd6-87cb-53d6148810af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\STD_Periph_Drivers">
+      <UniqueIdentifier>{7b838bf7-f798-4288-a3a4-f6036b386a17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TM">
+      <UniqueIdentifier>{c44e2729-0ee2-4572-9bd5-bee016c90bb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\User">
+      <UniqueIdentifier>{6dc8f569-4f79-4693-b70f-fb3a0362f3b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\USB CDC Device">
+      <UniqueIdentifier>{08ec02c1-0c33-47a6-ad63-3b37b37e4dd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Discription">
+      <UniqueIdentifier>{4180b2a1-8011-41f2-81fd-db30c6aea120}</UniqueIdentifier>
+      <Extensions>txt</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\misc.c">
+      <Filter>Source Files\STD_Periph_Drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rcc.c">
+      <Filter>Source Files\STD_Periph_Drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_gpio.c">
+      <Filter>Source Files\STD_Periph_Drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_exti.c">
+      <Filter>Source Files\STD_Periph_Drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_adc.c">
+      <Filter>Source Files\STD_Periph_Drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_i2c.c">
+      <Filter>Source Files\STD_Periph_Drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_spi.c">
+      <Filter>Source Files\STD_Periph_Drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_disco.c">
+      <Filter>Source Files\TM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_usb_vcp.c">
+      <Filter>Source Files\TM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_gpio.c">
+      <Filter>Source Files\TM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_adc.c">
+      <Filter>Source Files\TM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.c">
+      <Filter>Source Files\TM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_fonts.c">
+      <Filter>Source Files\TM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_i2c.c">
+      <Filter>Source Files\TM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_ili9341.c">
+      <Filter>Source Files\TM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_ili9341_button.c">
+      <Filter>Source Files\TM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_spi.c">
+      <Filter>Source Files\TM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_stmpe811.c">
+      <Filter>Source Files\TM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\User\main.c">
+      <Filter>Source Files\User</Filter>
+    </ClCompile>
+    <ClCompile Include="..\User\stm32f4xx_it.c">
+      <Filter>Source Files\User</Filter>
+    </ClCompile>
+    <ClCompile Include="..\User\system_stm32f4xx.c">
+      <Filter>Source Files\User</Filter>
+    </ClCompile>
+    <ClCompile Include="..\User\main407.c">
+      <Filter>Source Files\User</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_bsp.c">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_core.c">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_dcd.c">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_dcd_int.c">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_cdc_core.c">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_cdc_vcp.c">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_core.c">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_desc.c">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_ioreq.c">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_req.c">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_usr.c">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h">
+      <Filter>Source Files\CMSIS</Filter>
+    </None>
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h">
+      <Filter>Source Files\CMSIS</Filter>
+    </None>
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f40_41xxx.s">
+      <Filter>Source Files\Startup</Filter>
+    </None>
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f401xx.s">
+      <Filter>Source Files\Startup</Filter>
+    </None>
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f411xe.s">
+      <Filter>Source Files\Startup</Filter>
+    </None>
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f429_439xx.s">
+      <Filter>Source Files\Startup</Filter>
+    </None>
+    <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h">
+      <Filter>Source Files\TM</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_disco.h">
+      <Filter>Source Files\TM</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_usb_vcp.h">
+      <Filter>Source Files\TM</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_gpio.h">
+      <Filter>Source Files\TM</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_adc.h">
+      <Filter>Source Files\TM</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_delay.h">
+      <Filter>Source Files\TM</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_fonts.h">
+      <Filter>Source Files\TM</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_i2c.h">
+      <Filter>Source Files\TM</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_ili9341.h">
+      <Filter>Source Files\TM</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_ili9341_button.h">
+      <Filter>Source Files\TM</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_spi.h">
+      <Filter>Source Files\TM</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_stmpe811.h">
+      <Filter>Source Files\TM</Filter>
+    </None>
+    <None Include="..\User\main.h">
+      <Filter>Source Files\User</Filter>
+    </None>
+    <None Include="..\User\defines.h">
+      <Filter>Source Files\User</Filter>
+    </None>
+    <None Include="..\User\stm32f4xx_conf.h">
+      <Filter>Source Files\User</Filter>
+    </None>
+    <None Include="..\User\stm32f4xx_it.h">
+      <Filter>Source Files\User</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_bsp.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_conf.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_core.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_dcd.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_dcd_int.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_defines.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_regs.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_cdc_core.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_cdc_vcp.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_conf.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_core.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_def.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_desc.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_ioreq.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_req.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_usr.h">
+      <Filter>Source Files\USB CDC Device</Filter>
+    </None>
+    <None Include="Readme.txt">
+      <Filter>Discription</Filter>
+    </None>
+  </ItemGroup>
+</Project>
