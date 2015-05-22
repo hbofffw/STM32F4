@@ -70,10 +70,21 @@ int main(void) {
 	/* Initialize LED's. Make sure to check settings for your board in tm_stm32f4_disco.h file */
 	TM_DISCO_LedInit();
 	TM_DISCO_ButtonInit();
+	/* Initialize USB VCP */
+	TM_USB_VCP_Init();
+	/* Initialize ADC1 on channel 4, this is pin PA4 */
+	TM_ADC_Init(ADC1, ADC_Channel_4);
+	/* Initialize ADC1 on channel 3, this is pin PA3 */
+	TM_ADC_Init(ADC1, ADC_Channel_3);
+	/*Delay init*/
+	TM_DELAY_Init();
+
 
 	//LCD and TOUCHPAD seeting///////////////////	
-	/* Initialize LCD */
+	/* Initialize LCD */ 
 	TM_ILI9341_Init();
+	/* Initialize Touch */
+	TM_STMPE811_Init();
 	/* Fill LCD with gray color */
 	TM_ILI9341_Fill(ILI9341_COLOR_GRAY);
 	/* Select orientation */
@@ -82,8 +93,7 @@ int main(void) {
 	/* Select touch screen orientation */
 	touchData.orientation = TM_STMPE811_Orientation_Portrait_2;
 
-	/* Initialize Touch */
-	TM_STMPE811_Init();
+	
 	/* Button 1, default configuration */
 	/* Red with black border and black font 11x18 */
 	button.x = 10;	/* X location */
@@ -120,15 +130,8 @@ int main(void) {
 	//TM_ILI9341_Puts(45, 245, "prepared         reserved", &TM_Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_GRAY);
 
 	///////////////////////////////////////////end of lcd and touchpad setting //////////////////////////
-
-	/* Initialize USB VCP */
-	TM_USB_VCP_Init();
-	/* Initialize ADC1 on channel 0, this is pin PA0 */
-	TM_ADC_Init(ADC1, ADC_Channel_4);
-
-	/* Initialize ADC1 on channel 3, this is pin PA3 */
-	TM_ADC_Init(ADC1, ADC_Channel_3);
 	TM_ILI9341_Puts(10, 20, "ADC Use channel 4/3, PA4/PA3", &TM_Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_GRAY);
+
 	while (1) {
 		/* USB configured OK, drivers OK */
 		if (TM_USB_VCP_GetStatus() == TM_USB_VCP_CONNECTED) {

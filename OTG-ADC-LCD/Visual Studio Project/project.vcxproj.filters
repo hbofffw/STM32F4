@@ -258,7 +258,7 @@
       <Filter>源文件\USB CDC Device</Filter>
     </None>
     <None Include="Readme.txt">
-      <Filter>项目说明\</Filter>
+      <Filter>项目说明</Filter>
     </None>
   </ItemGroup>
 </Project>
