@@ -123,6 +123,7 @@
     <None Include="Readme.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_stdio.c" />
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\misc.c" />
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rcc.c" />
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_gpio.c" />
@@ -162,6 +163,9 @@
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_ioreq.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_req.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_usr.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_stdio.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
