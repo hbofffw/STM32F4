@@ -385,7 +385,7 @@ typedef enum {
 #ifndef TM_UART5_HARDWARE_FLOW_CONTROL
 #define TM_UART5_HARDWARE_FLOW_CONTROL		TM_USART_HardwareFlowControl_None
 #endif
-#ifndef TM_UART5_MODE
+#ifndef TM_UART5_MODE 
 #define TM_UART5_MODE						USART_Mode_Tx | USART_Mode_Rx
 #endif
 #ifndef TM_UART5_PARITY
