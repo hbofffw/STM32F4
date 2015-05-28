@@ -25,6 +25,7 @@
 #include "tm_stm32f4_adc.h"
 #include "tm_stm32f4_usart.h"
 
+
 #include <stdio.h>
 /* We need to implement own __FILE struct */
 /* FILE struct is used from __FILE */
@@ -52,6 +53,7 @@ int fputc(int ch, FILE *f) {
 
 int main(void) {
 	uint8_t c;
+	uint8_t s;
 
 	SystemInit();
 
@@ -60,7 +62,7 @@ int main(void) {
 	TM_DISCO_ButtonInit();
 	/*Delay init*/
 	TM_DELAY_Init();
-
+	TM_USART_Init(USART1, TM_USART_PinsPack_2, 9600);
 
 	/* Initialize USB VCP */
 	TM_USB_VCP_Init();
@@ -85,8 +87,15 @@ int main(void) {
 			/* USB not OK */
 			TM_DISCO_LedOff(LED_GREEN);
 		}
-		if (TM_USB_VCP_Getc(&c) == TM_USB_VCP_DATA_OK){
-			printf("Data from COM received. \n");
-		}		
+		
+		if (TM_USB_VCP_Getc(&s) == TM_USB_VCP_DATA_OK){
+			printf("rdy");
+			TM_USART_Putc(USART1, s);
+		}	
+		c = TM_USART_Getc(USART1);
+		if (c)
+		{
+			printf("%c", c);
+		}
 	}
 }

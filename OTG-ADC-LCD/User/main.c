@@ -25,9 +25,10 @@
 #include "tm_stm32f4_adc.h"
 #include "button_back.h"
 #include "tm_stm32f4_ili9341.h"
-#include "tm_stm32f4_stmpe811.h"
-#include "tm_stm32f4_ili9341_button.h"
+//#include "tm_stm32f4_stmpe811.h"
+//#include "tm_stm32f4_ili9341_button.h"
 #include "tm_stm32f4_usart.h"
+//#include "tm_stm32f4_stdio.h"
 #include <stdio.h>
 /* We need to implement own __FILE struct */
 /* FILE struct is used from __FILE */
@@ -54,19 +55,20 @@ int fputc(int ch, FILE *f) {
 
 int main(void) {
 	uint8_t c;
+	uint8_t s;
 	//	float i = 10.10;
 	//LCD and TOUCHPAD seeting///////////////////
 	/* TM_STMPE811_TouchData instance */
-	TM_STMPE811_TouchData touchData;
+	//TM_STMPE811_TouchData touchData;
 	/* TM_ILI9341_Button_t instance */
-	TM_ILI9341_Button_t button;
-	int8_t buttonPressed, button1, button2;
-	char str[30];
+	//TM_ILI9341_Button_t button;
+	//int8_t buttonPressed, button1, button2;
+	//char str[30];
 	/////////////////////////////////////////	
 	SystemInit();
 	//USART initialization
 	TM_USART_Init(USART1, TM_USART_PinsPack_2, 9600);
-	TM_USART_Puts(USART1, "Hello world\n");
+	
 	/* Initialize LED's. Make sure to check settings for your board in tm_stm32f4_disco.h file */
 	TM_DISCO_LedInit();
 	TM_DISCO_ButtonInit();
@@ -82,56 +84,56 @@ int main(void) {
 
 	//LCD and TOUCHPAD seeting///////////////////	
 	/* Initialize LCD */ 
-	TM_ILI9341_Init();
+	//TM_ILI9341_Init();
 	/* Initialize Touch */
-	TM_STMPE811_Init();
+	//TM_STMPE811_Init();
 	/* Fill LCD with gray color */
-	TM_ILI9341_Fill(ILI9341_COLOR_GRAY);
+	//TM_ILI9341_Fill(ILI9341_COLOR_GRAY);
 	/* Select orientation */
-	TM_ILI9341_Rotate(TM_ILI9341_Orientation_Portrait_2);
+	//TM_ILI9341_Rotate(TM_ILI9341_Orientation_Portrait_2);
 
-	/* Select touch screen orientation */
-	touchData.orientation = TM_STMPE811_Orientation_Portrait_2;
+	///* Select touch screen orientation */
+	//touchData.orientation = TM_STMPE811_Orientation_Portrait_2;
 
-	
-	/* Button 1, default configuration */
-	/* Red with black border and black font 11x18 */
-	button.x = 10;	/* X location */
-	button.y = 50;	/* Y location */
-	button.width = 219;
-	button.height = 50;
-	button.background = ILI9341_COLOR_RED;
-	button.borderColor = ILI9341_COLOR_BLACK;
-	button.label = "LCD";
-	button.color = ILI9341_COLOR_BLACK;
-	button.font = &TM_Font_11x18;
-	/* Add button */
-	button1 = TM_ILI9341_Button_Add(&button);
+	//
+	///* Button 1, default configuration */
+	///* Red with black border and black font 11x18 */
+	//button.x = 10;	/* X location */
+	//button.y = 50;	/* Y location */
+	//button.width = 219;
+	//button.height = 50;
+	//button.background = ILI9341_COLOR_RED;
+	//button.borderColor = ILI9341_COLOR_BLACK;
+	//button.label = "LCD";
+	//button.color = ILI9341_COLOR_BLACK;
+	//button.font = &TM_Font_11x18;
+	///* Add button */
+	//button1 = TM_ILI9341_Button_Add(&button);
 
-	/* Button with custom background and without label */
-	button.x = 10;
-	button.y = 110;
-	button.width = 219;
-	button.height = 50;
-	button.background = ILI9341_COLOR_RED;
-	button.borderColor = ILI9341_COLOR_BLACK;
-	button.label = "UART";
-	/* Use background image and no label */
-	//button.flags = TM_BUTTON_FLAG_NOLABEL | TM_BUTTON_FLAG_IMAGE;
-	button.color = ILI9341_COLOR_BLACK;
-	button.font = &TM_Font_11x18;
-	button.image = buttonBackground; /* Variable stored in  */
-	/* Add button */
-	button2 = TM_ILI9341_Button_Add(&button);
-	/* Draw buttons */
-	TM_ILI9341_Button_DrawAll();
+	///* Button with custom background and without label */
+	//button.x = 10;
+	//button.y = 110;
+	//button.width = 219;
+	//button.height = 50;
+	//button.background = ILI9341_COLOR_RED;
+	//button.borderColor = ILI9341_COLOR_BLACK;
+	//button.label = "UART";
+	///* Use background image and no label */
+	////button.flags = TM_BUTTON_FLAG_NOLABEL | TM_BUTTON_FLAG_IMAGE;
+	//button.color = ILI9341_COLOR_BLACK;
+	//button.font = &TM_Font_11x18;
+	//button.image = buttonBackground; /* Variable stored in  */
+	///* Add button */
+	//button2 = TM_ILI9341_Button_Add(&button);
+	///* Draw buttons */
+	//TM_ILI9341_Button_DrawAll();
 
-	/* Draw some strings */
-	//TM_ILI9341_Puts(45, 245, "prepared         reserved", &TM_Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_GRAY);
+	///* Draw some strings */
+	////TM_ILI9341_Puts(45, 245, "prepared         reserved", &TM_Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_GRAY);
 
-	///////////////////////////////////////////end of lcd and touchpad setting //////////////////////////
-	TM_ILI9341_Puts(10, 20, "ADC Use channel 4/3, PA4/PA3", &TM_Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_GRAY);
-
+	/////////////////////////////////////////////end of lcd and touchpad setting //////////////////////////
+	//TM_ILI9341_Puts(10, 20, "ADC Use channel 4/3, PA4/PA3", &TM_Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_GRAY);
+	//TM_ILI9341_DisplayOff();
 	while (1) {
 		/* USB configured OK, drivers OK */
 		if (TM_USB_VCP_GetStatus() == TM_USB_VCP_CONNECTED) {
@@ -144,47 +146,58 @@ int main(void) {
 		}
 		//button
 		if (TM_DISCO_ButtonPressed()) {
+			
 			/* Turn on leds */
-			sprintf(str, "ADC 4/3:%4d/%4d\n", TM_ADC_Read(ADC1, ADC_Channel_4), TM_ADC_Read(ADC1, ADC_Channel_3));
-			TM_ILI9341_Puts(10, 190, str, &TM_Font_11x18, ILI9341_COLOR_GREEN, ILI9341_COLOR_GRAY);
-			Delayms(100);
+			Delayms(500);
+			//sprintf(str, "ADC 4/3:%4d/%4d\n", TM_ADC_Read(ADC1, ADC_Channel_4), TM_ADC_Read(ADC1, ADC_Channel_3));
+			//TM_USART_Puts(USART1, "Hello world\n");
+			TM_USART_Puts(USART1, "AT\r\n");
+			//TM_ILI9341_Puts(10, 190, str, &TM_Font_11x18, ILI9341_COLOR_GREEN, ILI9341_COLOR_GRAY);
+			//Delayms(100);
+			
 		}
 		/* Get character from internal buffer */
 		c = TM_USART_Getc(USART1);
 		if (c) {
 			/* If anything received, put it back to terminal */
-			TM_USART_Putc(USART1, c);
+			//TM_USART_Putc(USART1, c);
+			printf("%c", c); 
+		}
+		if (TM_USB_VCP_Getc(&s) == TM_USB_VCP_DATA_OK)
+		{
+			//printf("data\r\n");
+			TM_USART_Putc(USART1, s);
 		}
 		//LCD
-		if (TM_STMPE811_ReadTouch(&touchData) == TM_STMPE811_State_Pressed) {
-			buttonPressed = TM_ILI9341_Button_Touch(&touchData);
-			if (buttonPressed == button1) {
+		//if (TM_STMPE811_ReadTouch(&touchData) == TM_STMPE811_State_Pressed) {
+		//	buttonPressed = TM_ILI9341_Button_Touch(&touchData);
+		//	if (buttonPressed == button1) {
 
-				sprintf(str, "ADC 4/3:%4d/%4d\n", TM_ADC_Read(ADC1, ADC_Channel_4), TM_ADC_Read(ADC1, ADC_Channel_3));
+		//		sprintf(str, "ADC 4/3:%4d/%4d\n", TM_ADC_Read(ADC1, ADC_Channel_4), TM_ADC_Read(ADC1, ADC_Channel_3));
 
-				TM_ILI9341_Puts(10, 220, "LCD pressed              \n", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_GRAY);
-				Delayms(100);
-			}
-			else if (buttonPressed == button2) {
+		//		TM_ILI9341_Puts(10, 220, "LCD pressed              \n", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_GRAY);
+		//		Delayms(100);
+		//	}
+		//	else if (buttonPressed == button2) {
 
-				if (TM_USB_VCP_GetStatus() == TM_USB_VCP_CONNECTED) {
-					/*USB OK, drivers OK*/
-					TM_DISCO_LedOn(LED_GREEN);
-					TM_ILI9341_Puts(10, 220, "UART pressed             \n", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_GRAY);
-					printf("ADC channel 0/3: %4d/%4d \n", TM_ADC_Read(ADC1, ADC_Channel_0), TM_ADC_Read(ADC1, ADC_Channel_3));
-				}
-				else {
-					/* USB not OK */
-					TM_DISCO_LedOff(LED_GREEN);
-					TM_ILI9341_Puts(10, 220, "USB NOT CONNECTED         \n", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_GRAY);
-					sprintf(str, "ADC 0/3:%4d/%4d\n", TM_ADC_Read(ADC1, ADC_Channel_0), TM_ADC_Read(ADC1, ADC_Channel_3));
-				}
+		//		if (TM_USB_VCP_GetStatus() == TM_USB_VCP_CONNECTED) {
+		//			/*USB OK, drivers OK*/
+		//			TM_DISCO_LedOn(LED_GREEN);
+		//			TM_ILI9341_Puts(10, 220, "UART pressed             \n", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_GRAY);
+		//			printf("ADC channel 0/3: %4d/%4d \n", TM_ADC_Read(ADC1, ADC_Channel_0), TM_ADC_Read(ADC1, ADC_Channel_3));
+		//		}
+		//		else {
+		//			/* USB not OK */
+		//			TM_DISCO_LedOff(LED_GREEN);
+		//			TM_ILI9341_Puts(10, 220, "USB NOT CONNECTED         \n", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_GRAY);
+		//			sprintf(str, "ADC 0/3:%4d/%4d\n", TM_ADC_Read(ADC1, ADC_Channel_0), TM_ADC_Read(ADC1, ADC_Channel_3));
+		//		}
 
 
-				Delayms(100);
-			}
-			TM_ILI9341_Puts(10, 190, str, &TM_Font_11x18, ILI9341_COLOR_GREEN, ILI9341_COLOR_GRAY);
-		}
+		//		Delayms(100);
+		//	}
+		//	TM_ILI9341_Puts(10, 190, str, &TM_Font_11x18, ILI9341_COLOR_GREEN, ILI9341_COLOR_GRAY);
+		//}
 
 	}
 }

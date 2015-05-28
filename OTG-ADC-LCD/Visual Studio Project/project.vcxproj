@@ -21,6 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{b30849f2-334f-47f7-be9d-72bc1cb09887}</ProjectGuid>
     <Keyword>MakeFileProj</Keyword>
+    <ProjectName>vcp</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='STM32F4-Discovery|Win32'" Label="Configuration">
