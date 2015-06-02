@@ -145,7 +145,10 @@
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_spi.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_stmpe811.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_usart.c" />
-    <ClCompile Include="..\User\main.c" />
+    <ClCompile Include="..\User\main.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Nucleo-F401|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='STM32F4-Discovery|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\User\stm32f4xx_it.c" />
     <ClCompile Include="..\User\system_stm32f4xx.c" />
     <ClCompile Include="..\User\main407.c" />
