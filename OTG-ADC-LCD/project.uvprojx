@@ -817,6 +817,16 @@
               <FileType>1</FileType>
               <FilePath>.\User\main407.c</FilePath>
             </File>
+            <File>
+              <FileName>ads1256.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\ads1256.c</FilePath>
+            </File>
+            <File>
+              <FileName>ads1256.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\ads1256.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1809,6 +1819,16 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>ads1256.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\ads1256.c</FilePath>
+            </File>
+            <File>
+              <FileName>ads1256.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\ads1256.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2758,6 +2778,16 @@
               <FileType>1</FileType>
               <FilePath>.\User\main407.c</FilePath>
             </File>
+            <File>
+              <FileName>ads1256.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\ads1256.c</FilePath>
+            </File>
+            <File>
+              <FileName>ads1256.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\ads1256.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3706,6 +3736,16 @@
               <FileName>main407.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\main407.c</FilePath>
+            </File>
+            <File>
+              <FileName>ads1256.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\ads1256.c</FilePath>
+            </File>
+            <File>
+              <FileName>ads1256.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\ads1256.h</FilePath>
             </File>
           </Files>
         </Group>

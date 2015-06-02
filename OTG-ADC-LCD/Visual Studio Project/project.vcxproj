@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{b30849f2-334f-47f7-be9d-72bc1cb09887}</ProjectGuid>
+    <ProjectGuid>{3bab1c81-e0bb-4102-9fb4-81d454845713}</ProjectGuid>
     <Keyword>MakeFileProj</Keyword>
-    <ProjectName>vcp</ProjectName>
+    <ProjectName>MYPROJ</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='STM32F4-Discovery|Win32'" Label="Configuration">
@@ -105,6 +105,7 @@
     <None Include="..\User\defines.h" />
     <None Include="..\User\stm32f4xx_conf.h" />
     <None Include="..\User\stm32f4xx_it.h" />
+    <None Include="..\User\ads1256.h" />
     <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_bsp.h" />
     <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_conf.h" />
     <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_core.h" />
@@ -124,7 +125,6 @@
     <None Include="Readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_stdio.c" />
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\misc.c" />
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rcc.c" />
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_gpio.c" />
@@ -145,14 +145,11 @@
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_spi.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_stmpe811.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_usart.c" />
-    <ClCompile Include="..\User\main.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='STM32F4-Discovery|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\User\main.c" />
     <ClCompile Include="..\User\stm32f4xx_it.c" />
     <ClCompile Include="..\User\system_stm32f4xx.c" />
-    <ClCompile Include="..\User\main407.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='STM32F429-Discovery|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\User\main407.c" />
+    <ClCompile Include="..\User\ads1256.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_bsp.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_core.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_dcd.c" />
@@ -164,9 +161,6 @@
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_ioreq.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_req.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_usr.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_stdio.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
