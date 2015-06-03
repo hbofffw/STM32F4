@@ -18,6 +18,7 @@
 
 
 #include "ads1256.h"
+#include "tm_stm32f4_usb_vcp.h"
 
 
 //#define SOFT_SPI		/* 定义此行表示使用GPIO模拟SPI接口 */
@@ -29,7 +30,7 @@
 	ADS1256模块    STM32-V5开发板
 	+5V   <------  5.0V      5V供电
 	GND   -------  GND       地
-	DRDY  ------>  PB1       准备就绪
+	DRDY  ------>  PE9       准备就绪
 	CS    <------  PC4       SPI_CS
 	DIN   <------  PA7       SPI_MOSI
 	DOUT  ------>  PA6       SPI_MISO
@@ -96,13 +97,13 @@
 #define PORT_RESET	GPIOC
 #define PIN_RESET	GPIO_Pin_5
 
-#define RCC_PWDN 	RCC_AHB1Periph_GPIOB
-#define PORT_PWDN	GPIOB
-#define PIN_PWDN	GPIO_Pin_0
+//#define RCC_PWDN 	RCC_AHB1Periph_GPIOB
+//#define PORT_PWDN	GPIOB
+//#define PIN_PWDN	GPIO_Pin_0
 
-#define RCC_DRDY 	RCC_AHB1Periph_GPIOB
-#define PORT_DRDY	GPIOB
-#define PIN_DRDY	GPIO_Pin_1
+#define RCC_DRDY 	RCC_AHB1Periph_GPIOE
+#define PORT_DRDY	GPIOE
+#define PIN_DRDY	GPIO_Pin_9
 
 #define RCC_DOUT 	RCC_AHB1Periph_GPIOA
 #define PORT_DOUT	GPIOA
@@ -110,8 +111,8 @@
 
 
 /* 定义口线置0和置1的宏 */
-#define PWDN_0()	GPIO_ResetBits(PORT_PWDN, PIN_PWDN)
-#define PWDN_1()	GPIO_SetBits(PORT_PWDN, PIN_PWDN)
+//#define PWDN_0()	GPIO_ResetBits(PORT_PWDN, PIN_PWDN)
+//#define PWDN_1()	GPIO_SetBits(PORT_PWDN, PIN_PWDN)
 
 #define RESET_0()	GPIO_ResetBits(PORT_RESET, PIN_RESET)
 #define RESET_1()	GPIO_SetBits(PORT_RESET, PIN_RESET)
@@ -220,13 +221,13 @@ void bsp_InitADS1256(void)
 
 
 	RESET_1();
-	PWDN_1();
+	//PWDN_1();
 	CS_1();
 	SCK_0();		/* SPI总线空闲时，钟线是低电平 */
 	DI_1();
 
 	/* 打开GPIO时钟 */
-	RCC_AHB1PeriphClockCmd(RCC_SCK | RCC_DIN | RCC_DOUT | RCC_CS | RCC_DRDY | RCC_RESET | RCC_PWDN, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_SCK | RCC_DIN | RCC_DOUT | RCC_CS | RCC_DRDY | RCC_RESET, ENABLE);
 
 	/* 配置几个推完输出IO */
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;		/* 设为输出口 */
@@ -246,8 +247,8 @@ void bsp_InitADS1256(void)
 	GPIO_InitStructure.GPIO_Pin = PIN_RESET;
 	GPIO_Init(PORT_RESET, &GPIO_InitStructure);
 
-	GPIO_InitStructure.GPIO_Pin = PIN_PWDN;
-	GPIO_Init(PORT_PWDN, &GPIO_InitStructure);
+	//GPIO_InitStructure.GPIO_Pin = PIN_PWDN;
+	//GPIO_Init(PORT_PWDN, &GPIO_InitStructure);
 
 	/* 配置GPIO为浮动输入模式(实际上CPU复位后就是输入状态) */
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;		/* 设为输入口 */
@@ -377,13 +378,14 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 */
 static void ADS1256_DelaySCLK(void)
 {
-	uint16_t i;
+	//uint16_t i;
 
 	/*
 		取 5 时，实测高电平200ns, 低电平250ns <-- 不稳定
 		取 10 以上，可以正常工作， 低电平400ns 高定400ns <--- 稳定
 		*/
-	for (i = 0; i < 10; i++);
+	//for (i = 0; i < 10; i++);
+	Delay(50);
 }
 
 /*
@@ -683,12 +685,19 @@ static void ADS1256_WaitDRDY(void)
 	{
 		if (DRDY_IS_LOW())
 		{
+			TM_DISCO_LedOn(LED_RED);
 			break;
 		}
 	}
 	if (i >= 40000000)
 	{
-		printf("ADS1256_WaitDRDY() Time Out ...\r\n");		/* 调试语句. 用语排错 */
+		//printf("ADS1256_WaitDRDY() Time Out ...\r\n");		/* 调试语句. 用语排错 */
+		//TM_USB_VCP_Puts("ADS1256_WaitDRDY() Time Out ...\r\n");
+		TM_DISCO_LedOn(LED_ORANGE);
+	}
+	else
+	{
+		TM_DISCO_LedOff(LED_ORANGE);
 	}
 }
 
@@ -805,8 +814,8 @@ void ADS1256_StartScan(void)
 	/* 使能SYSCFG时钟 */
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
-	/* 连接 EXTI Line9 到 PH9 引脚 */
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOH, EXTI_PinSource9);
+	/* 连接 EXTI Line9 到 PE9 引脚 */
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource9);
 
 	/* 配置 EXTI LineXXX */
 	EXTI_InitStructure.EXTI_Line = EXTI_Line9;

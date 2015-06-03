@@ -12,18 +12,18 @@
 #ifndef _ADS1256_H
 #define _ADS1256_H
 
-#include "stm32f4xx_rcc.h"
-#include "stm32f4xx_exti.h"
-#include "misc.h"
-#include "tm_stm32f4_disco.h"
 #include "defines.h"
 #include "stm32f4xx.h"
-#include "tm_stm32f4_delay.h"
+#include "misc.h"
 #include "tm_stm32f4_disco.h"
+#include "tm_stm32f4_delay.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_spi.h"
 #include "tm_stm32f4_spi.h"
 #include "tm_stm32f4_gpio.h"
+#include "stm32f4xx_rcc.h"
+#include "stm32f4xx_exti.h"
+#include "stm32f4xx_syscfg.h"
 
 /* 增益选项 */
 typedef enum
