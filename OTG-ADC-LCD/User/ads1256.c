@@ -16,7 +16,9 @@
 *********************************************************************************************************
 */
 
+
 #include "ads1256.h"
+
 
 //#define SOFT_SPI		/* 定义此行表示使用GPIO模拟SPI接口 */
 //#define HARD_SPI		/* 定义此行表示使用CPU的硬件SPI接口 */
@@ -125,7 +127,8 @@
 
 #define DO_IS_HIGH()	(GPIO_ReadInputDataBit(PORT_DOUT, PIN_DOUT) == Bit_SET)
 
-#define DRDY_IS_LOW()	(GPIO_ReadInputDataBit(PORT_DRDY, PIN_DRDY) =#endif
+#define DRDY_IS_LOW()	(GPIO_ReadInputDataBit(PORT_DRDY, PIN_DRDY) == Bit_RESET)
+
 //
 //#ifdef HARD_SPI		/* 硬件SPI */
 //	;
@@ -215,7 +218,7 @@ void bsp_InitADS1256(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 
-#ifdef SOFT_SPI
+
 	RESET_1();
 	PWDN_1();
 	CS_1();
@@ -257,7 +260,7 @@ void bsp_InitADS1256(void)
 
 	GPIO_InitStructure.GPIO_Pin = PIN_DRDY;
 	GPIO_Init(PORT_DRDY, &GPIO_InitStructure);
-#endif
+
 
 	//ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_1000SPS);	/* 配置ADC参数： 增益1:1, 数据输出速率 1KHz */
 }
@@ -360,7 +363,8 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 		CS_1();	/* SPI片选 = 1 */
 	}
 
-	bsp_DelayUS(50);
+	//bsp_DelayUS(50);
+	Delay(50);
 }
 
 /*
@@ -396,7 +400,8 @@ static void ADS1256_DelayDATA(void)
 		Delay from last SCLK edge for DIN to first SCLK rising edge for DOUT: RDATA, RDATAC,RREG Commands
 		最小 50 个tCLK = 50 * 0.13uS = 6.5uS
 		*/
-	bsp_DelayUS(10);	/* 最小延迟 6.5uS, 此处取10us */
+	//bsp_DelayUS(10);	/* 最小延迟 6.5uS, 此处取10us */
+	Delay(10);
 }
 
 /*
@@ -411,15 +416,16 @@ static void ADS1256_ResetHard(void)
 {
 	/* ADS1256数据手册第7页 */
 	RESET_0();			/* 复位 */
-	bsp_DelayUS(5);
+	//bsp_DelayUS(5);
+	Delay(5);
 	RESET_1();
 
 	//PWDN_0();			/* 进入掉电 同步*/
 	//bsp_DelayUS(2);	
 	//PWDN_1();			/* 退出掉电 */
 
-	bsp_DelayUS(5);
-
+	//bsp_DelayUS(5);
+	Delay(5);
 	//ADS1256_WaitDRDY();	/* 等待 DRDY变为0, 此过程实测: 630us */
 }
 
@@ -739,13 +745,13 @@ int32_t ADS1256_ReadAdc(uint8_t _ch)
 	while (!DRDY_IS_LOW());	/* 等待 DRDY 低 */
 
 	ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
-	bsp_DelayUS(5);
+	Delay(5);
 
 	ADS1256_WriteCmd(CMD_SYNC);
-	bsp_DelayUS(5);
+	Delay(5);
 
 	ADS1256_WriteCmd(CMD_WAKEUP);  /* 正常情况下，这个时候 DRDY 已经为高 */
-	bsp_DelayUS(25);
+	Delay(25);
 
 	read = (int32_t)ADS1256_ReadData();
 
@@ -762,13 +768,13 @@ int32_t ADS1256_ReadAdc(uint8_t _ch)
 	ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
 
 	ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
-	bsp_DelayUS(5);
+	Delay(5);
 
 	ADS1256_WriteCmd(CMD_SYNC);
-	bsp_DelayUS(5);
+	Delay(5);
 
 	ADS1256_WriteCmd(CMD_WAKEUP);
-	bsp_DelayUS(25);
+	Delay(25);
 
 	//ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
 
@@ -790,6 +796,7 @@ int32_t ADS1256_ReadAdc(uint8_t _ch)
 *	返 回 值: 无
 *********************************************************************************************************
 */
+//need to be edited
 void ADS1256_StartScan(void)
 {
 	EXTI_InitTypeDef   EXTI_InitStructure;
@@ -869,6 +876,7 @@ void ADS1256_StopScan(void)
 *	返 回 值: ADC采集结果（有符号数）
 *********************************************************************************************************
 */
+//need to be edited
 int32_t ADS1256_GetAdc(uint8_t _ch)
 {
 	int32_t iTemp;
@@ -878,11 +886,13 @@ int32_t ADS1256_GetAdc(uint8_t _ch)
 		return 0;
 	}
 
-	DISABLE_INT();  			/* 关中断 */
+	//DISABLE_INT();  			/* 关中断 */
+	__disable_irq();
 
 	iTemp = g_tADS1256.AdcNow[_ch];
 
-	ENABLE_INT();  				/* 开中断 */
+	//ENABLE_INT();  				/* 开中断 */
+	__enable_irq();
 
 	return iTemp;
 }
@@ -899,13 +909,16 @@ void ADS1256_ISR(void)
 {
 	/* 读取采集结构，保存在全局变量 */
 	ADS1256_SetChannal(g_tADS1256.Channel);	/* 切换模拟通道 */
-	bsp_DelayUS(5);
+	//bsp_DelayUS(5);
+	Delay(5);
 
 	ADS1256_WriteCmd(CMD_SYNC);
-	bsp_DelayUS(5);
+	//bsp_DelayUS(5);
+	Delay(5);
 
 	ADS1256_WriteCmd(CMD_WAKEUP);
-	bsp_DelayUS(25);
+	//bsp_DelayUS(25);
+	Delay(25);
 
 	if (g_tADS1256.Channel == 0)
 	{
@@ -931,6 +944,8 @@ void ADS1256_ISR(void)
 *	返 回 值: 无
 *********************************************************************************************************
 */
+
+//need to be edited
 #ifndef EXTI9_5_ISR_MOVE_OUT		/* bsp.h 中定义此行，表示本函数移到 stam32f4xx_it.c。 避免重复定义 */
 void EXTI9_5_IRQHandler(void)
 {
