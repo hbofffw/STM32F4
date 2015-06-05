@@ -1,8 +1,6 @@
 
 #include <stdio.h>
-#include "stm32f4xx_gpio.h"
 #include "ADS1256.h"
-#include "tm_stm32f4_spi.h"
 
 
 void SPI2_Init(void)
@@ -13,7 +11,7 @@ void SPI2_Init(void)
 
 	/* Enable SPI2 and GPIOB clocks */
 	//RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_SCK | RCC_DIN | RCC_DOUT | RCC_CS, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
 
 
 
@@ -69,7 +67,7 @@ void Init_ADS1256_GPIO(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 
-	RCC_APB2PeriphClockCmd(RCC_ADS1256Reset | RCC_ADS1256DRDY, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_ADS1256Reset | RCC_ADS1256DRDY, ENABLE);
 
 	GPIO_InitStructure.GPIO_Pin = GPIO_RCC_ADS1256Reset;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
@@ -151,9 +149,9 @@ void ADS1256_Init(void)
 //读取AD值
 unsigned int ADS1256ReadData()
 {
-	unsigned char i = 0;
+	//unsigned char i = 0;
 	unsigned int sum = 0;
-	unsigned int r = 0;
+	//unsigned int r = 0;
 	GPIO_ResetBits(GPIOC, GPIO_Pin_5);;
 
 	while (GPIO_ReadInputDataBit(GPIO_ADS1256DRDY_PORT, GPIO_ADS1256DRDY));               //当ADS1256_DRDY为低时才能写寄存器 

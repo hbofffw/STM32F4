@@ -55,7 +55,7 @@ int main(void) {
 	uint8_t c;
 	uint8_t s;
 	long ulResult;
-	long double ldVolutage;
+	double ldVolutage;
 	uint8_t i;
 	SystemInit();
 
@@ -123,7 +123,7 @@ int main(void) {
 					ldVolutage = (long double)ulResult*0.59604644775390625;
 
 					printf("µÚ%dÍ¨µÀ:", (i & 0x07) ? (i & 0x07) - 1 : 7);
-					printf("%lf", ldVolutage); 	//double
+					printf("%f", ldVolutage); 	//double
 					printf("uV\r\n");
 
 					//printf("%x",(unsigned long)ulResult);//16

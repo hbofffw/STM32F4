@@ -1,6 +1,11 @@
 #ifndef __ADS1256_H_
 #define	__ADS1256_H_
 
+#include "stm32f4xx_gpio.h"
+#include "stm32f4xx.h"
+#include "stm32f4xx_rcc.h"
+#include "stm32f4xx_spi.h"
+#include "tm_stm32f4_spi.h"
 //***************************
 //		Pin assign	   	
 //		GPIOC4	---	RESET
@@ -12,15 +17,15 @@
 //***************************					
 
 /*端口定义*/
-#define RCC_ADS1256Reset                          	RCC_APB2Periph_GPIOC
+#define RCC_ADS1256Reset                          	RCC_AHB1Periph_GPIOB
 #define GPIO_RCC_ADS1256Reset_PORT                  GPIOC    
 #define GPIO_RCC_ADS1256Reset                       GPIO_Pin_4
 
-#define RCC_ADS1256DRDY                             RCC_APB2Periph_GPIOC
+#define RCC_ADS1256DRDY                             RCC_AHB1Periph_GPIOB
 #define GPIO_ADS1256DRDY_PORT                       GPIOC  
 #define GPIO_ADS1256DRDY                            GPIO_Pin_9
 
-#define RCC_SCK		RCC_APB2Periph_GPIOB
+#define RCC_SCK		RCC_AHB1Periph_GPIOB
 #define PORT_SCK    GPIOB    
 #define PIN_SCK     GPIO_PIN_10
 
@@ -117,7 +122,7 @@
 #define ADS1256_DRATE_5SPS      0x13 
 #define ADS1256_DRATE_2_5SPS    0x03
 
-unsigned int ADS1256ReadData();
+unsigned int ADS1256ReadData(void);
 void ADS1256_Init(void);   //初始化ADS1256
 void Init_ADS1256_GPIO(void);
 void Delay(unsigned int dal);
