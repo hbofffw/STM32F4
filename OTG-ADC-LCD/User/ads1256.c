@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "stm32f4xx_gpio.h"
 #include "ADS1256.h"
+#include "tm_stm32f4_spi.h"
 
 
 void SPI2_Init(void)
@@ -12,16 +13,17 @@ void SPI2_Init(void)
 
 	/* Enable SPI2 and GPIOB clocks */
 	//RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC, ENABLE);
-	RCC_APB1PeriphClockCmd(RCC_SCK | RCC_DIN | RCC_DOUT | RCC_CS, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_SCK | RCC_DIN | RCC_DOUT | RCC_CS, ENABLE);
 
 
 
 	/* Configure SPI2 pins: NSS, SCK, MISO and MOSI */
 	
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
 	GPIO_InitStructure.GPIO_Pin = PIN_SCK;
 	GPIO_Init(PORT_SCK, &GPIO_InitStructure);
@@ -33,16 +35,19 @@ void SPI2_Init(void)
 	GPIO_InitStructure.GPIO_Pin = PIN_CS;
 	GPIO_Init(PORT_CS, &GPIO_InitStructure);
 
-	GPIO_SetBits(PORT_CS, PIN_CS);
-
-	//DOUT
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
 	GPIO_InitStructure.GPIO_Pin = PIN_DOUT;
 	GPIO_Init(PORT_DOUT, &GPIO_InitStructure);
+
+	GPIO_SetBits(PORT_CS, PIN_CS);
+
+	////DOUT
+	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+	//GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	//GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	//GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+
+	/*GPIO_InitStructure.GPIO_Pin = PIN_DOUT;
+	GPIO_Init(PORT_DOUT, &GPIO_InitStructure);*/
 
 	/* SPI2 configuration */
 	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex; //SPI1设置为两线全双工
@@ -86,6 +91,8 @@ void Init_ADS1256_GPIO(void)
 	GPIO_Init(GPIO_ADS1256DRDY_PORT, &GPIO_InitStructure);
 
 	SPI2_Init();
+	//use MaJerle's SPI initialization
+	//TM_SPI_Init(SPI2, TM_SPI_PinsPack_1);
 }
 
 
