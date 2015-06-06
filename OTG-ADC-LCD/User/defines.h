@@ -36,5 +36,8 @@
 //#define USE_USB_OTG_HS
 //
 
+#define TM_SPI1_PRESCALER	SPI_BaudRatePrescaler_256
+#define TM_SPI1_MODE		TM_SPI_Mode_1
+
 #endif
 
