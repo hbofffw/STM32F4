@@ -2,34 +2,34 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="源文件">
-      <UniqueIdentifier>{9d83acb7-1579-4e5f-be19-0f5b4ae8c3cc}</UniqueIdentifier>
+      <UniqueIdentifier>{38ae1a79-5816-41e3-a47a-6e489529dd66}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="头文件">
-      <UniqueIdentifier>{1e55289a-19d4-4a22-a325-66f041935b04}</UniqueIdentifier>
+      <UniqueIdentifier>{d496f0f0-259c-4d1c-b7b2-edaf58dbdc4f}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
     <Filter Include="项目说明">
-      <UniqueIdentifier>{dbf02dd9-88df-4c8f-b523-318b74129acf}</UniqueIdentifier>
+      <UniqueIdentifier>{92f2b435-50b6-4d42-965c-9651a870a740}</UniqueIdentifier>
       <Extensions>txt</Extensions>
     </Filter>
     <Filter Include="源文件\CMSIS">
-      <UniqueIdentifier>{1eacc804-df59-4811-86e4-7f371c6323b9}</UniqueIdentifier>
+      <UniqueIdentifier>{6be888c5-6103-498f-9994-1281e6973773}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\Startup">
-      <UniqueIdentifier>{8d36b63e-5b15-4515-83eb-4633a066eb0c}</UniqueIdentifier>
+      <UniqueIdentifier>{dfa6d527-a80c-4692-9c59-faf361745d2e}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\STD_Periph_Drivers">
-      <UniqueIdentifier>{87e7bae8-db1e-4817-923b-0b91b947e7de}</UniqueIdentifier>
+      <UniqueIdentifier>{7744dfb6-b8b8-4d85-8a68-666c8f35af3d}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\TM">
-      <UniqueIdentifier>{4bdfd440-7159-4881-928f-e2676d2bd53b}</UniqueIdentifier>
+      <UniqueIdentifier>{4155ec7a-8f94-412c-9305-cf9c1b6f0cc1}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\User">
-      <UniqueIdentifier>{cd58b9e4-100e-4a4e-bf03-37cffef69d70}</UniqueIdentifier>
+      <UniqueIdentifier>{b64599ba-fd4b-4777-92f7-7c62a1f7777f}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\USB CDC Device">
-      <UniqueIdentifier>{12b1aeaf-ca48-455b-bff9-d399dbc7fe3b}</UniqueIdentifier>
+      <UniqueIdentifier>{ca488f3d-ed6c-4a6b-b2f8-8a0a9aab5346}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +55,9 @@
       <Filter>源文件\STD_Periph_Drivers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c">
+      <Filter>源文件\STD_Periph_Drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_syscfg.c">
       <Filter>源文件\STD_Periph_Drivers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_disco.c">
@@ -108,6 +111,9 @@
     <ClCompile Include="..\User\ads1256.c">
       <Filter>源文件\User</Filter>
     </ClCompile>
+    <ClCompile Include="..\User\main401.c">
+      <Filter>源文件\User</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_bsp.c">
       <Filter>源文件\USB CDC Device</Filter>
     </ClCompile>
@@ -140,9 +146,6 @@
     </ClCompile>
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_usr.c">
       <Filter>源文件\USB CDC Device</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_syscfg.c">
-      <Filter>源文件\STD_Periph_Drivers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -267,7 +270,7 @@
       <Filter>源文件\USB CDC Device</Filter>
     </None>
     <None Include="Readme.txt">
-      <Filter>项目说明</Filter>
+      <Filter>项目说明\</Filter>
     </None>
   </ItemGroup>
 </Project>

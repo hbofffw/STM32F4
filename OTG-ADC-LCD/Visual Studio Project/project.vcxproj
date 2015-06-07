@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3bab1c81-e0bb-4102-9fb4-81d454845713}</ProjectGuid>
+    <ProjectGuid>{e0dddc08-5ec2-412b-875d-3f20fa70fd2d}</ProjectGuid>
     <Keyword>MakeFileProj</Keyword>
-    <ProjectName>MYPROJ</ProjectName>
+    <ProjectName>myproj</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='STM32F4-Discovery|Win32'" Label="Configuration">
@@ -132,8 +132,8 @@
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_adc.c" />
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_i2c.c" />
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_spi.c" />
-    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_syscfg.c" />
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c" />
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_syscfg.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_disco.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_usb_vcp.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_gpio.c" />
@@ -146,14 +146,12 @@
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_spi.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_stmpe811.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_usart.c" />
-    <ClCompile Include="..\User\main.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Nucleo-F401|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='STM32F4-Discovery|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\User\main.c" />
     <ClCompile Include="..\User\stm32f4xx_it.c" />
     <ClCompile Include="..\User\system_stm32f4xx.c" />
     <ClCompile Include="..\User\main407.c" />
     <ClCompile Include="..\User\ads1256.c" />
+    <ClCompile Include="..\User\main401.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_bsp.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_core.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_dcd.c" />

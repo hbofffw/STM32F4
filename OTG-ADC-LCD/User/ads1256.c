@@ -18,7 +18,7 @@
 
 
 #include "ads1256.h"
-#include "tm_stm32f4_usb_vcp.h"
+//#include "tm_stm32f4_usb_vcp.h"
 #include "tm_stm32f4_spi.h"
 
 
@@ -28,7 +28,7 @@
 /*
 ADS1256模块可以直接插到STM32-V5开发板CN26排母(2*6P 2.54mm)接口上.
 
-ADS1256模块    STM32-V5开发板
+//FOR F4DISCOVERY
 +5V   <------  5.0V      5V供电
 GND   -------  GND       地
 DRDY  ------>  PE9       准备就绪
@@ -41,6 +41,19 @@ GND   -------  GND       地
 RST   <------  PC5       复位信号
 NC   空脚
 NC   空脚
+
+
+//FOR F401
++5V <------  5.0V      5V供电
+GND	------ - GND       地
+DRDY------>  PC9       准备就绪
+CS    <------PB0       SPI_CS
+DIN   <------PB1       SPI_MOSI
+DOUT------>  PB2       SPI_MISO
+SCLK  <------PC0       SPI时钟
+GND  ------- GND       地
+//-PDWN  <------  PB0       掉电控制
+RST   <------PC1       复位信号
 */
 
 /*
@@ -82,6 +95,38 @@ RDATAC, RESET, SYNC 命令之后，需要延迟 24 * tCLK = 3.12uS;
 //
 //#ifdef SOFT_SPI		/* 软件SPI */
 /* 定义GPIO端口 */
+#if defined (TM_DISCO_NUCLEO_F401)
+#define RCC_SCK 	RCC_AHB1Periph_GPIOC
+#define PORT_SCK	GPIOC
+#define PIN_SCK		GPIO_Pin_0
+
+#define RCC_DIN 	RCC_AHB1Periph_GPIOB	
+#define PORT_DIN	GPIOB
+#define PIN_DIN		GPIO_Pin_1	
+
+#define RCC_CS 		RCC_AHB1Periph_GPIOB
+#define PORT_CS		GPIOB	
+#define PIN_CS		GPIO_Pin_10
+
+#define RCC_RESET 	RCC_AHB1Periph_GPIOC
+#define PORT_RESET	GPIOC
+#define PIN_RESET	GPIO_Pin_1
+
+//#define RCC_PWDN 	RCC_AHB1Periph_GPIOB
+//#define PORT_PWDN	GPIOB
+//#define PIN_PWDN	GPIO_Pin_0
+
+#define RCC_DRDY 	RCC_AHB1Periph_GPIOC
+#define PORT_DRDY	GPIOC
+#define PIN_DRDY	GPIO_Pin_9
+
+#define RCC_DOUT 	RCC_AHB1Periph_GPIOB	
+#define PORT_DOUT	GPIOB	
+#define PIN_DOUT	GPIO_Pin_2
+
+#endif
+
+#if defined (TM_DISCO_STM32F4_DISCOVERY)
 #define RCC_SCK 	RCC_AHB1Periph_GPIOA
 #define PORT_SCK	GPIOA
 #define PIN_SCK		GPIO_Pin_5
@@ -99,7 +144,7 @@ RDATAC, RESET, SYNC 命令之后，需要延迟 24 * tCLK = 3.12uS;
 #define PIN_RESET	GPIO_Pin_5
 
 //#define RCC_PWDN 	RCC_AHB1Periph_GPIOB
-//#define PORT_PWDN	GPIOB
+//#define PORT_PWDN	GPIOB 
 //#define PIN_PWDN	GPIO_Pin_0
 
 #define RCC_DRDY 	RCC_AHB1Periph_GPIOE
@@ -109,8 +154,7 @@ RDATAC, RESET, SYNC 命令之后，需要延迟 24 * tCLK = 3.12uS;
 #define RCC_DOUT 	RCC_AHB1Periph_GPIOA
 #define PORT_DOUT	GPIOA
 #define PIN_DOUT	GPIO_Pin_6
-
-
+#endif
 /* 定义口线置0和置1的宏 */
 //#define PWDN_0()	GPIO_ResetBits(PORT_PWDN, PIN_PWDN)
 //#define PWDN_1()	GPIO_SetBits(PORT_PWDN, PIN_PWDN)
@@ -687,7 +731,9 @@ static void ADS1256_WaitDRDY(void)
 	{
 		if (DRDY_IS_LOW())
 		{
+#if defined (TM_DISCO_STM32F4_DISCOVERY)
 			TM_DISCO_LedOn(LED_RED);
+#endif
 			break;
 		}
 	}
@@ -695,11 +741,15 @@ static void ADS1256_WaitDRDY(void)
 	{
 		//printf("ADS1256_WaitDRDY() Time Out ...\r\n");		/* 调试语句. 用语排错 */
 		//TM_USB_VCP_Puts("ADS1256_WaitDRDY() Time Out ...\r\n");
+#if defined (TM_DISCO_STM32F4_DISCOVERY)
 		TM_DISCO_LedOn(LED_BLUE);
+#endif
 	}
 	else
 	{
+#if defined (TM_DISCO_STM32F4_DISCOVERY)
 		TM_DISCO_LedOff(LED_BLUE);
+#endif
 	}
 }
 
