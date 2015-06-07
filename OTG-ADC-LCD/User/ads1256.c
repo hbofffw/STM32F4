@@ -48,12 +48,12 @@ NC   空脚
 GND	------ - GND       地
 DRDY------>  PC9       准备就绪
 CS    <------PB0       SPI_CS
-DIN   <------PB1       SPI_MOSI
-DOUT------>  PB2       SPI_MISO
-SCLK  <------PC0       SPI时钟
+DIN   <------PC2       SPI_MOSI
+DOUT------>  PC3       SPI_MISO
+SCLK  <------PB10      SPI时钟
 GND  ------- GND       地
 //-PDWN  <------  PB0       掉电控制
-RST   <------PC1       复位信号
+RST   <------PC4       复位信号
 */
 
 /*
@@ -96,21 +96,21 @@ RDATAC, RESET, SYNC 命令之后，需要延迟 24 * tCLK = 3.12uS;
 //#ifdef SOFT_SPI		/* 软件SPI */
 /* 定义GPIO端口 */
 #if defined (TM_DISCO_NUCLEO_F401)
-#define RCC_SCK 	RCC_AHB1Periph_GPIOC
-#define PORT_SCK	GPIOC
-#define PIN_SCK		GPIO_Pin_0
+#define RCC_SCK 	RCC_AHB1Periph_GPIOB
+#define PORT_SCK	GPIOB	
+#define PIN_SCK		GPIO_Pin_10
 
-#define RCC_DIN 	RCC_AHB1Periph_GPIOB	
-#define PORT_DIN	GPIOB
-#define PIN_DIN		GPIO_Pin_1	
+#define RCC_DIN 	RCC_AHB1Periph_GPIOC		
+#define PORT_DIN	GPIOC	
+#define PIN_DIN		GPIO_Pin_2	
 
 #define RCC_CS 		RCC_AHB1Periph_GPIOB
 #define PORT_CS		GPIOB	
-#define PIN_CS		GPIO_Pin_10
+#define PIN_CS		GPIO_Pin_0
 
 #define RCC_RESET 	RCC_AHB1Periph_GPIOC
 #define PORT_RESET	GPIOC
-#define PIN_RESET	GPIO_Pin_1
+#define PIN_RESET	GPIO_Pin_4
 
 //#define RCC_PWDN 	RCC_AHB1Periph_GPIOB
 //#define PORT_PWDN	GPIOB
@@ -120,9 +120,9 @@ RDATAC, RESET, SYNC 命令之后，需要延迟 24 * tCLK = 3.12uS;
 #define PORT_DRDY	GPIOC
 #define PIN_DRDY	GPIO_Pin_9
 
-#define RCC_DOUT 	RCC_AHB1Periph_GPIOB	
-#define PORT_DOUT	GPIOB	
-#define PIN_DOUT	GPIO_Pin_2
+#define RCC_DOUT 	RCC_AHB1Periph_GPIOC		
+#define PORT_DOUT	GPIOC	
+#define PIN_DOUT	GPIO_Pin_3
 
 #endif
 
@@ -867,8 +867,12 @@ void ADS1256_StartScan(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
 	/* 连接 EXTI Line9 到 PE9 引脚 */
+#if defined (TM_DISCO_STM32F4_DISCOVERY)
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource9);
-
+#elif defined (TM_DISCO_NUCLEO_F401)
+	/* 连接 EXTI Line9 到 PC9 引脚 */
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource9);
+#endif
 	/* 配置 EXTI LineXXX */
 	EXTI_InitStructure.EXTI_Line = EXTI_Line9;
 	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
