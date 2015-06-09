@@ -147,9 +147,6 @@
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_usr.c">
       <Filter>源文件\USB CDC Device</Filter>
     </ClCompile>
-    <ClCompile Include="..\User\esp8266.c">
-      <Filter>源文件\User</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h">
@@ -275,10 +272,5 @@
     <None Include="Readme.txt">
       <Filter>项目说明</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\User\esp8266.h">
-      <Filter>源文件\User</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
