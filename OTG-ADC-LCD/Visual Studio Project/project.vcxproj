@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{e0dddc08-5ec2-412b-875d-3f20fa70fd2d}</ProjectGuid>
+    <ProjectGuid>{a9a22441-6f61-464d-8c63-196eedc46100}</ProjectGuid>
     <Keyword>MakeFileProj</Keyword>
     <ProjectName>myproj</ProjectName>
   </PropertyGroup>
@@ -106,6 +106,7 @@
     <None Include="..\User\stm32f4xx_conf.h" />
     <None Include="..\User\stm32f4xx_it.h" />
     <None Include="..\User\ads1256.h" />
+    <None Include="..\User\esp8266.h" />
     <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_bsp.h" />
     <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_conf.h" />
     <None Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_core.h" />
@@ -146,13 +147,13 @@
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_spi.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_stmpe811.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_usart.c" />
-    <ClCompile Include="..\User\esp8266.c" />
     <ClCompile Include="..\User\main.c" />
     <ClCompile Include="..\User\stm32f4xx_it.c" />
     <ClCompile Include="..\User\system_stm32f4xx.c" />
     <ClCompile Include="..\User\main407.c" />
     <ClCompile Include="..\User\ads1256.c" />
     <ClCompile Include="..\User\main401.c" />
+    <ClCompile Include="..\User\esp8266.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_bsp.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_core.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usb_dcd.c" />
@@ -164,9 +165,6 @@
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_ioreq.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_req.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_usr.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\User\esp8266.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "myproj", "project.vcxproj", "{E0DDDC08-5EC2-412B-875D-3F20FA70FD2D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "myproj", "project.vcxproj", "{A9A22441-6F61-464D-8C63-196EEDC46100}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,14 +12,14 @@ Global
 		STM32F4-Discovery|Win32 = STM32F4-Discovery|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E0DDDC08-5EC2-412B-875D-3F20FA70FD2D}.Nucleo-F401|Win32.ActiveCfg = Nucleo-F401|Win32
-		{E0DDDC08-5EC2-412B-875D-3F20FA70FD2D}.Nucleo-F401|Win32.Build.0 = Nucleo-F401|Win32
-		{E0DDDC08-5EC2-412B-875D-3F20FA70FD2D}.Nucleo-F411|Win32.ActiveCfg = Nucleo-F411|Win32
-		{E0DDDC08-5EC2-412B-875D-3F20FA70FD2D}.Nucleo-F411|Win32.Build.0 = Nucleo-F411|Win32
-		{E0DDDC08-5EC2-412B-875D-3F20FA70FD2D}.STM32F429-Discovery|Win32.ActiveCfg = STM32F429-Discovery|Win32
-		{E0DDDC08-5EC2-412B-875D-3F20FA70FD2D}.STM32F429-Discovery|Win32.Build.0 = STM32F429-Discovery|Win32
-		{E0DDDC08-5EC2-412B-875D-3F20FA70FD2D}.STM32F4-Discovery|Win32.ActiveCfg = STM32F4-Discovery|Win32
-		{E0DDDC08-5EC2-412B-875D-3F20FA70FD2D}.STM32F4-Discovery|Win32.Build.0 = STM32F4-Discovery|Win32
+		{A9A22441-6F61-464D-8C63-196EEDC46100}.Nucleo-F401|Win32.ActiveCfg = Nucleo-F401|Win32
+		{A9A22441-6F61-464D-8C63-196EEDC46100}.Nucleo-F401|Win32.Build.0 = Nucleo-F401|Win32
+		{A9A22441-6F61-464D-8C63-196EEDC46100}.Nucleo-F411|Win32.ActiveCfg = Nucleo-F411|Win32
+		{A9A22441-6F61-464D-8C63-196EEDC46100}.Nucleo-F411|Win32.Build.0 = Nucleo-F411|Win32
+		{A9A22441-6F61-464D-8C63-196EEDC46100}.STM32F429-Discovery|Win32.ActiveCfg = STM32F429-Discovery|Win32
+		{A9A22441-6F61-464D-8C63-196EEDC46100}.STM32F429-Discovery|Win32.Build.0 = STM32F429-Discovery|Win32
+		{A9A22441-6F61-464D-8C63-196EEDC46100}.STM32F4-Discovery|Win32.ActiveCfg = STM32F4-Discovery|Win32
+		{A9A22441-6F61-464D-8C63-196EEDC46100}.STM32F4-Discovery|Win32.Build.0 = STM32F4-Discovery|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
