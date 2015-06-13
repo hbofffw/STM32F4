@@ -56,7 +56,7 @@ int fputc(int ch, FILE *f) {
 
 int main(void) {
 	uint8_t c;
-	//uint8_t s;
+	uint8_t s;
 	int32_t adc[8];
 	int32_t volt[8];
 	uint8_t i;
@@ -67,6 +67,7 @@ int main(void) {
 	//TM_DISCO_ButtonInit();
 	/*Delay init*/
 	TM_DELAY_Init();
+	TM_USART_Init(USART1, TM_USART_PinsPack_1, 115200);
 	TM_USART_Init(USART2, TM_USART_PinsPack_1, 115200);
 	//TM_SPI_Init(SPI1, TM_SPI_PinsPack_Custom);
 
@@ -96,8 +97,12 @@ int main(void) {
 			//printf("ADC channel 4/3: %4d/%4d \n", TM_ADC_Read(ADC1, ADC_Channel_4), TM_ADC_Read(ADC1, ADC_Channel_3));
 			Delayms(50);
 		}
-		
+		s = TM_USART_Getc(USART1);
 
+		if (s)
+		{
+			printf("%c", s);
+		}
 		c = TM_USART_Getc(USART2);
 		if (c) {
 			/* If anything received, put it back to terminal */
@@ -133,6 +138,10 @@ int main(void) {
 					}
 					Delayms(300);
 				}
+			}
+			if (c=='l')
+			{
+				TM_USART_Puts(USART1,"Hi sir!\r\n");
 			}
 			//TM_USART_Putc(USART1, s);
 		}
