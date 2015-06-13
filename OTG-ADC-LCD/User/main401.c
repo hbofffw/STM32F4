@@ -67,7 +67,9 @@ int main(void) {
 	//TM_DISCO_ButtonInit();
 	/*Delay init*/
 	TM_DELAY_Init();
+	//link wifi modual
 	TM_USART_Init(USART1, TM_USART_PinsPack_1, 115200);
+	//usb
 	TM_USART_Init(USART2, TM_USART_PinsPack_1, 115200);
 	//TM_SPI_Init(SPI1, TM_SPI_PinsPack_Custom);
 
@@ -105,44 +107,45 @@ int main(void) {
 		}
 		c = TM_USART_Getc(USART2);
 		if (c) {
+			TM_USART_Putc(USART1, c);
 			/* If anything received, put it back to terminal */
 			//TM_USART_Putc(USART1, c);
 			//printf("rdy");
-			if (c == 's')
-			{
-				for (i = 0; i < 8; i++)
-				{
-					/* 从全局缓冲区读取采样结果。 采样结果是在中断服务程序中读取的。*/
-					adc[i] = ADS1256_GetAdc(i);
+			//if (c == 's')
+			//{
+			//	for (i = 0; i < 8; i++)
+			//	{
+			//		/* 从全局缓冲区读取采样结果。 采样结果是在中断服务程序中读取的。*/
+			//		adc[i] = ADS1256_GetAdc(i);
 
-					/* 4194303 = 2.5V , 这是理论值，实际可以根据2.5V基准的实际值进行公式矫正 */
-					volt[i] = ((int64_t)adc[i] * 2500000) / 4194303;	/* 计算实际电压值（近似估算的），如需准确，请进行校准 */
-				}
-				/* 打印采集数据 */
-				{
-					int32_t iTemp;
+			//		/* 4194303 = 2.5V , 这是理论值，实际可以根据2.5V基准的实际值进行公式矫正 */
+			//		volt[i] = ((int64_t)adc[i] * 2500000) / 4194303;	/* 计算实际电压值（近似估算的），如需准确，请进行校准 */
+			//	}
+			//	/* 打印采集数据 */
+			//	{
+			//		int32_t iTemp;
 
-					for (i = 0; i < 8; i++)
-					{
-						iTemp = volt[i];	/* 余数，uV  */
-						if (iTemp < 0)
-						{
-							iTemp = -iTemp;
-							printf("%d=%6d,(-%d.%03d %03d V) ", i, adc[i], iTemp / 1000000, (iTemp % 1000000) / 1000, iTemp % 1000);
-						}
-						else
-						{
-							printf("%d=%6d,( %d.%03d %03d V) ", i, adc[i], iTemp / 1000000, (iTemp % 1000000) / 1000, iTemp % 1000);
-						}
-						printf("\r\n");
-					}
-					Delayms(300);
-				}
-			}
-			if (c=='l')
-			{
-				TM_USART_Puts(USART1,"Hi sir!\r\n");
-			}
+			//		for (i = 0; i < 8; i++)
+			//		{
+			//			iTemp = volt[i];	/* 余数，uV  */
+			//			if (iTemp < 0)
+			//			{
+			//				iTemp = -iTemp;
+			//				printf("%d=%6d,(-%d.%03d %03d V) ", i, adc[i], iTemp / 1000000, (iTemp % 1000000) / 1000, iTemp % 1000);
+			//			}
+			//			else
+			//			{
+			//				printf("%d=%6d,( %d.%03d %03d V) ", i, adc[i], iTemp / 1000000, (iTemp % 1000000) / 1000, iTemp % 1000);
+			//			}
+			//			printf("\r\n");
+			//		}
+			//		Delayms(300);
+			//	}
+			//}
+			//if (c=='l')
+			//{
+			//	TM_USART_Puts(USART1,"Hi sir!\r\n");
+			//}
 			//TM_USART_Putc(USART1, s);
 		}
 	}
