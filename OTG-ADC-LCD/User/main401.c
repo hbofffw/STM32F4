@@ -90,7 +90,7 @@ int main(void) {
 			printf("Ok, ADS1256 Chip ID = 0x%X\r\n", id);
 		}
 	}
-	ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_1000SPS); /* 配置ADC参数： 增益1:1, 数据输出速率 1KHz */
+	ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_1000SPS); /* 配置ADC参数： 增益1:1, 数据输出速率 2KHz */
 	ADS1256_StartScan(); /* 启动中断扫描模式, 轮流采集8个通道的ADC数据. 通过 ADS1256_GetAdc() 函数来读取这些数据 */
 
 	while (1) {

@@ -431,7 +431,7 @@ static void ADS1256_DelaySCLK(void)
 	取 10 以上，可以正常工作， 低电平400ns 高定400ns <--- 稳定
 	*/
 	//for (i = 0; i < 10; i++);
-	Delay(50);
+	Delay(5);
 }
 
 /*
