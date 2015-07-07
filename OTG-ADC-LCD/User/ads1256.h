@@ -92,10 +92,14 @@ void InitADS1256(void);
 void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate);
 
 uint8_t ADS1256_ReadChipID(void);
-int32_t ADS1256_ReadAdc(uint8_t _ch);
+//int32_t ADS1256_ReadAdc(uint8_t _ch);
+int32_t ADS1256_ReadAdc(void);
 void ADS1256_StartScan(void);
 void ADS1256_StopScan(void);
-int32_t ADS1256_GetAdc(uint8_t _ch);
+//int32_t ADS1256_GetAdc(uint8_t _ch);
+int32_t ADS1256_GetAdc(void);
+//int32_t ADS1256_ReadData(void);
+//void ADS1256_SetChannal(uint8_t _ch);
 
 extern ADS1256_VAR_T g_tADS1256;
 

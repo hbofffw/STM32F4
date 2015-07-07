@@ -90,9 +90,9 @@ int main(void) {
 			printf("Ok, ADS1256 Chip ID = 0x%X\r\n", id);
 		}
 	}
-	ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_1000SPS); /* 配置ADC参数： 增益1:1, 数据输出速率 2KHz */
-	ADS1256_StartScan(); /* 启动中断扫描模式, 轮流采集8个通道的ADC数据. 通过 ADS1256_GetAdc() 函数来读取这些数据 */
-
+	ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_30000SPS); /* 配置ADC参数： 增益1:1, 数据输出速率 2KHz */
+	ADS1256_StartScan(); 
+	//ADS1256_SetChannal(0);
 	while (1) {
 		if (TM_DISCO_ButtonOnReleased())
 		{
@@ -110,16 +110,17 @@ int main(void) {
 			TM_USART_Putc(USART1, c);
 			/* If anything received, put it back to terminal */
 			TM_USART_Putc(USART1, c);
-			printf("rdy");
+			//printf("rdy");
 			if (c == 's')
 			{
 				for (i = 0; i < 8; i++)
 				{
 					/* 从全局缓冲区读取采样结果。 采样结果是在中断服务程序中读取的。*/
-					adc[i] = ADS1256_GetAdc(i);
+					//adc[i] = ADS1256_GetAdc(0);
+					adc[i] = ADS1256_GetAdc();
 
 					/* 4194303 = 2.5V , 这是理论值，实际可以根据2.5V-基准的实际值进行公式矫正 */
-					volt[i] = ((int64_t)adc[i] * 2500000) / 4194303;	/* 计算实际电压值（近似估算的），如需准确，请进行校准 */
+					//volt[i] = ((int64_t)adc[i] * 2500000) / 4194303;	/* 计算实际电压值（近似估算的），如需准确，请进行校准 */
 				}
 				/* 打印采集数据 */
 				{
@@ -131,11 +132,11 @@ int main(void) {
 						if (iTemp < 0)
 						{
 							iTemp = -iTemp;
-							printf("%d=%6d,(-%d.%03d %03d V) ", i, adc[i], iTemp / 1000000, (iTemp % 1000000) / 1000, iTemp % 1000);
+							printf("%d=%6d ", i, adc[i]);
 						}
 						else
 						{
-							printf("%d=%6d,( %d.%03d %03d V) ", i, adc[i], iTemp / 1000000, (iTemp % 1000000) / 1000, iTemp % 1000);
+							printf("%d=%6d", i, adc[i]);
 						}
 						printf("\r\n");
 					}

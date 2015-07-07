@@ -412,6 +412,8 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 
 	//bsp_DelayUS(50);
 	Delay(50);
+	//added by dongbo huang
+	
 }
 
 /*
@@ -449,7 +451,7 @@ static void ADS1256_DelayDATA(void)
 	最小 50 个tCLK = 50 * 0.13uS = 6.5uS
 	*/
 	//bsp_DelayUS(10);	/* 最小延迟 6.5uS, 此处取10us */
-	Delay(10);
+	Delay(7);
 }
 
 /*
@@ -795,18 +797,18 @@ static int32_t ADS1256_ReadData(void)
 *	返 回 值: 无
 *********************************************************************************************************
 */
-int32_t ADS1256_ReadAdc(uint8_t _ch)
+int32_t ADS1256_ReadAdc(void)
 {
 	/* ADS1256 数据手册第21页 */
 
-#if 0	/* 对于30Ksps 采样速率 */
+//#if 0	/* 对于30Ksps 采样速率 */
 	int32_t read;
 
 	while (DRDY_IS_LOW());	/* 等待 DRDY 高 */
 	while (!DRDY_IS_LOW());	/* 等待 DRDY 低 */
 
-	ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
-	Delay(5);
+	//ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
+	//Delay(5);
 
 	ADS1256_WriteCmd(CMD_SYNC);
 	Delay(5);
@@ -822,25 +824,25 @@ int32_t ADS1256_ReadAdc(uint8_t _ch)
 	read = (int32_t)ADS1256_ReadData();
 
 	return read;
-#else	
-	//while (DRDY_IS_LOW());
-
-	/* ADS1256 数据手册第21页 */
-	ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
-
-	ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
-	Delay(5);
-
-	ADS1256_WriteCmd(CMD_SYNC);
-	Delay(5);
-
-	ADS1256_WriteCmd(CMD_WAKEUP);
-	Delay(25);
-
-	//ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
-
-	return (int32_t)ADS1256_ReadData();
-#endif	
+//#else	
+//	//while (drdy_is_low());
+//
+//	/* ads1256 数据手册第21页 */
+//	ads1256_waitdrdy();		/* 等待 drdy = 0 */
+//
+//	ads1256_setchannal(_ch);	/* 切换模拟通道 */
+//	delay(5);
+//
+//	ads1256_writecmd(cmd_sync);
+//	delay(5);
+//
+//	ads1256_writecmd(cmd_wakeup);
+//	delay(25);
+//
+//	//ads1256_waitdrdy();		/* 等待 drdy = 0 */
+//
+//	return (int32_t)ads1256_readdata();
+//#endif	
 }
 
 /*
@@ -889,9 +891,9 @@ void ADS1256_StartScan(void)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
-
+	ADS1256_SetChannal(0);
 	/* 开始扫描前, 清零结果缓冲区 */
-	{
+	/*{
 		uint8_t i;
 
 		g_tADS1256.Channel = 0;
@@ -900,7 +902,7 @@ void ADS1256_StartScan(void)
 		{
 			g_tADS1256.AdcNow[i] = 0;
 		}
-	}
+	}*/
 }
 
 /*
@@ -942,19 +944,20 @@ void ADS1256_StopScan(void)
 *********************************************************************************************************
 */
 //need to be edited
-int32_t ADS1256_GetAdc(uint8_t _ch)
+int32_t ADS1256_GetAdc(void)
 {
 	int32_t iTemp;
 
-	if (_ch > 7)
+	/*if (_ch > 7)
 	{
 		return 0;
-	}
+	}*/
 
 	//DISABLE_INT();  			/* 关中断 */
 	__disable_irq();
 
-	iTemp = g_tADS1256.AdcNow[_ch];
+	//iTemp = g_tADS1256.AdcNow[_ch];
+	iTemp = g_tADS1256.AdcNow[0];
 
 	//ENABLE_INT();  				/* 开中断 */
 	__enable_irq();
@@ -973,9 +976,9 @@ int32_t ADS1256_GetAdc(uint8_t _ch)
 void ADS1256_ISR(void)
 {
 	/* 读取采集结构，保存在全局变量 */
-	ADS1256_SetChannal(g_tADS1256.Channel);	/* 切换模拟通道 */
+	//ADS1256_SetChannal(g_tADS1256.Channel);	/* 切换模拟通道 */
 	//bsp_DelayUS(5);
-	Delay(5);
+	//Delay(5);
 
 	ADS1256_WriteCmd(CMD_SYNC);
 	//bsp_DelayUS(5);
@@ -984,20 +987,20 @@ void ADS1256_ISR(void)
 	ADS1256_WriteCmd(CMD_WAKEUP);
 	//bsp_DelayUS(25);
 	Delay(25);
+	g_tADS1256.AdcNow[0] = ADS1256_ReadData();
+	//if (g_tADS1256.Channel == 0)
+	//{
+	//	g_tADS1256.AdcNow[7] = ADS1256_ReadData();	/* 注意保存的是上一个通道的数据 */
+	//}
+	//else
+	//{
+	//	g_tADS1256.AdcNow[g_tADS1256.Channel - 1] = ADS1256_ReadData();	/* 注意保存的是上一个通道的数据 */
+	//}
 
-	if (g_tADS1256.Channel == 0)
-	{
-		g_tADS1256.AdcNow[7] = ADS1256_ReadData();	/* 注意保存的是上一个通道的数据 */
-	}
-	else
-	{
-		g_tADS1256.AdcNow[g_tADS1256.Channel - 1] = ADS1256_ReadData();	/* 注意保存的是上一个通道的数据 */
-	}
-
-	if (++g_tADS1256.Channel >= 8)
-	{
-		g_tADS1256.Channel = 0;
-	}
+	//if (++g_tADS1256.Channel >= 8)
+	//{
+	//	g_tADS1256.Channel = 0;
+	//}
 }
 
 
