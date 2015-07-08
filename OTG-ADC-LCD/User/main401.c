@@ -58,8 +58,10 @@ int main(void) {
 	uint8_t c;
 	uint8_t s;
 	int32_t adc[8];
+	int32_t adct[1000];
 	int32_t volt[8];
 	uint8_t i;
+	int count;
 	SystemInit();
 
 	/* Initialize LED's. Make sure to check settings for your board in tm_stm32f4_disco.h file */
@@ -142,6 +144,26 @@ int main(void) {
 					}
 					Delayms(300);
 				}
+			}
+			if (c == 'c')
+			{
+				count = 0;
+				TM_DELAY_SetTime(1000);
+				do
+				{
+					++count;
+				} while (TM_DELAY_Time() == 0);
+				printf("timer test: %d", count);
+			}
+			if (c == 't')
+			{
+				count = 0;
+				TM_DELAY_SetTime(1000);
+				do 
+				{
+					adct[count++] = ADS1256_GetAdc();
+				} while (TM_DELAY_Time() == 0);
+				printf("there are %d samples", count);
 			}
 			//if (c=='l')
 			//{
