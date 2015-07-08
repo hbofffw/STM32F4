@@ -35,6 +35,9 @@
 /* I set this in target C/C++ preprocessor defines */
 //#define USE_USB_OTG_HS
 //
+//#define TM_DELAY_TIM            TIM2
+//#define TM_DELAY_TIM_IRQ        TIM2_IRQn
+//#define TM_DELAY_TIM_IRQ_HANDLER    TIM2_IRQHandler
 
 #define TM_SPI1_PRESCALER	SPI_BaudRatePrescaler_256
 #define TM_SPI1_MODE		TM_SPI_Mode_1

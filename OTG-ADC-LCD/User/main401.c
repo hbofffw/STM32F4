@@ -59,13 +59,15 @@ int main(void) {
 	uint8_t s;
 	int32_t adc[8];
 	int32_t adct[1000];
+	int32_t adctest;
 	int32_t volt[8];
 	uint8_t i;
 	int count;
+	int number;
 	SystemInit();
 
 	/* Initialize LED's. Make sure to check settings for your board in tm_stm32f4_disco.h file */
-	//TM_DISCO_LedInit();
+	TM_DISCO_LedInit();
 	//TM_DISCO_ButtonInit();
 	/*Delay init*/
 	TM_DELAY_Init();
@@ -147,23 +149,57 @@ int main(void) {
 			}
 			if (c == 'c')
 			{
+				printf("counting...\r\n");
 				count = 0;
-				TM_DELAY_SetTime(1000);
-				do
+				number = 0;
+				TM_DELAY_SetTime(0);
+				do 
 				{
-					++count;
-				} while (TM_DELAY_Time() == 0);
-				printf("timer test: %d", count);
+					count++;
+					Delay(1000);
+				} while (TM_DELAY_Time()<=1000);
+				
+				//while (1)
+				//{
+				//	TM_DELAY_SetTime(0);
+				//	//TM_DISCO_LedToggle(LED_GREEN);
+				//	++count;
+				//	if (count>=1000)
+				//	{
+				//		break;
+				//	/}
+				//	while (TM_DELAY_Time() < 1);
+				//	//{
+				//		/*TM_DELAY_SetTime2(0);
+				//		while (1){
+				//		if (TM_DELAY_Time2() >= 1)
+				//		{
+				//		count++;
+				//		break;
+				//		}
+				//		}*/
+				//		/*if (++count == 433)
+				//		{
+				//		number++;
+				//		count = 0;
+				//		}*/
+				//		
+				//	//}
+				//}
+				
+				printf("timer test: %d\r\n", count);
 			}
 			if (c == 't')
 			{
 				count = 0;
-				TM_DELAY_SetTime(1000);
-				do 
+				TM_DELAY_SetTime(0);
+				do
 				{
-					adct[count++] = ADS1256_GetAdc();
-				} while (TM_DELAY_Time() == 0);
-				printf("there are %d samples", count);
+					adctest = ADS1256_GetAdc();
+					count++;
+					Delay(500);
+				} while (TM_DELAY_Time() <= 1000);
+				printf("there are %d samples\r\n", count);
 			}
 			//if (c=='l')
 			//{

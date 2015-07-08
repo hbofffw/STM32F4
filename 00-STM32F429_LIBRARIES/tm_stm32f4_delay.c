@@ -53,7 +53,7 @@ void SysTick_Handler(void) {
 	}
 	
 	/* Call user function */
-	TM_DELAY_1msHandler();
+	//TM_DELAY_1msHandler();
 	
 	/* Check custom timers */
 	for (i = 0; i < CustomTimers.Count; i++) {
