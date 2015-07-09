@@ -94,7 +94,7 @@ u8 tabb[2];
 #define ADS1256_DRATE_5SPS      0x13 
 #define ADS1256_DRATE_2_5SPS    0x03
 
-void SPI_Init1(void) //PE5开始
+void SPI_Init2(void) //PE5开始
 {
 	u8 read_tab[5];
 	SPI_InitTypeDef  SPI_InitStructure;
@@ -115,7 +115,7 @@ void SPI_Init1(void) //PE5开始
 	GPIO_PinAFConfig(GPIOC, GPIO_PinSource2, GPIO_AF_SPI2);
 
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;  //PC9=DRSY
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
@@ -123,14 +123,14 @@ void SPI_Init1(void) //PE5开始
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;    //PB12=CS 
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;    //PC4=RESET 
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
 
@@ -139,14 +139,14 @@ void SPI_Init1(void) //PE5开始
 	
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10; //sck
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
 	
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 
@@ -164,8 +164,10 @@ void SPI_Init1(void) //PE5开始
 	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
 	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
 	SPI_InitStructure.SPI_CRCPolynomial = 7;
-	SPI_Init(SPI2, &SPI_InitStructure);
 	SPI_Cmd(SPI2, ENABLE);
+	SPI_Init(SPI2, &SPI_InitStructure);
+	SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_TXE, ENABLE); //使能	SPI发送缓存空中断
+
 	ADS_CS_HIGH();
 
 	//      ADS1256_ResetHard();		/* 硬件复位 */                        
@@ -185,9 +187,9 @@ u8 results1, results2, results3;
 void ADS1256_ResetHard(void)
 {
 	RESET_LOW();
-	Delay(5);
+	Delay(100);
 	RESET_HIGH();
-	Delay(5);
+	Delay(100);
 }
 /*******************************************************************************
 * Function Name  : SPI_FLASH_SendByte
@@ -200,13 +202,13 @@ void ADS1256_ResetHard(void)
 u8 SPI_SendByte(u8 byte)
 {
 	/* Loop while DR register in not emplty */
-	while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
-	/* Send byte through the SPI1 peripheral */
-	SPI_I2S_SendData(SPI1, byte);
+	while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET);
+	/* Send byte through the SPI2 peripheral */
+	SPI_I2S_SendData(SPI2, byte);
 	/* Wait to receive a byte */
-	while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET);
+	while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_RXNE) == RESET);
 	/* Return the byte read from the SPI bus */
-	return SPI_I2S_ReceiveData(SPI1);
+	return SPI_I2S_ReceiveData(SPI2);
 }
 //-----------------------------------------------------------------//
 //	功    能：ADS1256 写数据
@@ -254,12 +256,14 @@ unsigned char ADS1256RREG(unsigned char regaddr)
 //-----------------------------------------------------------------//
 void ADS1256_Init(void)
 {
-	unsigned char tab1[5];
+	//unsigned char tab1[5];
+	SPI_Init2();
 	ADS1256_ResetHard();
-	tab1[0] = ADS1256RREG(0);
+	
+	/*tab1[0] = ADS1256RREG(0);
 	tab1[1] = ADS1256RREG(1);
 	tab1[2] = ADS1256RREG(2);
-	tab1[3] = ADS1256RREG(3);
+	tab1[3] = ADS1256RREG(3);*/
 
 	//ADS1256WREG(0x00, 0x31 );      
 	//ADS1256WREG(0x01, 0x23 );         
@@ -271,25 +275,38 @@ void ADS1256_Init(void)
 
 
 
-	ADS_CS_LOW();
+	//ADS_CS_LOW();
 	while (ADS_DRDY);
-	SPI_SendByte(ADS1256_CMD_WREG | ADS1256_STATUS);//连续写入4个寄存器
-	SPI_SendByte(3);
-	SPI_SendByte(0x31);
-	SPI_SendByte(0x23);
-	SPI_SendByte(0x20);
-	SPI_SendByte(0x03);
-	ADS_CS_HIGH();
+	//SPI_SendByte(ADS1256_CMD_WREG | ADS1256_STATUS);//连续写入4个寄存器
+	//SPI_SendByte(3);
+	//SPI_SendByte(0x31);
+	//SPI_SendByte(0x23);
+	//SPI_SendByte(0x20);
+	//SPI_SendByte(0x03);  
+	ADS1256WREG(ADS1256_STATUS, 0x00);               // 高位在前、校准、使用缓冲
+	Delay(10);
+	//	ADS1256WREG(ADS1256_MUX,0x08);                  // 初始化端口A0为‘+’，AINCOM位‘-’
+	ADS1256WREG(ADS1256_ADCON, 0x00);                // 放大倍数1
+	Delay(10);
+	ADS1256WREG(ADS1256_DRATE, ADS1256_DRATE_30000SPS);  // 数据5sps
+	Delay(10);
+	ADS1256WREG(ADS1256_IO, 0x00);
+	Delay(10);
+	SPI_I2S_SendData(SPI2, ADS1256_CMD_SELFCAL);
+	while (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_9));
+	SPI_I2S_ClearFlag(SPI2, SPI_I2S_FLAG_TXE);	 //清除发送缓冲为空中断标识
+	//ADS_CS_HIGH();
 
 
 
 
-	Delay(100);
+	/*Delay(100);
 	tab1[1] = ADS1256RREG(1);
 	tab1[2] = ADS1256RREG(2);
 	tab1[3] = ADS1256RREG(3);
 	tab1[4] = ADS1256RREG(4);
-	tab1[5] = ADS1256RREG(5);
+	tab1[5] = ADS1256RREG(5);*/
+
 }
 
 int32_t ADS1256ReadData(void)
@@ -328,7 +345,7 @@ int32_t ADS1256ReadData(void)
 //	全局变量: /
 //	备    注: /
 //-----------------------------------------------------------------//
-void ADS_sum(unsigned char road)
+void ADS_sum(void)
 {
 	unsigned long results = 0;
 	//ADS1256WREG(ADS1256_MUX,road);		//设置通道

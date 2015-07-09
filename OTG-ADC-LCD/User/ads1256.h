@@ -36,7 +36,7 @@ RST   <------PC4       ¸´Î»ÐÅºÅ
 #include "stm32f4xx_exti.h"
 #include "stm32f4xx_syscfg.h"
 
-void SPI_Init1(void);
+void SPI_Init2(void);
 
 extern u8  results1;
 extern u8  results2;
@@ -44,7 +44,7 @@ extern u8  results3;
 void SPI_ADS1256_Init(void);
 void ADS1256_GPIO_init(void);
 void ADS1256_Init(void);
-void ADS_sum(unsigned char road);
+void ADS_sum(void);
 u8 SPI_SendByte(u8 byte);
 int32_t ADS1256ReadData(void);
 void ADS1256WREG(unsigned char regaddr, unsigned char databyte);

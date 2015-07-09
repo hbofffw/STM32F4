@@ -81,9 +81,10 @@ int main(void) {
 	//TM_ADC_Init(ADC1, ADC_Channel_3);
 	Delayms(100); /* 等待上电稳定，等基准电压电路稳定, bsp_InitADS1256() 内部会进行自校准 */
 	//InitADS1256(); /* 初始化配置ADS1256.  PGA=1, DRATE=30KSPS, BUFEN=1, 输入正负5V */
-	Init_ADS1256_GPIO();
-	GPIO_SetBits(GPIOC, GPIO_Pin_4);
+	SPI_Init2();
 	ADS1256_Init();
+	Delay(10);
+	ADS1256_SetChannal(0);
 	/* 打印芯片ID (通过读ID可以判断硬件接口是否正常) , 正常时状态寄存器的高4bit = 3 */
 	//{
 	//	uint8_t id;
@@ -198,15 +199,16 @@ int main(void) {
 				TM_DELAY_SetTime(0);
 				do
 				{
-					adctest = ADS_sum((i << 4) | ADS1256_MUXN_AIN0);
+					adctest = ADS1256ReadData();
 					count++;
 					//Delay(1000);
 				} while (TM_DELAY_Time() <= 1000);
 				printf("there are %d samples\r\n", count);
+				printf("data sampled: %d\r\n", adctest);
 			}
 			if (c == 'r')
 			{
-				adctest = ADS_sum((i << 4) | ADS1256_MUXN_AIN0);
+				adctest = ADS1256ReadData();
 				printf("data sampled: %d\r\n", adctest);
 			}
 			//if (c=='l')
