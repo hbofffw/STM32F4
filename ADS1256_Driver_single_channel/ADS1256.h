@@ -11,14 +11,39 @@
 //		GPIOB15	--- DIN
 //***************************					
 
-/*端口定义*/ 
-#define RCC_ADS1256Reset                          	RCC_APB2Periph_GPIOC
-#define GPIO_RCC_ADS1256Reset_PORT                  GPIOC    
-#define GPIO_RCC_ADS1256Reset                       GPIO_Pin_10
+/*//FOR F401
++5V <------  5.0V      5V供电
+GND	------ - GND       地
+DRDY------>  PC9       准备就绪
+CS    <------PB12       SPI_CS
+DIN   <------PC2       SPI_MOSI
+DOUT------>  PC3       SPI_MISO
+SCLK  <------PB10      SPI时钟
+GND  ------- GND       地
+//-PDWN  <------  PB0       掉电控制
+RST   <------PC4       复位信号
+*/
+#include "defines.h"
+#include "stm32f4xx.h"
+#include "misc.h"
+#include "tm_stm32f4_disco.h"
+#include "tm_stm32f4_delay.h"
+#include "stm32f4xx_gpio.h"
+#include "stm32f4xx_spi.h"
+#include "tm_stm32f4_spi.h"
+#include "tm_stm32f4_gpio.h"
+#include "stm32f4xx_rcc.h"
+#include "stm32f4xx_exti.h"
+#include "stm32f4xx_syscfg.h"
 
-#define RCC_ADS1256DRDY                             RCC_APB2Periph_GPIOC
+/*端口定义*/ 
+#define RCC_ADS1256Reset                          	RCC_AHB1Periph_GPIOC
+#define GPIO_RCC_ADS1256Reset_PORT                  GPIOC    
+#define GPIO_RCC_ADS1256Reset                       GPIO_Pin_4
+
+#define RCC_ADS1256DRDY                             RCC_AHB1Periph_GPIOC
 #define GPIO_ADS1256DRDY_PORT                       GPIOC  
-#define GPIO_ADS1256DRDY                            GPIO_Pin_11
+#define GPIO_ADS1256DRDY                            GPIO_Pin_9
 
 
 

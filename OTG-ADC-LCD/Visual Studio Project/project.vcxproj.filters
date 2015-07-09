@@ -150,7 +150,7 @@
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_usr.c">
       <Filter>源文件\USB CDC Device</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ADS1256_Driver_single_channel\ADS1256.c">
+    <ClCompile Include="..\User\oldads1256\old_ads1256.c">
       <Filter>源文件\User</Filter>
     </ClCompile>
   </ItemGroup>
@@ -283,7 +283,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\ADS1256_Driver_single_channel\ADS1256.h">
+    <ClInclude Include="..\User\oldads1256\old_ads1256.h">
       <Filter>源文件\User</Filter>
     </ClInclude>
   </ItemGroup>

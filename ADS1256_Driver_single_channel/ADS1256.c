@@ -4,56 +4,61 @@
 #include "ADS1256.h"
 
 
-void SPI2_Init(void)
-{
-    SPI_InitTypeDef  SPI_InitStructure;
-    GPIO_InitTypeDef GPIO_InitStructure;
-    /****Initial SPI2******************/
-
-    /* Enable SPI2 and GPIOB clocks */
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
-
-
-
-    /* Configure SPI2 pins: NSS, SCK, MISO and MOSI */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
-
-    //SPI2 NSS 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
-
-    GPIO_SetBits(GPIOB, GPIO_Pin_12);
-
-    /* SPI2 configuration */ 
-    SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex; //SPI1设置为两线全双工
-    SPI_InitStructure.SPI_Mode = SPI_Mode_Master;                    //设置SPI2为主模式
-    SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;                  //SPI发送接收8位帧结构
-    SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;                   //串行时钟在不操作时，时钟为低电平
-    SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;                 //第一个时钟沿开始采样数据
-    SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;                  //NSS信号由软件（使用SSI位）管理
-    SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256; //定义波特率预分频的值:波特率预分频值为8
-    SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;       //数据传输从MSB位开始
-    SPI_InitStructure.SPI_CRCPolynomial = 7;         //CRC值计算的多项式
-    SPI_Init(SPI2, &SPI_InitStructure);
-    /* Enable SPI2  */
-    SPI_Cmd(SPI2, ENABLE);  
-}  
+//void SPI2_Init(void)
+//{
+//    SPI_InitTypeDef  SPI_InitStructure;
+//    GPIO_InitTypeDef GPIO_InitStructure;
+//    /****Initial SPI2******************/
+//
+//    /* Enable SPI2 and GPIOB clocks */
+//	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOC, ENABLE);
+//    RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+//
+//
+//
+//    /* Configure SPI2 pins: NSS, SCK, MISO and MOSI */
+//    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+//    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+//    GPIO_Init(GPIOB, &GPIO_InitStructure);
+//
+//    //SPI2 NSS 
+//    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
+//    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+//    GPIO_Init(GPIOB, &GPIO_InitStructure);
+//
+//    GPIO_SetBits(GPIOB, GPIO_Pin_12);
+//
+//    /* SPI2 configuration */ 
+//    SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex; //SPI1设置为两线全双工
+//    SPI_InitStructure.SPI_Mode = SPI_Mode_Master;                    //设置SPI2为主模式
+//    SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;                  //SPI发送接收8位帧结构
+//    SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;                   //串行时钟在不操作时，时钟为低电平
+//    SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;                 //第一个时钟沿开始采样数据
+//    SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;                  //NSS信号由软件（使用SSI位）管理
+//    SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256; //定义波特率预分频的值:波特率预分频值为8
+//    SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;       //数据传输从MSB位开始
+//    SPI_InitStructure.SPI_CRCPolynomial = 7;         //CRC值计算的多项式
+//    SPI_Init(SPI2, &SPI_InitStructure);
+//    /* Enable SPI2  */
+//    SPI_Cmd(SPI2, ENABLE);  
+//}  
 
 //初始化ADS1256 GPIO
 void Init_ADS1256_GPIO(void)
 {
+	SPI_InitTypeDef  SPI_InitStructure;
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    RCC_APB2PeriphClockCmd(RCC_ADS1256Reset | RCC_ADS1256DRDY, ENABLE); 
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOC, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+
 
     GPIO_InitStructure.GPIO_Pin = GPIO_RCC_ADS1256Reset; 
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;		/* 设为输出口 */
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
     GPIO_Init(GPIO_RCC_ADS1256Reset_PORT, &GPIO_InitStructure);  
@@ -61,12 +66,40 @@ void Init_ADS1256_GPIO(void)
 
 
     GPIO_InitStructure.GPIO_Pin = GPIO_ADS1256DRDY; 
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;		/* 设为输入口 */
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 无需上下拉电阻 */
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
     GPIO_Init(GPIO_ADS1256DRDY_PORT, &GPIO_InitStructure);  
 
-    SPI2_Init();
+	/* Configure SPI2 pins: NSS, SCK, MISO and MOSI */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	//SPI2 NSS 
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	GPIO_SetBits(GPIOB, GPIO_Pin_12);
+
+	/* SPI2 configuration */
+	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex; //SPI1设置为两线全双工
+	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;                    //设置SPI2为主模式
+	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;                  //SPI发送接收8位帧结构
+	SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;                   //串行时钟在不操作时，时钟为低电平
+	SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;                 //第一个时钟沿开始采样数据
+	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;                  //NSS信号由软件（使用SSI位）管理
+	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256; //定义波特率预分频的值:波特率预分频值为8
+	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;       //数据传输从MSB位开始
+	SPI_InitStructure.SPI_CRCPolynomial = 7;         //CRC值计算的多项式
+	SPI_Init(SPI2, &SPI_InitStructure);
+	/* Enable SPI2  */
+	SPI_Cmd(SPI2, ENABLE);
 }
 
 
