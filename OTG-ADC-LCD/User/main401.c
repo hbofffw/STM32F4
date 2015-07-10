@@ -25,7 +25,7 @@
 #include "tm_stm32f4_adc.h"
 #include "tm_stm32f4_usart.h"
 #include "tm_stm32f4_spi.h"
-#include "ADS1256.h"
+#include "ads1256.h"
 
 #include <stdio.h>
 /* We need to implement own __FILE struct */
@@ -82,9 +82,11 @@ int main(void) {
 	Delayms(100); /* 等待上电稳定，等基准电压电路稳定, bsp_InitADS1256() 内部会进行自校准 */
 	//InitADS1256(); /* 初始化配置ADS1256.  PGA=1, DRATE=30KSPS, BUFEN=1, 输入正负5V */
 	SPI_Init2();
-	ADS1256_Init();
+	//ADS1256_Init();
+	ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_30000SPS);
 	Delay(10);
-	ADS1256_SetChannal(0);
+	//ADS1256_StartScan();
+	//ADS1256_SetChannal(0);
 	/* 打印芯片ID (通过读ID可以判断硬件接口是否正常) , 正常时状态寄存器的高4bit = 3 */
 	//{
 	//	uint8_t id;
@@ -119,38 +121,38 @@ int main(void) {
 			/* If anything received, put it back to terminal */
 			TM_USART_Putc(USART1, c);
 			//printf("rdy");
-			if (c == 's')
-			{
-				for (i = 0; i < 8; i++)
-				{
-					/* 从全局缓冲区读取采样结果。 采样结果是在中断服务程序中读取的。*/
-					//adc[i] = ADS1256_GetAdc(0);
-					//adc[i] = ADS1256_GetAdc();
+			//if (c == 's')
+			//{
+			//	for (i = 0; i < 8; i++)
+			//	{
+			//		/* 从全局缓冲区读取采样结果。 采样结果是在中断服务程序中读取的。*/
+			//		//adc[i] = ADS1256_GetAdc(0);
+			//		//adc[i] = ADS1256_GetAdc();
 
-					/* 4194303 = 2.5V , 这是理论值，实际可以根据2.5V-基准的实际值进行公式矫正 */
-					//volt[i] = ((int64_t)adc[i] * 2500000) / 4194303;	/* 计算实际电压值（近似估算的），如需准确，请进行校准 */
-				}
-				/* 打印采集数据 */
-				{
-					int32_t iTemp;
+			//		/* 4194303 = 2.5V , 这是理论值，实际可以根据2.5V-基准的实际值进行公式矫正 */
+			//		//volt[i] = ((int64_t)adc[i] * 2500000) / 4194303;	/* 计算实际电压值（近似估算的），如需准确，请进行校准 */
+			//	}
+			//	/* 打印采集数据 */
+			//	{
+			//		int32_t iTemp;
 
-					for (i = 0; i < 8; i++)
-					{
-						iTemp = volt[i];	/* 余数，uV  */
-						if (iTemp < 0)
-						{
-							iTemp = -iTemp;
-							printf("%d=%6d ", i, adc[i]);
-						}
-						else
-						{
-							printf("%d=%6d", i, adc[i]);
-						}
-						printf("\r\n");
-					}
-					Delayms(300);
-				}
-			}
+			//		for (i = 0; i < 8; i++)
+			//		{
+			//			iTemp = volt[i];	/* 余数，uV  */
+			//			if (iTemp < 0)
+			//			{
+			//				iTemp = -iTemp;
+			//				printf("%d=%6d ", i, adc[i]);
+			//			}
+			//			else
+			//			{
+			//				printf("%d=%6d", i, adc[i]);
+			//			}
+			//			printf("\r\n");
+			//		}
+			//		Delayms(300);
+			//	}
+			//}
 			if (c == 'c')
 			{
 				printf("counting...\r\n");
@@ -199,7 +201,7 @@ int main(void) {
 				TM_DELAY_SetTime(0);
 				do
 				{
-					adctest = ADS1256ReadData();
+					adctest = ADS1256_ReadData();
 					count++;
 					//Delay(1000);
 				} while (TM_DELAY_Time() <= 1000);
@@ -208,7 +210,7 @@ int main(void) {
 			}
 			if (c == 'r')
 			{
-				adctest = ADS1256ReadData();
+				adctest = ADS1256_ReadData();
 				printf("data sampled: %d\r\n", adctest);
 			}
 			//if (c=='l')
