@@ -275,14 +275,15 @@ void ADS1256_Init(void)
 
 
 
-	//ADS_CS_LOW();
-	while (ADS_DRDY);
+	
+	//while (ADS_DRDY);
 	//SPI_SendByte(ADS1256_CMD_WREG | ADS1256_STATUS);//连续写入4个寄存器
 	//SPI_SendByte(3);
 	//SPI_SendByte(0x31);
 	//SPI_SendByte(0x23);
 	//SPI_SendByte(0x20);
 	//SPI_SendByte(0x03);  
+	//ADS_CS_LOW();
 	ADS1256WREG(ADS1256_STATUS, 0x00);               // 高位在前、校准、使用缓冲
 	Delay(10);
 	//	ADS1256WREG(ADS1256_MUX,0x08);                  // 初始化端口A0为‘+’，AINCOM位‘-’
@@ -298,7 +299,7 @@ void ADS1256_Init(void)
 	//ADS_CS_HIGH();
 
 
-
+	Delay(50);
 
 	/*Delay(100);
 	tab1[1] = ADS1256RREG(1);
