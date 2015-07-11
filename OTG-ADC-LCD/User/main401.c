@@ -67,7 +67,7 @@ int main(void) {
 	SystemInit();
 
 	/* Initialize LED's. Make sure to check settings for your board in tm_stm32f4_disco.h file */
-	//TM_DISCO_LedInit();
+	TM_DISCO_LedInit();
 	//TM_DISCO_ButtonInit();
 	/*Delay init*/
 	TM_DELAY_Init();
@@ -89,7 +89,7 @@ int main(void) {
 	//ADS1256_StartScan();
 	//ADS1256_SetChannal(0);
 	/* 打印芯片ID (通过读ID可以判断硬件接口是否正常) , 正常时状态寄存器的高4bit = 3 */
-	{
+	/*{
 		uint8_t id;
 		id = ADS1256_ReadChipID();
 		if (id != 3)
@@ -100,9 +100,9 @@ int main(void) {
 		{
 			printf("Ok, ADS1256 Chip ID = 0x%X\r\n", id);
 		}
-	}
+	}*/
 	ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_30000SPS); /* 配置ADC参数： 增益1:1, 数据输出速率 2KHz */
-	ADS1256_StartScan(); 
+	//ADS1256_StartScan(); 
 	//ADS1256_SetChannal(0);
 	while (1) {
 		//if (TM_DISCO_ButtonOnReleased())
@@ -124,15 +124,17 @@ int main(void) {
 			//printf("rdy");
 			if (c == 's')
 			{
+				ADS1256_StartScan();
 				for (i = 0; i < 8; i++)
 				{
 					/* 从全局缓冲区读取采样结果。 采样结果是在中断服务程序中读取的。*/
-					adc[i] = ADS1256_GetAdc(i);
+					adc[i] = ADS1256_ReadAdc();// ADS1256_GetAdc(i);
 					//adc[i] = ADS1256_GetAdc();
 
 					/* 4194303 = 2.5V , 这是理论值，实际可以根据2.5V-基准的实际值进行公式矫正 */
 					volt[i] = ((int64_t)adc[i] * 2500000) / 4194303;	/* 计算实际电压值（近似估算的），如需准确，请进行校准 */
 				}
+				ADS1256_StopScan();
 				/* 打印采集数据 */
 				{
 					int32_t iTemp;
@@ -162,6 +164,7 @@ int main(void) {
 				TM_DELAY_SetTime(0);
 				do 
 				{
+					TM_DISCO_LedToggle(TM_DISCO_LED_PINS);
 					count++;
 					Delay(1000);
 				} while (TM_DELAY_Time()<=1000);
@@ -198,21 +201,25 @@ int main(void) {
 			}
 			if (c == 't')
 			{
+				ADS1256_StartScan();
 				count = 0;
 				TM_DELAY_SetTime(0);
 				do
 				{
-					adctest = ADS1256_GetAdc(0);
+					adctest = ADS1256_ReadAdc();// ADS1256_GetAdc(0);
 					count++;
 					//Delay(1000);
 				} while (TM_DELAY_Time() <= 1000);
+				ADS1256_StopScan();
 				printf("there are %d samples\r\n", count);
 				printf("data sampled: %d\r\n", adctest);
 			}
 			if (c == 'r')
 			{
-				adctest = ADS1256_GetAdc(0);
+				ADS1256_StartScan();
+				adctest = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
 				printf("data sampled: %d\r\n", adctest);
+				ADS1256_StopScan();
 			}
 			//if (c=='l')
 			//{

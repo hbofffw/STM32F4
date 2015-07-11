@@ -279,7 +279,7 @@ void InitADS1256(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;		/* 设为输出口 */
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;	/* IO口最大速度 */
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
 
 	GPIO_InitStructure.GPIO_Pin = PIN_SCK;
 	GPIO_Init(PORT_SCK, &GPIO_InitStructure);
@@ -326,7 +326,7 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 	g_tADS1256.Gain = _gain;
 	g_tADS1256.DataRate = _drate;
 
-	ADS1256_StopScan();			/* 暂停CPU中断 */
+	//ADS1256_StopScan();			/* 暂停CPU中断 */
 
 	ADS1256_ResetHard();		/* 硬件复位 */
 
@@ -361,6 +361,7 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 		ACAL=1使能自校准功能。当 PGA，BUFEEN, DRATE改变时会启动自校准
 		*/
 		buf[0] = (0 << 3) | (1 << 2) | (1 << 1);
+		//buf[0] = (0 << 3) | (1 << 1);
 		//ADS1256_WriteReg(REG_STATUS, (0 << 3) | (1 << 2) | (1 << 1));
 
 		buf[1] = 0x08;	/* 高四位0表示AINP接 AIN0,  低四位8表示 AINN 固定接 AINCOM */
@@ -406,12 +407,13 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 		ADS1256_Send8Bit(buf[1]);	/* 设置输入通道参数 */
 		ADS1256_Send8Bit(buf[2]);	/* 设置ADCON控制寄存器，增益 */
 		ADS1256_Send8Bit(buf[3]);	/* 设置输出数据速率 */
-
+		ADS1256_Send8Bit(CMD_SELFCAL);
+		Delay(100);
 		CS_1();	/* SPI片选 = 1 */
 	}
 
 	//bsp_DelayUS(50);
-	Delay(50);
+	
 }
 
 /*
@@ -431,7 +433,7 @@ static void ADS1256_DelaySCLK(void)
 	取 10 以上，可以正常工作， 低电平400ns 高定400ns <--- 稳定
 	*/
 	//for (i = 0; i < 10; i++);
-	Delay(50);
+	Delay(20);
 }
 
 /*
@@ -449,7 +451,7 @@ static void ADS1256_DelayDATA(void)
 	最小 50 个tCLK = 50 * 0.13uS = 6.5uS
 	*/
 	//bsp_DelayUS(10);	/* 最小延迟 6.5uS, 此处取10us */
-	Delay(10);
+	Delay(1);
 }
 
 /*
@@ -525,7 +527,7 @@ static uint8_t ADS1256_Recive8Bit(void)
 	uint8_t i;
 	uint8_t read = 0;
 
-	ADS1256_DelaySCLK();
+	//ADS1256_DelaySCLK();
 	/*　ADS1256 要求 SCL高电平和低电平持续时间最小 200ns  */
 	for (i = 0; i < 8; i++)
 	{
@@ -537,7 +539,7 @@ static uint8_t ADS1256_Recive8Bit(void)
 		{
 			read++;
 		}
-		ADS1256_DelaySCLK();
+		//ADS1256_DelaySCLK();
 	}
 	return read;
 }
@@ -765,18 +767,18 @@ static int32_t ADS1256_ReadData(void)
 {
 	uint32_t read = 0;
 
-	CS_0();	/* SPI片选 = 0 */
+	//CS_0();	/* SPI片选 = 0 */
 
-	ADS1256_Send8Bit(CMD_RDATA);	/* 读数据的命令 */
+	//ADS1256_Send8Bit(CMD_RDATA);	/* 读数据的命令 */
 
-	ADS1256_DelayDATA();	/* 必须延迟才能读取芯片返回数据 */
+	//ADS1256_DelayDATA();	/* 必须延迟才能读取芯片返回数据 */
 
 	/* 读采样结果，3个字节，高字节在前 */
 	read = ADS1256_Recive8Bit() << 16;
 	read += ADS1256_Recive8Bit() << 8;
 	read += ADS1256_Recive8Bit() << 0;
 
-	CS_1();	/* SPI片选 = 1 */
+	//CS_1();	/* SPI片选 = 1 */
 
 	/* 负数进行扩展。24位有符号数扩展为32位有符号数 */
 	if (read & 0x800000)
@@ -795,52 +797,52 @@ static int32_t ADS1256_ReadData(void)
 *	返 回 值: 无
 *********************************************************************************************************
 */
-int32_t ADS1256_ReadAdc(uint8_t _ch)
+int32_t ADS1256_ReadAdc(void)
 {
 	/* ADS1256 数据手册第21页 */
 
-#if 0	/* 对于30Ksps 采样速率 */
+//#if 0	/* 对于30Ksps 采样速率 */
 	int32_t read;
 
-	while (DRDY_IS_LOW());	/* 等待 DRDY 高 */
-	while (!DRDY_IS_LOW());	/* 等待 DRDY 低 */
+	//while (!DRDY_IS_LOW());	/*单次转换时， 等待 DRDY 高； 连续转换时，等待 DRDY 低 */
+	//while (!DRDY_IS_LOW());	/* 等待 DRDY 低 */
 
-	ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
-	Delay(5);
+	//ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
+	//Delay(5);
 
-	ADS1256_WriteCmd(CMD_SYNC);
-	Delay(5);
+	//ADS1256_WriteCmd(CMD_SYNC);
+	//Delay(5);
 
-	ADS1256_WriteCmd(CMD_WAKEUP);  /* 正常情况下，这个时候 DRDY 已经为高 */
-	Delay(25);
-
-	read = (int32_t)ADS1256_ReadData();
-
-	while (DRDY_IS_LOW());	/* 等待 DRDY 高 */
-	while (!DRDY_IS_LOW());	/* 等待 DRDY 低 */
+	//ADS1256_WriteCmd(CMD_WAKEUP);  /* 正常情况下，这个时候 DRDY 已经为高 */
+	//Delay(25);
 
 	read = (int32_t)ADS1256_ReadData();
+
+	//while (DRDY_IS_LOW());	/* 等待 DRDY 高 */
+	//while (!DRDY_IS_LOW());	/* 等待 DRDY 低 */
+
+	//read = (int32_t)ADS1256_ReadData();
 
 	return read;
-#else	
-	//while (DRDY_IS_LOW());
-
-	/* ADS1256 数据手册第21页 */
-	ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
-
-	ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
-	Delay(5);
-
-	ADS1256_WriteCmd(CMD_SYNC);
-	Delay(5);
-
-	ADS1256_WriteCmd(CMD_WAKEUP);
-	Delay(25);
-
-	//ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
-
-	return (int32_t)ADS1256_ReadData();
-#endif	
+//#else	
+//	//while (DRDY_IS_LOW());
+//
+//	/* ADS1256 数据手册第21页 */
+//	ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
+//
+//	//ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
+//	//Delay(5);
+//
+//	//ADS1256_WriteCmd(CMD_SYNC);
+//	//Delay(5);
+//
+//	//ADS1256_WriteCmd(CMD_WAKEUP);
+//	//Delay(25);
+//
+//	//ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
+//
+//	return (int32_t)ADS1256_ReadData();
+//#endif	
 }
 
 /*
@@ -860,38 +862,43 @@ int32_t ADS1256_ReadAdc(uint8_t _ch)
 //need to be edited
 void ADS1256_StartScan(void)
 {
-	EXTI_InitTypeDef   EXTI_InitStructure;
-	NVIC_InitTypeDef   NVIC_InitStructure;
-
-	/* 使能SYSCFG时钟 */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-
-	/* 连接 EXTI Line9 到 PE9 引脚 */
-#if defined (TM_DISCO_STM32F4_DISCOVERY)
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource9);
-#elif defined (TM_DISCO_NUCLEO_F401)
-	/* 连接 EXTI Line9 到 PC9 引脚 */
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource9);
-#endif
-	/* 配置 EXTI LineXXX */
-	EXTI_InitStructure.EXTI_Line = EXTI_Line9;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;	/* 下降沿(等待 DRDY 由1变0的时刻) */
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
-
-	/* 设置NVIC优先级分组为Group2：0-3抢占式优先级，0-3的响应式优先级 */
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-
-	/* 中断优先级配置 最低优先级 这里一定要分开的设置中断，不能够合并到一个里面设置 */
-	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x03;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+	CS_0();
+	//while (!DRDY_IS_LOW());
+	ADS1256_Send8Bit(CMD_RDATAC);	/* 读数据的命令 */
+	//Delay(50);
+		/* SPI片选 = 0 */
+//	EXTI_InitTypeDef   EXTI_InitStructure;
+//	NVIC_InitTypeDef   NVIC_InitStructure;
+//
+//	/* 使能SYSCFG时钟 */
+//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+//
+//	/* 连接 EXTI Line9 到 PE9 引脚 */
+//#if defined (TM_DISCO_STM32F4_DISCOVERY)
+//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource9);
+//#elif defined (TM_DISCO_NUCLEO_F401)
+//	/* 连接 EXTI Line9 到 PC9 引脚 */
+//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource9);
+//#endif
+//	/* 配置 EXTI LineXXX */
+//	EXTI_InitStructure.EXTI_Line = EXTI_Line9;
+//	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+//	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;	/* 下降沿(等待 DRDY 由1变0的时刻) */
+//	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+//	EXTI_Init(&EXTI_InitStructure);
+//
+//	/* 设置NVIC优先级分组为Group2：0-3抢占式优先级，0-3的响应式优先级 */
+//	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+//
+//	/* 中断优先级配置 最低优先级 这里一定要分开的设置中断，不能够合并到一个里面设置 */
+//	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x03;
+//	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
+//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//	NVIC_Init(&NVIC_InitStructure);
 
 	/* 开始扫描前, 清零结果缓冲区 */
-	{
+	/*{
 		uint8_t i;
 
 		g_tADS1256.Channel = 0;
@@ -900,7 +907,7 @@ void ADS1256_StartScan(void)
 		{
 			g_tADS1256.AdcNow[i] = 0;
 		}
-	}
+	}*/
 }
 
 /*
@@ -913,24 +920,27 @@ void ADS1256_StartScan(void)
 */
 void ADS1256_StopScan(void)
 {
-	EXTI_InitTypeDef   EXTI_InitStructure;
-	//	NVIC_InitTypeDef   NVIC_InitStructure;
-
-	/* 配置 EXTI LineXXX */
-	EXTI_InitStructure.EXTI_Line = EXTI_Line9;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;	/* 下降沿(等待 DRDY 由1变0的时刻) */
-	EXTI_InitStructure.EXTI_LineCmd = DISABLE;		/* 禁止 */
-	EXTI_Init(&EXTI_InitStructure);
-
-#if 0			
-	/* 中断优先级配置 最低优先级 这里一定要分开的设置中断，不能够合并到一个里面设置 */
-	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x03;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;		/* 禁止 */
-	NVIC_Init(&NVIC_InitStructure);
-#endif
+	while (!DRDY_IS_LOW());
+	ADS1256_Send8Bit(CMD_SDATAC);
+	CS_1();
+//	EXTI_InitTypeDef   EXTI_InitStructure;
+//	//	NVIC_InitTypeDef   NVIC_InitStructure;
+//
+//	/* 配置 EXTI LineXXX */
+//	EXTI_InitStructure.EXTI_Line = EXTI_Line9;
+//	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+//	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;	/* 下降沿(等待 DRDY 由1变0的时刻) */
+//	EXTI_InitStructure.EXTI_LineCmd = DISABLE;		/* 禁止 */
+//	EXTI_Init(&EXTI_InitStructure);
+//
+//#if 0			
+//	/* 中断优先级配置 最低优先级 这里一定要分开的设置中断，不能够合并到一个里面设置 */
+//	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x03;
+//	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
+//	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;		/* 禁止 */
+//	NVIC_Init(&NVIC_InitStructure);
+//#endif
 }
 
 /*
@@ -946,18 +956,18 @@ int32_t ADS1256_GetAdc(uint8_t _ch)
 {
 	int32_t iTemp;
 
-	if (_ch > 7)
+	/*if (_ch > 7)
 	{
 		return 0;
-	}
+	}*/
 
 	//DISABLE_INT();  			/* 关中断 */
-	__disable_irq();
+	//__disable_irq();
 
 	iTemp = g_tADS1256.AdcNow[_ch];
 
 	//ENABLE_INT();  				/* 开中断 */
-	__enable_irq();
+	//__enable_irq();
 
 	return iTemp;
 }
@@ -973,31 +983,31 @@ int32_t ADS1256_GetAdc(uint8_t _ch)
 void ADS1256_ISR(void)
 {
 	/* 读取采集结构，保存在全局变量 */
-	ADS1256_SetChannal(g_tADS1256.Channel);	/* 切换模拟通道 */
+	//ADS1256_SetChannal(g_tADS1256.Channel);	/* 切换模拟通道 */
 	//bsp_DelayUS(5);
-	Delay(5);
+	//Delay(5);
 
-	ADS1256_WriteCmd(CMD_SYNC);
+	//ADS1256_WriteCmd(CMD_SYNC);
 	//bsp_DelayUS(5);
-	Delay(5);
+	//Delay(5);
 
-	ADS1256_WriteCmd(CMD_WAKEUP);
+	//ADS1256_WriteCmd(CMD_WAKEUP);
 	//bsp_DelayUS(25);
-	Delay(25);
+	//Delay(25);
+	g_tADS1256.AdcNow[0] = ADS1256_ReadData();
+	//if (g_tADS1256.Channel == 0)
+	//{
+	//	g_tADS1256.AdcNow[7] = ADS1256_ReadData();	/* 注意保存的是上一个通道的数据 */
+	//}
+	//else
+	//{
+	//	g_tADS1256.AdcNow[g_tADS1256.Channel - 1] = ADS1256_ReadData();	/* 注意保存的是上一个通道的数据 */
+	//}
 
-	if (g_tADS1256.Channel == 0)
-	{
-		g_tADS1256.AdcNow[7] = ADS1256_ReadData();	/* 注意保存的是上一个通道的数据 */
-	}
-	else
-	{
-		g_tADS1256.AdcNow[g_tADS1256.Channel - 1] = ADS1256_ReadData();	/* 注意保存的是上一个通道的数据 */
-	}
-
-	if (++g_tADS1256.Channel >= 8)
-	{
-		g_tADS1256.Channel = 0;
-	}
+	//if (++g_tADS1256.Channel >= 8)
+	//{
+	//	g_tADS1256.Channel = 0;
+	//}
 }
 
 
@@ -1011,20 +1021,20 @@ void ADS1256_ISR(void)
 */
 
 //need to be edited
-#ifndef EXTI9_5_ISR_MOVE_OUT		/* bsp.h 中定义此行，表示本函数移到 stam32f4xx_it.c。 避免重复定义 */
-void EXTI9_5_IRQHandler(void)
-{
-	if (EXTI_GetITStatus(EXTI_Line9) != RESET)
-	{
-		EXTI_ClearITPendingBit(EXTI_Line9);		/* 清除中断标志位 */
-
-		ADS1256_ISR();
-
-		/* 执行上面的代码完毕后，再次清零中断标志 */
-		EXTI_ClearITPendingBit(EXTI_Line9);		/* 清除中断标志位 */
-	}
-}
-#endif
+//#ifndef EXTI9_5_ISR_MOVE_OUT		/* bsp.h 中定义此行，表示本函数移到 stam32f4xx_it.c。 避免重复定义 */
+//void EXTI9_5_IRQHandler(void)
+//{
+//	if (EXTI_GetITStatus(EXTI_Line9) != RESET)
+//	{
+//		EXTI_ClearITPendingBit(EXTI_Line9);		/* 清除中断标志位 */
+//
+//		ADS1256_ISR();
+//
+//		/* 执行上面的代码完毕后，再次清零中断标志 */
+//		EXTI_ClearITPendingBit(EXTI_Line9);		/* 清除中断标志位 */
+//	}
+//}
+//#endif
 
 
 
