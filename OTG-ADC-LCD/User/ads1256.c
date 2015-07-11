@@ -1,135 +1,235 @@
+/*
+*********************************************************************************************************
+*
+*	模块名称 : ADS1256 驱动模块(8通道带PGA的24位ADC)
+*	文件名称 : bsp_ads1256.c
+*	版    本 : V1.0
+*	说    明 : ADS1256模块和CPU之间采用SPI接口。本驱动程序支持硬件SPI接口和软件SPI接口。
+*			  通过宏切换。
+*
+*	修改记录 :
+*		版本号  日期         作者     说明
+*		V1.0    2014-01-01  armfly  正式发布
+*
+*	Copyright (C), 2013-2014, 安富莱电子 www.armfly.com
+*
+*********************************************************************************************************
+*/
+
 
 #include "ads1256.h"
+//#include "tm_stm32f4_usb_vcp.h"
+#include "tm_stm32f4_spi.h"
 
-u8 tabb[2];
+
+//#define SOFT_SPI		/* 定义此行表示使用GPIO模拟SPI接口 */
+//#define HARD_SPI		/* 定义此行表示使用CPU的硬件SPI接口 */
+
+/*
+ADS1256模块可以直接插到STM32-V5开发板CN26排母(2*6P 2.54mm)接口上.
+
+//FOR F4DISCOVERY
++5V   <------  5.0V      5V供电
+GND   -------  GND       地
+DRDY  ------>  PE9       准备就绪
+CS    <------  PB0       SPI_CS
+DIN   <------  PA7       SPI_MOSI
+DOUT  ------>  PA6       SPI_MISO
+SCLK  <------  PA5       SPI时钟
+GND   -------  GND       地
+//-PDWN  <------  PB0       掉电控制
+RST   <------  PC5       复位信号
+NC   空脚
+NC   空脚
 
 
+//FOR F401
++5V <------  5.0V      5V供电
+GND	------ - GND       地
+DRDY------>  PC9       准备就绪
+CS    <------PB0       SPI_CS
+DIN   <------PC2       SPI_MISO
+DOUT------>  PC3       SPI_MOSI
+SCLK  <------PB10      SPI时钟
+GND  ------- GND       地
+//-PDWN  <------  PB0       掉电控制
+RST   <------PC4       复位信号
+*/
+
+/*
+ADS1256基本特性:
+1、模拟部分供电5V;
+2、SPI数字接口电平：3.3V
+3、PGA设置范围： 1、2、4、8、16、32、64、
+4、参考电压2.5V (推荐缺省的，外置的）
+5、输入电压范围：PGA = 1 时, 可输入正负5V
+6. 自动校准 （当设置了PGA,BUF使能、数据采样率时，会启动自校准)
+7. 输入的缓冲器可设置启用和关闭（一般选启用）
+
+
+外部晶振频率 = 7.68MHz,
+时钟频率 tCLK = 1/7.68M = 0.13uS
+输出数据周期 tDATA =  1 / 30K = 0.033mS  (按30Ksps计算)
+
+对SPI的时钟速度要求: (ads1256.pdf page 6)
+最快 4个tCLK = 0.52uS
+最慢 10个tDATA = 0.3mS (按 30Ksps 计算)
+
+SCL高电平和低电平持续时间最小 200ns
+
+RREG, WREG, RDATA 命令之后，需要延迟 4 * tCLK = 0.52uS;
+RDATAC, RESET, SYNC 命令之后，需要延迟 24 * tCLK = 3.12uS;
+
+实际测试，在3.3V上电后, 及时不做任何配置，ADS125的DRDY 口线即开始输出脉冲信号（2.6us高,33.4低，频率30KHz）
+*/
+
+/*
+调试记录
+(1) 设置寄存器时，SCK过快导致芯片不能每次都收到数据。原因: 发送的相邻的字节之间需要延迟一小段时间.
+(2) 连续复位CPU时，偶尔出现芯片输出采样率异常。
+*/
+
+//#if !defined(SOFT_SPI) && !defined(HARD_SPI)
+// 	#error "Please define SPI Interface mode : SOFT_SPI or HARD_SPI"
+//#endif
+//
+//#ifdef SOFT_SPI		/* 软件SPI */
+/* 定义GPIO端口 */
+#if defined (TM_DISCO_NUCLEO_F401)
 #define RCC_SCK 	RCC_AHB1Periph_GPIOB
-#define PORT_SCK	GPIOB
+#define PORT_SCK	GPIOB	
 #define PIN_SCK		GPIO_Pin_10
 
-#define RCC_DIN 	RCC_AHB1Periph_GPIOC
-#define PORT_DIN	GPIOC
-#define PIN_DIN		GPIO_Pin_2
+#define RCC_DIN 	RCC_AHB1Periph_GPIOC		
+#define PORT_DIN	GPIOC	
+#define PIN_DIN		GPIO_Pin_2	
 
 #define RCC_CS 		RCC_AHB1Periph_GPIOB
-#define PORT_CS		GPIOB
-#define PIN_CS		GPIO_Pin_12
+#define PORT_CS		GPIOB	
+#define PIN_CS		GPIO_Pin_0
 
 #define RCC_RESET 	RCC_AHB1Periph_GPIOC
 #define PORT_RESET	GPIOC
 #define PIN_RESET	GPIO_Pin_4
 
-//#define RCC_PWDN 	RCC_AHB1Periph_GPIOA
-//#define PORT_PWDN	GPIOA
+//#define RCC_PWDN 	RCC_AHB1Periph_GPIOB
+//#define PORT_PWDN	GPIOB
 //#define PIN_PWDN	GPIO_Pin_0
 
 #define RCC_DRDY 	RCC_AHB1Periph_GPIOC
 #define PORT_DRDY	GPIOC
 #define PIN_DRDY	GPIO_Pin_9
 
-#define RCC_DOUT 	RCC_AHB1Periph_GPIOC
-#define PORT_DOUT	GPIOC
+#define RCC_DOUT 	RCC_AHB1Periph_GPIOC		
+#define PORT_DOUT	GPIOC	
 #define PIN_DOUT	GPIO_Pin_3
 
+#endif
 
+#if defined (TM_DISCO_STM32F4_DISCOVERY)
+#define RCC_SCK 	RCC_AHB1Periph_GPIOA
+#define PORT_SCK	GPIOA
+#define PIN_SCK		GPIO_Pin_5
 
-//PE6=CS PE7=RESET PE8=PWDN   //PE9=DRSY
-#define ADS_CS_LOW()        GPIO_ResetBits(PORT_CS, PIN_CS)
-#define ADS_CS_HIGH()       GPIO_SetBits(PORT_CS, PIN_CS)
-//#define PWDN_LOW()	    GPIO_ResetBits(GPIOE, GPIO_Pin_8)
-//#define PWDN_HIGH()	    GPIO_SetBits(GPIOE, GPIO_Pin_8)
-#define SCK_LOW()		GPIO_ResetBits(PORT_SCK, PIN_SCK)
-#define SCK_HIGH()		GPIO_SetBits(PORT_SCK,	PIN_SCK)
-#define DI_LOW()		GPIO_ResetBits(PORT_DIN, PIN_DIN)
-#define DI_HIGH()		GPIO_SetBits(PORT_DIN, PIN_DIN)
-#define RESET_LOW()	    GPIO_ResetBits(PORT_RESET, PIN_RESET)
-#define RESET_HIGH()	    GPIO_SetBits(PORT_RESET, PIN_RESET)
+#define RCC_DIN 	RCC_AHB1Periph_GPIOA
+#define PORT_DIN	GPIOA
+#define PIN_DIN		GPIO_Pin_7
+
+#define RCC_CS 		RCC_AHB1Periph_GPIOB
+#define PORT_CS		GPIOB
+#define PIN_CS		GPIO_Pin_0
+
+#define RCC_RESET 	RCC_AHB1Periph_GPIOC
+#define PORT_RESET	GPIOC
+#define PIN_RESET	GPIO_Pin_5
+
+//#define RCC_PWDN 	RCC_AHB1Periph_GPIOB
+//#define PORT_PWDN	GPIOB 
+//#define PIN_PWDN	GPIO_Pin_0
+
+#define RCC_DRDY 	RCC_AHB1Periph_GPIOE
+#define PORT_DRDY	GPIOE
+#define PIN_DRDY	GPIO_Pin_9
+
+#define RCC_DOUT 	RCC_AHB1Periph_GPIOA
+#define PORT_DOUT	GPIOA
+#define PIN_DOUT	GPIO_Pin_6
+#endif
+/* 定义口线置0和置1的宏 */
+//#define PWDN_0()	GPIO_ResetBits(PORT_PWDN, PIN_PWDN)
+//#define PWDN_1()	GPIO_SetBits(PORT_PWDN, PIN_PWDN)
+
+#define RESET_0()	GPIO_ResetBits(PORT_RESET, PIN_RESET)
+#define RESET_1()	GPIO_SetBits(PORT_RESET, PIN_RESET)
+
+#define CS_0()		GPIO_ResetBits(PORT_CS, PIN_CS)
+#define CS_1()		GPIO_SetBits(PORT_CS, PIN_CS)
+
+#define SCK_0()		GPIO_ResetBits(PORT_SCK, PIN_SCK)
+#define SCK_1()		GPIO_SetBits(PORT_SCK, PIN_SCK)
+
+#define DI_0()		GPIO_ResetBits(PORT_DIN, PIN_DIN)
+#define DI_1()		GPIO_SetBits(PORT_DIN, PIN_DIN)
+
 #define DO_IS_HIGH()	(GPIO_ReadInputDataBit(PORT_DOUT, PIN_DOUT) == Bit_SET)
+
 #define DRDY_IS_LOW()	(GPIO_ReadInputDataBit(PORT_DRDY, PIN_DRDY) == Bit_RESET)
-//#define ADS_DRDY	    GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_9)
 
+//
+//#ifdef HARD_SPI		/* 硬件SPI */
+//	;
+//#endif= Bit_RESET)
+//
 
-/******************ads1248寄存器地址*******************/
-// define commands 
-#define ADS1256_CMD_WAKEUP   0x00     //完成SYNC和退出待机模式
-#define ADS1256_CMD_RDATA    0x01     //读数据
-#define ADS1256_CMD_RDATAC   0x03     //连续读数据
-#define ADS1256_CMD_SDATAC   0x0f     //停止连续读数据 
-#define ADS1256_CMD_RREG     0x10     //从寄存器度数据 
-#define ADS1256_CMD_WREG     0x50     //向寄存器写数据 
-#define ADS1256_CMD_SELFCAL  0xf0     //偏移和增益自动校准
-#define ADS1256_CMD_SELFOCAL 0xf1     //偏移自动校准 
-#define ADS1256_CMD_SELFGCAL 0xf2     //增益自动校准 
-#define ADS1256_CMD_SYSOCAL  0xf3     //系统失调校准 
-#define ADS1256_CMD_SYSGCAL  0xf4     //系统增益校准 
-#define ADS1256_CMD_SYNC     0xfc     //同步AD转换 
-#define ADS1256_CMD_STANDBY  0xfd     //待机模式开始 
-#define ADS1256_CMD_REST    0xfe      //复位
+/* 寄存器定义： Table 23. Register Map --- ADS1256数据手册第30页 */
+enum
+{
+	/* 寄存器地址， 后面是复位后缺省值 */
+	REG_STATUS = 0,	// x1H
+	REG_MUX = 1, // 01H
+	REG_ADCON = 2, // 20H
+	REG_DRATE = 3, // F0H
+	REG_IO = 4, // E0H
+	REG_OFC0 = 5, // xxH
+	REG_OFC1 = 6, // xxH
+	REG_OFC2 = 7, // xxH
+	REG_FSC0 = 8, // xxH
+	REG_FSC1 = 9, // xxH
+	REG_FSC2 = 10, // xxH
+};
 
-// define the ADS1256 register values 
-#define ADS1256_STATUS       0x00   
-#define ADS1256_MUX          0x01   
-#define ADS1256_ADCON        0x02   
-#define ADS1256_DRATE        0x03   
-#define ADS1256_IO           0x04   
-#define ADS1256_OFC0         0x05   
-#define ADS1256_OFC1         0x06   
-#define ADS1256_OFC2         0x07   
-#define ADS1256_FSC0         0x08   
-#define ADS1256_FSC1         0x09   
-#define ADS1256_FSC2         0x0A 
+/* 命令定义： TTable 24. Command Definitions --- ADS1256数据手册第34页 */
+enum
+{
+	CMD_WAKEUP = 0x00,	// Completes SYNC and Exits Standby Mode 0000  0000 (00h)
+	CMD_RDATA = 0x01, // Read Data 0000  0001 (01h)
+	CMD_RDATAC = 0x03, // Read Data Continuously 0000   0011 (03h)
+	CMD_SDATAC = 0x0F, // Stop Read Data Continuously 0000   1111 (0Fh)
+	CMD_RREG = 0x10, // Read from REG rrr 0001 rrrr (1xh)
+	CMD_WREG = 0x50, // Write to REG rrr 0101 rrrr (5xh)
+	CMD_SELFCAL = 0xF0, // Offset and Gain Self-Calibration 1111    0000 (F0h)
+	CMD_SELFOCAL = 0xF1, // Offset Self-Calibration 1111    0001 (F1h)
+	CMD_SELFGCAL = 0xF2, // Gain Self-Calibration 1111    0010 (F2h)
+	CMD_SYSOCAL = 0xF3, // System Offset Calibration 1111   0011 (F3h)
+	CMD_SYSGCAL = 0xF4, // System Gain Calibration 1111    0100 (F4h)
+	CMD_SYNC = 0xFC, // Synchronize the A/D Conversion 1111   1100 (FCh)
+	CMD_STANDBY = 0xFD, // Begin Standby Mode 1111   1101 (FDh)
+	CMD_RESET = 0xFE, // Reset to Power-Up Values 1111   1110 (FEh)
+};
 
+static void ADS1256_Send8Bit(uint8_t _data);
+static uint8_t ADS1256_Recive8Bit(void);
+static void ADS1256_WaitDRDY(void);
+static void ADS1256_ResetHard(void);
+static void ADS1256_DelaySCLK(void);
+static void ADS1256_DelayDATA(void);
 
-// define multiplexer codes 
-#define ADS1256_MUXP_AIN0   0x00 
-#define ADS1256_MUXP_AIN1   0x10 
-#define ADS1256_MUXP_AIN2   0x20 
-#define ADS1256_MUXP_AIN3   0x30 
-#define ADS1256_MUXP_AIN4   0x40 
-#define ADS1256_MUXP_AIN5   0x50 
-#define ADS1256_MUXP_AIN6   0x60 
-#define ADS1256_MUXP_AIN7   0x70 
-#define ADS1256_MUXP_AINCOM 0x80 
-
-#define ADS1256_MUXN_AIN0   0x00 
-#define ADS1256_MUXN_AIN1   0x01 
-#define ADS1256_MUXN_AIN2   0x02 
-#define ADS1256_MUXN_AIN3   0x03 
-#define ADS1256_MUXN_AIN4   0x04 
-#define ADS1256_MUXN_AIN5   0x05 
-#define ADS1256_MUXN_AIN6   0x06 
-#define ADS1256_MUXN_AIN7   0x07 
-#define ADS1256_MUXN_AINCOM 0x08   
-
-
-//// define gain codes 
-//#define ADS1256_GAIN_1      0x00 
-//#define ADS1256_GAIN_2      0x01 
-//#define ADS1256_GAIN_4      0x02 
-//#define ADS1256_GAIN_8      0x03 
-//#define ADS1256_GAIN_16     0x04 
-//#define ADS1256_GAIN_32     0x05 
-//#define ADS1256_GAIN_64     0x06 
-////#define ADS1256_GAIN_64     0x07 
-
-//define drate codes 
-#define ADS1256_DRATE_30000SPS   0xF0 
-#define ADS1256_DRATE_15000SPS   0xE0 
-#define ADS1256_DRATE_7500SPS   0xD0 
-#define ADS1256_DRATE_3750SPS   0xC0 
-#define ADS1256_DRATE_2000SPS   0xB0 
-#define ADS1256_DRATE_1000SPS   0xA1 
-#define ADS1256_DRATE_500SPS    0x92 
-#define ADS1256_DRATE_100SPS    0x82 
-#define ADS1256_DRATE_60SPS     0x72 
-#define ADS1256_DRATE_50SPS     0x63 
-#define ADS1256_DRATE_30SPS     0x53 
-#define ADS1256_DRATE_25SPS     0x43 
-#define ADS1256_DRATE_15SPS     0x33 
-#define ADS1256_DRATE_10SPS     0x23 
-#define ADS1256_DRATE_5SPS      0x13 
-#define ADS1256_DRATE_2_5SPS    0x03
+static void ADS1256_WriteCmd(uint8_t _cmd);
+static void ADS1256_WriteReg(uint8_t _RegID, uint8_t _RegValue);
+static uint8_t ADS1256_ReadReg(uint8_t _RegID);
+static int32_t ADS1256_ReadData(void);
+static void ADS1256_SetChannal(uint8_t _ch);
+//static void ADS1256_SetDiffChannal(uint8_t _ch);
 
 ADS1256_VAR_T g_tADS1256;
 static const uint8_t s_tabDataRate[ADS1256_DRATE_MAX] =
@@ -152,26 +252,88 @@ static const uint8_t s_tabDataRate[ADS1256_DRATE_MAX] =
 	0x03
 };
 
-static void ADS1256_WaitDRDY(void);
-static void ADS1256_Send8Bit(uint8_t _data);
-static uint8_t ADS1256_Recive8Bit(void);
+/*
+*********************************************************************************************************
+*	函 数 名: bsp_InitADS1256
+*	功能说明: 配置STM32的GPIO和SPI接口，用于连接 ADS1256
+*	形    参: 无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+void InitADS1256(void)
+{
+	GPIO_InitTypeDef GPIO_InitStructure;
 
+
+	RESET_1();
+	//PWDN_1();
+	CS_1();
+	SCK_0();		/* SPI总线空闲时，钟线是低电平 */
+	DI_1();
+
+
+	/* 打开GPIO时钟 */
+	RCC_AHB1PeriphClockCmd(RCC_CS | RCC_DIN | RCC_DOUT | RCC_SCK | RCC_DRDY | RCC_RESET, ENABLE);
+
+	/* 配置几个推完输出IO */
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;		/* 设为输出口 */
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;	/* IO口最大速度 */
+
+	GPIO_InitStructure.GPIO_Pin = PIN_SCK;
+	GPIO_Init(PORT_SCK, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = PIN_DIN;
+	GPIO_Init(PORT_DIN, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = PIN_CS;
+	GPIO_Init(PORT_CS, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = PIN_RESET;
+	GPIO_Init(PORT_RESET, &GPIO_InitStructure);
+
+	//GPIO_InitStructure.GPIO_Pin = PIN_PWDN;
+	//GPIO_Init(PORT_PWDN, &GPIO_InitStructure);
+
+	/* 配置GPIO为浮动输入模式(实际上CPU复位后就是输入状态) */
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;		/* 设为输入口 */
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 无需上下拉电阻 */
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
+
+	GPIO_InitStructure.GPIO_Pin = PIN_DOUT;
+	GPIO_Init(PORT_DOUT, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = PIN_DRDY;
+	GPIO_Init(PORT_DRDY, &GPIO_InitStructure);
+
+
+	//ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_1000SPS);	/* 配置ADC参数： 增益1:1, 数据输出速率 1KHz */
+}
+
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_CfgADC
+*	功能说明: 配置ADC参数，增益和数据输出速率
+*	形    参: _gain : 增益
+*			  _drate : 数据输出速率
+*	返 回 值: 无
+*********************************************************************************************************
+*/
 void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 {
 	g_tADS1256.Gain = _gain;
 	g_tADS1256.DataRate = _drate;
 
-	//ADS1256_StopScan();			/* 暂停CPU中断 */
+	ADS1256_StopScan();			/* 暂停CPU中断 */
 
 	ADS1256_ResetHard();		/* 硬件复位 */
 
 	ADS1256_WaitDRDY();
 
-	ADS1256_Send8Bit(ADS1256_CMD_SELFGCAL);
-	Delay(100);
-
 	{
-		//uint8_t buf[4];		/* 暂存ADS1256 寄存器配置参数，之后连续写4个寄存器 */
+		uint8_t buf[4];		/* 暂存ADS1256 寄存器配置参数，之后连续写4个寄存器 */
 
 		/* 状态寄存器定义
 		Bits 7-4 ID3, ID2, ID1, ID0  Factory Programmed Identification Bits (Read Only)
@@ -189,19 +351,19 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 		the PGA (bits 0-2 of ADCON register), DR (bits 7-0 in the DRATE register) or BUFEN (bit 1 in the STATUS register)
 		values.
 
+
 		Bit 1 BUFEN: Analog Input Buffer Enable
 		0 = Buffer Disabled (default)
 		1 = Buffer Enabled
-
 		Bit 0 DRDY :  Data Ready (Read Only)
 		This bit duplicates the state of the DRDY pin.
 
 		ACAL=1使能自校准功能。当 PGA，BUFEEN, DRATE改变时会启动自校准
 		*/
-		//buf[0] = (0 << 3) | (1 << 2) | (1 << 1);
+		buf[0] = (0 << 3) | (1 << 2) | (1 << 1);
 		//ADS1256_WriteReg(REG_STATUS, (0 << 3) | (1 << 2) | (1 << 1));
 
-		//buf[1] = 0x08;	/* 高四位0表示AINP接 AIN0,  低四位8表示 AINN 固定接 AINCOM */
+		buf[1] = 0x08;	/* 高四位0表示AINP接 AIN0,  低四位8表示 AINN 固定接 AINCOM */
 
 		/*	ADCON: A/D Control Register (Address 02h)
 		Bit 7 Reserved, always 0 (Read Only)
@@ -230,29 +392,123 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 		110 = 64
 		111 = 64
 		*/
-		//buf[2] = (0 << 5) | (0 << 2) | (_gain << 1);
+		buf[2] = (0 << 5) | (0 << 2) | (_gain << 1);
 		//ADS1256_WriteReg(REG_ADCON, (0 << 5) | (0 << 2) | (GAIN_1 << 1));	/* 选择1;1增益, 输入正负5V */
 
 		/* 因为切换通道和读数据耗时 123uS, 因此扫描中断模式工作时，最大速率 = DRATE_1000SPS */
-		//buf[3] = s_tabDataRate[_drate];	// DRATE_10SPS;	/* 选择数据输出速率 */
+		buf[3] = s_tabDataRate[_drate];	// DRATE_10SPS;	/* 选择数据输出速率 */
 
-		//ADS_CS_LOW();	/* SPI片选 = 0 */
-		//ADS1256_Send8Bit(ADS1256_CMD_WREG | 0);	/* 写寄存器的命令, 并发送寄存器地址 */
-		//ADS1256_Send8Bit(0x03);			/* 寄存器个数 - 1, 此处3表示写4个寄存器 */
+		CS_0();	/* SPI片选 = 0 */
+		ADS1256_Send8Bit(CMD_WREG | 0);	/* 写寄存器的命令, 并发送寄存器地址 */
+		ADS1256_Send8Bit(0x03);			/* 寄存器个数 - 1, 此处3表示写4个寄存器 */
 
-		//ADS1256_Send8Bit(buf[0]);	/* 设置状态寄存器 */
-		//ADS1256_Send8Bit(buf[1]);	/* 设置输入通道参数 */
-		//ADS1256_Send8Bit(buf[2]);	/* 设置ADCON控制寄存器，增益 */
-		//ADS1256_Send8Bit(buf[3]);	/* 设置输出数据速率 */
+		ADS1256_Send8Bit(buf[0]);	/* 设置状态寄存器 */
+		ADS1256_Send8Bit(buf[1]);	/* 设置输入通道参数 */
+		ADS1256_Send8Bit(buf[2]);	/* 设置ADCON控制寄存器，增益 */
+		ADS1256_Send8Bit(buf[3]);	/* 设置输出数据速率 */
 
-		//ADS_CS_HIGH();	/* SPI片选 = 1 */
+		CS_1();	/* SPI片选 = 1 */
+	}
 
-		ADS1256WREG(ADS1256_STATUS, 0x04);   	//初始化STATUS reg  ID位为f,数据输出高位在先,自动校准开,输入缓冲关闭,DRDY高电平
-		// 	ADS1256_WriteReg(ADS1256_STATUS,0x06);  			 		//buff on	,模拟输入电压必须<AVDD-2V,否则，输出有误。ZHP 20131104
-		ADS1256WREG(ADS1256_MUX, ADS1256_MUXP_AIN0 + ADS1256_MUXN_AINCOM); //初始化MUX    reg  单端输入AIN0-AINCOM		ADS1256WREG(ADS1256_ADCON, ADS1256_GAIN_1);
-		ADS1256WREG(ADS1256_DRATE, ADS1256_DRATE_30000SPS);
-		ADS1256_Send8Bit(ADS1256_CMD_SELFGCAL);
-		Delay(100);
+	//bsp_DelayUS(50);
+	Delay(50);
+}
+
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_DelaySCLK
+*	功能说明: CLK之间的延迟，时序延迟. 用于STM32F407  168M主频
+*	形    参: 无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+static void ADS1256_DelaySCLK(void)
+{
+	//uint16_t i;
+
+	/*
+	取 5 时，实测高电平200ns, 低电平250ns <-- 不稳定
+	取 10 以上，可以正常工作， 低电平400ns 高定400ns <--- 稳定
+	*/
+	//for (i = 0; i < 10; i++);
+	Delay(50);
+}
+
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_DelayDATA
+*	功能说明: 读取DOUT之前的延迟
+*	形    参: 无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+static void ADS1256_DelayDATA(void)
+{
+	/*
+	Delay from last SCLK edge for DIN to first SCLK rising edge for DOUT: RDATA, RDATAC,RREG Commands
+	最小 50 个tCLK = 50 * 0.13uS = 6.5uS
+	*/
+	//bsp_DelayUS(10);	/* 最小延迟 6.5uS, 此处取10us */
+	Delay(10);
+}
+
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_ResetHard
+*	功能说明: 硬件复位 ADS1256芯片.低电平复位。最快4个时钟，也就是 4x0.13uS = 0.52uS
+*	形    参: 无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+static void ADS1256_ResetHard(void)
+{
+	/* ADS1256数据手册第7页 */
+	RESET_0();			/* 复位 */
+	//bsp_DelayUS(5);
+	Delay(5);
+	RESET_1();
+
+	//PWDN_0();			/* 进入掉电 同步*/
+	//bsp_DelayUS(2);	
+	//PWDN_1();			/* 退出掉电 */
+
+	//bsp_DelayUS(5);
+	Delay(5);
+	//ADS1256_WaitDRDY();	/* 等待 DRDY变为0, 此过程实测: 630us */
+}
+
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_Send8Bit
+*	功能说明: 向SPI总线发送8个bit数据。 不带CS控制。
+*	形    参: _data : 数据
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+static void ADS1256_Send8Bit(uint8_t _data)
+{
+	uint8_t i;
+
+	/* 连续发送多个字节时，需要延迟一下 */
+	ADS1256_DelaySCLK();  //50us
+	ADS1256_DelaySCLK();
+
+	/*　ADS1256 要求 SCL高电平和低电平持续时间最小 200ns  */
+	for (i = 0; i < 8; i++)
+	{
+		if (_data & 0x80)
+		{
+			DI_1();
+		}
+		else
+		{
+			DI_0();
+		}
+		SCK_1();
+		ADS1256_DelaySCLK();
+		_data <<= 1;
+		SCK_0();			/* <----  ADS1256 是在SCK下降沿采样DIN数据, 数据必须维持 50nS */
+		ADS1256_DelaySCLK();
 	}
 }
 
@@ -269,328 +525,98 @@ static uint8_t ADS1256_Recive8Bit(void)
 	uint8_t i;
 	uint8_t read = 0;
 
-	Delay(10);
+	ADS1256_DelaySCLK();
 	/*　ADS1256 要求 SCL高电平和低电平持续时间最小 200ns  */
 	for (i = 0; i < 8; i++)
 	{
-		SCK_HIGH();
-		Delay(10);
+		SCK_1();
+		ADS1256_DelaySCLK();
 		read = read << 1;
-		SCK_LOW();
+		SCK_0();
 		if (DO_IS_HIGH())
 		{
 			read++;
 		}
-		Delay(10);
+		ADS1256_DelaySCLK();
 	}
 	return read;
 }
 
-static void ADS1256_Send8Bit(uint8_t _data)
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_WriteReg
+*	功能说明: 写指定的寄存器
+*	形    参:  _RegID : 寄存器ID
+*			  _RegValue : 寄存器值
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+static void ADS1256_WriteReg(uint8_t _RegID, uint8_t _RegValue)
 {
-	uint8_t i;
+	CS_0();	/* SPI片选 = 0 */
+	ADS1256_Send8Bit(CMD_WREG | _RegID);	/* 写寄存器的命令, 并发送寄存器地址 */
+	ADS1256_Send8Bit(0x00);		/* 寄存器个数 - 1, 此处写1个寄存器 */
 
-	/* 连续发送多个字节时，需要延迟一下 */
-	Delay(20);
-
-	/*　ADS1256 要求 SCL高电平和低电平持续时间最小 200ns  */
-	for (i = 0; i < 8; i++)
-	{
-		if (_data & 0x80)
-		{
-			DI_HIGH();
-		}
-		else
-		{
-			DI_LOW();
-		}
-		SCK_HIGH();
-		Delay(5);
-		_data <<= 1;
-		SCK_LOW();			/* <----  ADS1256 是在SCK下降沿采样DIN数据, 数据必须维持 50nS */
-		Delay(5);
-	}
-}
-static void ADS1256_WaitDRDY(void)
-{
-	uint32_t i;
-
-	for (i = 0; i < 40000000; i++)
-	{
-		if (DRDY_IS_LOW())
-		{
-			break;
-		}
-	}
-	if (i >= 40000000)
-	{
-		//printf("ADS1256_WaitDRDY() Time Out ...\r\n");		/* 调试语句. 用语排错 */
-	}
+	ADS1256_Send8Bit(_RegValue);	/* 发送寄存器值 */
+	CS_1();	/* SPI片选 = 1 */
 }
 
-void SPI_Init2(void) //PE5开始
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_ReadReg
+*	功能说明: 写指定的寄存器
+*	形    参:  _RegID : 寄存器ID
+*			  _RegValue : 寄存器值。
+*	返 回 值: 读到的寄存器值。
+*********************************************************************************************************
+*/
+static uint8_t ADS1256_ReadReg(uint8_t _RegID)
 {
-	//u8 read_tab[5];
-	//SPI_InitTypeDef  SPI_InitStructure;
-	GPIO_InitTypeDef GPIO_InitStructure;
-	
-	//RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
-	RESET_HIGH();
-	ADS_CS_HIGH();
-	SCK_HIGH();
-	DI_HIGH();
+	uint8_t read;
 
-	RCC_AHB1PeriphClockCmd(RCC_SCK | RCC_DIN | RCC_DOUT | RCC_CS | RCC_DRDY | RCC_RESET, ENABLE);
-	//GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3; //PE3=1
-	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	//GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-	//GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	//GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-	//GPIO_Init(GPIOE, &GPIO_InitStructure);
-	//GPIO_SetBits(GPIOE, GPIO_Pin_3);
+	CS_0();	/* SPI片选 = 0 */
+	ADS1256_Send8Bit(CMD_RREG | _RegID);	/* 写寄存器的命令, 并发送寄存器地址 */
+	ADS1256_Send8Bit(0x00);	/* 寄存器个数 - 1, 此处读1个寄存器 */
 
-	/*GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_SPI2);
-	GPIO_PinAFConfig(GPIOC, GPIO_PinSource3, GPIO_AF_SPI2);
-	GPIO_PinAFConfig(GPIOC, GPIO_PinSource2, GPIO_AF_SPI2);*/
+	ADS1256_DelayDATA();	/* 必须延迟才能读取芯片返回数据 */
 
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;  //PC9=DRSY
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
+	read = ADS1256_Recive8Bit();	/* 读寄存器值 */
+	CS_1();	/* SPI片选 = 1 */
 
-	GPIO_InitStructure.GPIO_Pin = PIN_DRDY;
-	GPIO_Init(PORT_DRDY, &GPIO_InitStructure);
-
-	GPIO_InitStructure.GPIO_Pin = PIN_DOUT;
-	GPIO_Init(PORT_DOUT, &GPIO_InitStructure);
-
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;		/* 设为输出口 */
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
-
-	GPIO_InitStructure.GPIO_Pin = PIN_DIN;
-	GPIO_Init(PORT_DIN, &GPIO_InitStructure);
-
-	GPIO_InitStructure.GPIO_Pin = PIN_CS;
-	GPIO_Init(PORT_CS, &GPIO_InitStructure);
-
-	GPIO_InitStructure.GPIO_Pin = PIN_SCK;
-	GPIO_Init(PORT_SCK, &GPIO_InitStructure);
-
-	GPIO_InitStructure.GPIO_Pin = PIN_RESET;
-	GPIO_Init(PORT_RESET, &GPIO_InitStructure);
-	//SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-	//SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
-	//SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
-	//SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
-	//SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;
-	//SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-	//SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
-	//SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
-	//SPI_InitStructure.SPI_CRCPolynomial = 7;
-	//SPI_Cmd(SPI2, ENABLE);
-	//SPI_Init(SPI2, &SPI_InitStructure);
-	//SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_TXE, ENABLE); //使能	SPI发送缓存空中断
-
-	//ADS_CS_HIGH();
-
-	//      ADS1256_ResetHard();		/* 硬件复位 */                        
-	//      ADS1256_WaitDRDY();
-	//      read_tab[0] = ADS1256_ReadReg(0);   
-	//      ADS1256_WaitDRDY();        
-	//      read_tab[1] = ADS1256_ReadReg(1);  
-	//      ADS1256_WaitDRDY();        
-	//      read_tab[2] = ADS1256_ReadReg(2); 
-	//      ADS1256_WaitDRDY();        
-	//      read_tab[3] = ADS1256_ReadReg(3); 
-	//      ADS1256_WaitDRDY();        
-	//      read_tab[4] = ADS1256_ReadReg(4);   
+	return read;
 }
 
-//u8 results1, results2, results3;
-void ADS1256_ResetHard(void)
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_WriteCmd
+*	功能说明: 发送单字节命令
+*	形    参:  _cmd : 命令
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+static void ADS1256_WriteCmd(uint8_t _cmd)
 {
-	RESET_LOW();
-	Delay(100);
-	RESET_HIGH();
-	Delay(100);
+	CS_0();	/* SPI片选 = 0 */
+	ADS1256_Send8Bit(_cmd);
+	CS_1();	/* SPI片选 = 1 */
 }
-/*******************************************************************************
-* Function Name  : SPI_FLASH_SendByte
-* Description    : Sends a byte through the SPI interface and return the byte
-*                  received from the SPI bus.
-* Input          : byte : byte to send.
-* Output         : None
-* Return         : The value of the received byte.
-*******************************************************************************/
-//u8 SPI_SendByte(u8 byte)
-//{
-//	/* Loop while DR register in not emplty */
-//	while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET);
-//	/* Send byte through the SPI2 peripheral */
-//	SPI_I2S_SendData(SPI2, byte);
-//	/* Wait to receive a byte */
-//	while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_RXNE) == RESET);
-//	/* Return the byte read from the SPI bus */
-//	return SPI_I2S_ReceiveData(SPI2);
-//}
-//-----------------------------------------------------------------//
-//	功    能：ADS1256 写数据
-//	入口参数: /
-//	出口参数: /
-//	全局变量: /
-//	备    注: 向ADS1256中地址为regaddr的寄存器写入一个字节databyte
-//-----------------------------------------------------------------//
-void ADS1256WREG(unsigned char regaddr, unsigned char databyte)
+
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_ReadChipID
+*	功能说明: 读芯片ID, 读状态寄存器中的高4bit
+*	形    参: 无
+*	返 回 值: 8bit状态寄存器值的高4位
+*********************************************************************************************************
+*/
+uint8_t ADS1256_ReadChipID(void)
 {
-	ADS_CS_LOW();
-	//while (ADS_DRDY);//当ADS1256_DRDY为低时才能写寄存器
-	ADS1256_Send8Bit(ADS1256_CMD_WREG | regaddr );//向寄存器写入数据地址
-	ADS1256_Send8Bit(0x00);//写入数据的个数n-1
-	ADS1256_Send8Bit(databyte);//向regaddr地址指向的寄存器写入数据databyte
-	ADS_CS_HIGH();
+	uint8_t id;
+
+	ADS1256_WaitDRDY();
+	id = ADS1256_ReadReg(REG_STATUS);
+	return (id >> 4);
 }
-//-----------------------------------------------------------------//
-//	功    能：ADS1256 读寄存器数据
-//	入口参数: /
-//	出口参数: /
-//	全局变量: /
-//	备    注: 从ADS1256中地址为regaddr的寄存器读出一个字节databyte
-//-----------------------------------------------------------------//
-unsigned char ADS1256RREG(unsigned char regaddr)
-{
-	//从ADS1256中地址为regaddr的寄存器读出一个字节
-	unsigned char r = 0;
-	ADS_CS_LOW();
-	//while (ADS_DRDY);//当ADS1256_DRDY为低时才能写寄存器
-	//SPI_SendByte(ADS1256_CMD_RREG | (regaddr & 0xF));
-	ADS1256_Send8Bit(ADS1256_CMD_RREG | regaddr);
-	ADS1256_Send8Bit(0x00);//写入读取数据的个数n-1
-	Delay(10); //min=50*(1/fCLKIN)=50*(1/7.68MHZ)=6500ns;max=whatever                   
-	//r = SPI_SendByte(0); //读出regaddr地址指向的寄存器的数据
-	r = ADS1256_Recive8Bit();
-	ADS_CS_HIGH();
-	return r;//返回数据
-}
-//-----------------------------------------------------------------//
-//	功    能：ADS1256初始化子程序
-//	入口参数: /
-//	出口参数: /
-//	全局变量: /
-//	备    注: /
-//-----------------------------------------------------------------//
-//void ADS1256_Init(void)
-//{
-//	//unsigned char tab1[5];
-//	SPI_Init2();
-//	ADS1256_ResetHard();
-//	
-//	/*tab1[0] = ADS1256RREG(0);
-//	tab1[1] = ADS1256RREG(1);
-//	tab1[2] = ADS1256RREG(2);
-//	tab1[3] = ADS1256RREG(3);*/
-//
-//	//ADS1256WREG(0x00, 0x31 );      
-//	//ADS1256WREG(0x01, 0x23 );         
-//	//ADS1256WREG(0x02, 0x20 );         
-//	//ADS1256WREG(0x03, 0xf0 ); 
-//
-//
-//
-//
-//
-//
-//	
-//	//while (ADS_DRDY);
-//	//SPI_SendByte(ADS1256_CMD_WREG | ADS1256_STATUS);//连续写入4个寄存器
-//	//SPI_SendByte(3);
-//	//SPI_SendByte(0x31);
-//	//SPI_SendByte(0x23);
-//	//SPI_SendByte(0x20);
-//	//SPI_SendByte(0x03);  
-//	//ADS_CS_LOW();
-//	ADS1256WREG(ADS1256_STATUS, 0x00);               // 高位在前、校准、使用缓冲
-//	Delay(10);
-//	//	ADS1256WREG(ADS1256_MUX,0x08);                  // 初始化端口A0为‘+’，AINCOM位‘-’
-//	ADS1256WREG(ADS1256_ADCON, 0x00);                // 放大倍数1
-//	Delay(10);
-//	ADS1256WREG(ADS1256_DRATE, ADS1256_DRATE_30000SPS);  // 数据5sps
-//	Delay(10);
-//	ADS1256WREG(ADS1256_IO, 0x00);
-//	Delay(10);
-//	SPI_I2S_SendData(SPI2, ADS1256_CMD_SELFCAL);
-//	while (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_9));
-//	SPI_I2S_ClearFlag(SPI2, SPI_I2S_FLAG_TXE);	 //清除发送缓冲为空中断标识
-//	//ADS_CS_HIGH();
-//
-//
-//	Delay(50);
-//
-//	/*Delay(100);
-//	tab1[1] = ADS1256RREG(1);
-//	tab1[2] = ADS1256RREG(2);
-//	tab1[3] = ADS1256RREG(3);
-//	tab1[4] = ADS1256RREG(4);
-//	tab1[5] = ADS1256RREG(5);*/
-//
-//}
-
-int32_t ADS1256_ReadData(void)
-{
-	//unsigned char i = 0;
-	uint32_t sum = 0;
-	//uint32_t r = 0;
-
-	
-	//while (DRDY_IS_LOW());	/* 等待 DRDY 高 */
-	//while (!DRDY_IS_LOW());	/* 等待 DRDY 低 */
-
-	//ADS1256_Send8Bit(ADS1256_CMD_SYNC);
-	//Delay(5);
-	//ADS1256_Send8Bit(ADS1256_CMD_WAKEUP);
-	//Delay(5);
-	//ADS_CS_LOW();
-	ADS1256_Send8Bit(ADS1256_CMD_RDATA);
-	Delay(7);               //min=50*(1/fCLKIN)=50*(1/7.68MHZ)=6500ns;max=whatever
-	/*for (i = 0; i < 3; i++)
-	{
-	sum = sum << 8;
-	r = ADS1256_Send8Bit(0);
-	sum |= r;
-	}*/
-	//while (DRDY_IS_LOW());	/* 等待 DRDY 高 */
-	//while (!DRDY_IS_LOW());	/* 等待 DRDY 低 */
-	//ADS1256_WaitDRDY();
-	sum = ADS1256_Recive8Bit() << 16;
-	sum += ADS1256_Recive8Bit() << 8;
-	sum += ADS1256_Recive8Bit() << 0;
-	//ADS_CS_HIGH();
-	/* 负数进行扩展。24位有符号数扩展为32位有符号数 */
-	if (sum & 0x800000)
-	{
-		sum += 0xFF000000;
-		//sum = sum * 2;
-	}
-	return (int32_t)sum;
-}
-//-----------------------------------------------------------------//
-//	功    能：读取ADS1256单路数据
-//	入口参数: /
-//	出口参数: /
-//	全局变量: /
-//	备    注: /
-//-----------------------------------------------------------------//
-//void ADS_sum(void)
-//{
-//	unsigned long results = 0;
-//	//ADS1256WREG(ADS1256_MUX,road);		//设置通道
-//	results = ADS1256ReadData();        //读取AD值，返回24位数据。
-//	results1 = (results >> 16) & 0x0000ff; //发送最高位	
-//	results2 = (results >> 8) & 0x0000ff;  //发送中间位
-//	results3 = results & 0x0000ff;		   //发送低位
-//}
-
 
 /*
 *********************************************************************************************************
@@ -600,16 +626,38 @@ int32_t ADS1256_ReadData(void)
 *	返 回 值: 无
 *********************************************************************************************************
 */
-void ADS1256_SetChannal(uint8_t _ch)
+static void ADS1256_SetChannal(uint8_t _ch)
 {
+	/*
+	Bits 7-4 PSEL3, PSEL2, PSEL1, PSEL0: Positive Input Channel (AINP) Select
+	0000 = AIN0 (default)
+	0001 = AIN1
+	0010 = AIN2 (ADS1256 only)
+	0011 = AIN3 (ADS1256 only)
+	0100 = AIN4 (ADS1256 only)
+	0101 = AIN5 (ADS1256 only)
+	0110 = AIN6 (ADS1256 only)
+	0111 = AIN7 (ADS1256 only)
+	1xxx = AINCOM (when PSEL3 = 1, PSEL2, PSEL1, PSEL0 are “don’t care”)
+
+	NOTE: When using an ADS1255 make sure to only select the available inputs.
+
+	Bits 3-0 NSEL3, NSEL2, NSEL1, NSEL0: Negative Input Channel (AINN)Select
+	0000 = AIN0
+	0001 = AIN1 (default)
+	0010 = AIN2 (ADS1256 only)
+	0011 = AIN3 (ADS1256 only)
+	0100 = AIN4 (ADS1256 only)
+	0101 = AIN5 (ADS1256 only)
+	0110 = AIN6 (ADS1256 only)
+	0111 = AIN7 (ADS1256 only)
+	1xxx = AINCOM (when NSEL3 = 1, NSEL2, NSEL1, NSEL0 are “don’t care”)
+	*/
 	if (_ch > 7)
 	{
 		return;
 	}
-	ADS1256WREG(ADS1256_MUX, (_ch << 4) | (1 << 3));	/* Bit3 = 1, AINN 固定接 AINCOM */
-	ADS1256_WaitDRDY();
-	ADS1256_Send8Bit(ADS1256_CMD_SYNC);
-	ADS1256_Send8Bit(ADS1256_CMD_WAKEUP);
+	ADS1256_WriteReg(REG_MUX, (_ch << 4) | (1 << 3));	/* Bit3 = 1, AINN 固定接 AINCOM */
 }
 
 /*
@@ -620,59 +668,366 @@ void ADS1256_SetChannal(uint8_t _ch)
 *	返 回 值: 8bit状态寄存器值的高4位
 *********************************************************************************************************
 */
-//void ADS1256_SetDiffChannal(uint8_t _ch)
-//{
-//
-//	if (_ch == 0)
-//	{
-//		ADS1256WREG(ADS1256_MUX, (0 << 4) | 1);	//差分输入 AIN0， AIN1 
-//	}
-//	else if (_ch == 1)
-//	{
-//
-//		ADS1256WREG(ADS1256_MUX, (2 << 4) | 3);	//差分输入 AIN2， AIN3 
-//	}
-//	else if (_ch == 2)
-//	{
-//		ADS1256WREG(ADS1256_MUX, (4 << 4) | 5);	//差分输入 AIN4， AIN5 
-//	}
-//	else if (_ch == 3)
-//	{
-//		ADS1256WREG(ADS1256_MUX, (6 << 4) | 7);	//差分输入 AIN6， AIN7
-//	}
-//
-//
-//	tabb[0] = ADS1256RREG(ADS1256_MUX);
-//	tabb[0] = ADS1256RREG(ADS1256_MUX);
-//}
+#if 0
+static void ADS1256_SetDiffChannal(uint8_t _ch)
+{
+	/*
+	Bits 7-4 PSEL3, PSEL2, PSEL1, PSEL0: Positive Input Channel (AINP) Select
+	0000 = AIN0 (default)
+	0001 = AIN1
+	0010 = AIN2 (ADS1256 only)
+	0011 = AIN3 (ADS1256 only)
+	0100 = AIN4 (ADS1256 only)
+	0101 = AIN5 (ADS1256 only)
+	0110 = AIN6 (ADS1256 only)
+	0111 = AIN7 (ADS1256 only)
+	1xxx = AINCOM (when PSEL3 = 1, PSEL2, PSEL1, PSEL0 are “don’t care”)
+
+	NOTE: When using an ADS1255 make sure to only select the available inputs.
+
+	Bits 3-0 NSEL3, NSEL2, NSEL1, NSEL0: Negative Input Channel (AINN)Select
+	0000 = AIN0
+	0001 = AIN1 (default)
+	0010 = AIN2 (ADS1256 only)
+	0011 = AIN3 (ADS1256 only)
+	0100 = AIN4 (ADS1256 only)
+	0101 = AIN5 (ADS1256 only)
+	0110 = AIN6 (ADS1256 only)
+	0111 = AIN7 (ADS1256 only)
+	1xxx = AINCOM (when NSEL3 = 1, NSEL2, NSEL1, NSEL0 are “don’t care”)
+	*/
+	if (_ch == 0)
+	{
+		ADS1256_WriteReg(REG_MUX, (0 << 4) | 1);	/* 差分输入 AIN0， AIN1 */
+	}
+	else if (_ch == 1)
+	{
+		ADS1256_WriteReg(REG_MUX, (2 << 4) | 3);	/* 差分输入 AIN2， AIN3 */
+	}
+	else if (_ch == 2)
+	{
+		ADS1256_WriteReg(REG_MUX, (4 << 4) | 5);	/* 差分输入 AIN4， AIN5 */
+	}
+	else if (_ch == 3)
+	{
+		ADS1256_WriteReg(REG_MUX, (6 << 4) | 7);	/* 差分输入 AIN6， AIN7 */
+	}
+}
+#endif
+
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_WaitDRDY
+*	功能说明: 等待内部操作完成。 自校准时间较长，需要等待。
+*	形    参: 无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+static void ADS1256_WaitDRDY(void)
+{
+	uint32_t i;
+
+	for (i = 0; i < 40000000; i++)
+	{
+		if (DRDY_IS_LOW())
+		{
+#if defined (TM_DISCO_STM32F4_DISCOVERY)
+			TM_DISCO_LedOn(LED_RED);
+#endif
+			break;
+		}
+	}
+	if (i >= 40000000)
+	{
+		//printf("ADS1256_WaitDRDY() Time Out ...\r\n");		/* 调试语句. 用语排错 */
+		//TM_USB_VCP_Puts("ADS1256_WaitDRDY() Time Out ...\r\n");
+#if defined (TM_DISCO_STM32F4_DISCOVERY)
+		TM_DISCO_LedOn(LED_BLUE);
+#endif
+	}
+	else
+	{
+#if defined (TM_DISCO_STM32F4_DISCOVERY)
+		TM_DISCO_LedOff(LED_BLUE);
+#endif
+	}
+}
+
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_ReadData
+*	功能说明: 读ADC数据
+*	形    参: 无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+static int32_t ADS1256_ReadData(void)
+{
+	uint32_t read = 0;
+
+	CS_0();	/* SPI片选 = 0 */
+
+	ADS1256_Send8Bit(CMD_RDATA);	/* 读数据的命令 */
+
+	ADS1256_DelayDATA();	/* 必须延迟才能读取芯片返回数据 */
+
+	/* 读采样结果，3个字节，高字节在前 */
+	read = ADS1256_Recive8Bit() << 16;
+	read += ADS1256_Recive8Bit() << 8;
+	read += ADS1256_Recive8Bit() << 0;
+
+	CS_1();	/* SPI片选 = 1 */
+
+	/* 负数进行扩展。24位有符号数扩展为32位有符号数 */
+	if (read & 0x800000)
+	{
+		read += 0xFF000000;
+	}
+
+	return (int32_t)read;
+}
+
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_ReadAdc
+*	功能说明: 读指定通道的ADC数据
+*	形    参: 无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+int32_t ADS1256_ReadAdc(uint8_t _ch)
+{
+	/* ADS1256 数据手册第21页 */
+
+#if 0	/* 对于30Ksps 采样速率 */
+	int32_t read;
+
+	while (DRDY_IS_LOW());	/* 等待 DRDY 高 */
+	while (!DRDY_IS_LOW());	/* 等待 DRDY 低 */
+
+	ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
+	Delay(5);
+
+	ADS1256_WriteCmd(CMD_SYNC);
+	Delay(5);
+
+	ADS1256_WriteCmd(CMD_WAKEUP);  /* 正常情况下，这个时候 DRDY 已经为高 */
+	Delay(25);
+
+	read = (int32_t)ADS1256_ReadData();
+
+	while (DRDY_IS_LOW());	/* 等待 DRDY 高 */
+	while (!DRDY_IS_LOW());	/* 等待 DRDY 低 */
+
+	read = (int32_t)ADS1256_ReadData();
+
+	return read;
+#else	
+	//while (DRDY_IS_LOW());
+
+	/* ADS1256 数据手册第21页 */
+	ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
+
+	ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
+	Delay(5);
+
+	ADS1256_WriteCmd(CMD_SYNC);
+	Delay(5);
+
+	ADS1256_WriteCmd(CMD_WAKEUP);
+	Delay(25);
+
+	//ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
+
+	return (int32_t)ADS1256_ReadData();
+#endif	
+}
+
+/*
+*********************************************************************************************************
+*	下面的函数用于DRDY中断工作模式
+*********************************************************************************************************
+*/
+
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_StartScan
+*	功能说明: 将 DRDY引脚 （PH9 ）配置成外部中断触发方式， 中断服务程序中扫描8个通道的数据。
+*	形    参: 无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+//need to be edited
+void ADS1256_StartScan(void)
+{
+	EXTI_InitTypeDef   EXTI_InitStructure;
+	NVIC_InitTypeDef   NVIC_InitStructure;
+
+	/* 使能SYSCFG时钟 */
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+
+	/* 连接 EXTI Line9 到 PE9 引脚 */
+#if defined (TM_DISCO_STM32F4_DISCOVERY)
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource9);
+#elif defined (TM_DISCO_NUCLEO_F401)
+	/* 连接 EXTI Line9 到 PC9 引脚 */
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource9);
+#endif
+	/* 配置 EXTI LineXXX */
+	EXTI_InitStructure.EXTI_Line = EXTI_Line9;
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;	/* 下降沿(等待 DRDY 由1变0的时刻) */
+	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStructure);
+
+	/* 设置NVIC优先级分组为Group2：0-3抢占式优先级，0-3的响应式优先级 */
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+
+	/* 中断优先级配置 最低优先级 这里一定要分开的设置中断，不能够合并到一个里面设置 */
+	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x03;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+
+	/* 开始扫描前, 清零结果缓冲区 */
+	{
+		uint8_t i;
+
+		g_tADS1256.Channel = 0;
+
+		for (i = 0; i < 8; i++)
+		{
+			g_tADS1256.AdcNow[i] = 0;
+		}
+	}
+}
+
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_StopScan
+*	功能说明: 停止 DRDY 中断
+*	形    参: 无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+void ADS1256_StopScan(void)
+{
+	EXTI_InitTypeDef   EXTI_InitStructure;
+	//	NVIC_InitTypeDef   NVIC_InitStructure;
+
+	/* 配置 EXTI LineXXX */
+	EXTI_InitStructure.EXTI_Line = EXTI_Line9;
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;	/* 下降沿(等待 DRDY 由1变0的时刻) */
+	EXTI_InitStructure.EXTI_LineCmd = DISABLE;		/* 禁止 */
+	EXTI_Init(&EXTI_InitStructure);
+
+#if 0			
+	/* 中断优先级配置 最低优先级 这里一定要分开的设置中断，不能够合并到一个里面设置 */
+	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x03;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;		/* 禁止 */
+	NVIC_Init(&NVIC_InitStructure);
+#endif
+}
+
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_GetAdc
+*	功能说明: 从缓冲区读取ADC采样结果。采样结构是由中断服务程序填充的。
+*	形    参: _ch 通道号 (0 - 7)
+*	返 回 值: ADC采集结果（有符号数）
+*********************************************************************************************************
+*/
+//need to be edited
+int32_t ADS1256_GetAdc(uint8_t _ch)
+{
+	int32_t iTemp;
+
+	if (_ch > 7)
+	{
+		return 0;
+	}
+
+	//DISABLE_INT();  			/* 关中断 */
+	__disable_irq();
+
+	iTemp = g_tADS1256.AdcNow[_ch];
+
+	//ENABLE_INT();  				/* 开中断 */
+	__enable_irq();
+
+	return iTemp;
+}
+
+/*
+*********************************************************************************************************
+*	函 数 名: ADS1256_ISR
+*	功能说明: 定时采集中断服务程序
+*	形    参:  无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+void ADS1256_ISR(void)
+{
+	/* 读取采集结构，保存在全局变量 */
+	ADS1256_SetChannal(g_tADS1256.Channel);	/* 切换模拟通道 */
+	//bsp_DelayUS(5);
+	Delay(5);
+
+	ADS1256_WriteCmd(CMD_SYNC);
+	//bsp_DelayUS(5);
+	Delay(5);
+
+	ADS1256_WriteCmd(CMD_WAKEUP);
+	//bsp_DelayUS(25);
+	Delay(25);
+
+	if (g_tADS1256.Channel == 0)
+	{
+		g_tADS1256.AdcNow[7] = ADS1256_ReadData();	/* 注意保存的是上一个通道的数据 */
+	}
+	else
+	{
+		g_tADS1256.AdcNow[g_tADS1256.Channel - 1] = ADS1256_ReadData();	/* 注意保存的是上一个通道的数据 */
+	}
+
+	if (++g_tADS1256.Channel >= 8)
+	{
+		g_tADS1256.Channel = 0;
+	}
+}
 
 
-//void ADS1256_SetDiffChannal2(uint8_t _ch)
-//{
-//	ADS_CS_LOW();
-//	while (ADS_DRDY);
-//	SPI_SendByte(ADS1256_CMD_WREG | 0x01);
-//	SPI_SendByte(0);
-//	Delay(100);
-//	if (_ch == 0)
-//	{
-//		SPI_SendByte(0x01);
-//	}
-//	else if (_ch == 1)
-//	{
-//
-//		SPI_SendByte(0x23);
-//	}
-//	else if (_ch == 2)
-//	{
-//		SPI_SendByte(0x45);
-//	}
-//	else if (_ch == 3)
-//	{
-//		SPI_SendByte(0x67);
-//	}
-//
-//	//      ADS_CS_HIGH(); 
-//
-//
-//}
+/*
+*********************************************************************************************************
+*	函 数 名: EXTI9_5_IRQHandler
+*	功能说明: 外部中断服务程序.  此程序执行时间约 123uS
+*	形    参：无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+
+//need to be edited
+#ifndef EXTI9_5_ISR_MOVE_OUT		/* bsp.h 中定义此行，表示本函数移到 stam32f4xx_it.c。 避免重复定义 */
+void EXTI9_5_IRQHandler(void)
+{
+	if (EXTI_GetITStatus(EXTI_Line9) != RESET)
+	{
+		EXTI_ClearITPendingBit(EXTI_Line9);		/* 清除中断标志位 */
+
+		ADS1256_ISR();
+
+		/* 执行上面的代码完毕后，再次清零中断标志 */
+		EXTI_ClearITPendingBit(EXTI_Line9);		/* 清除中断标志位 */
+	}
+}
+#endif
+
+
+
+
+
+/***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

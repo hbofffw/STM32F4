@@ -19,8 +19,7 @@
 
 #include "ads1256.h"
 //#include "tm_stm32f4_usb_vcp.h"
-//#include "stm32f4xx_spi.h"
-//#include "tm_stm32f4_spi.h"
+#include "tm_stm32f4_spi.h"
 
 
 //#define SOFT_SPI		/* 定义此行表示使用GPIO模拟SPI接口 */
@@ -33,7 +32,7 @@ ADS1256模块可以直接插到STM32-V5开发板CN26排母(2*6P 2.54mm)接口上.
 +5V   <------  5.0V      5V供电
 GND   -------  GND       地
 DRDY  ------>  PE9       准备就绪
-CS    <------  PB12       SPI_CS
+CS    <------  PB0       SPI_CS
 DIN   <------  PA7       SPI_MOSI
 DOUT  ------>  PA6       SPI_MISO
 SCLK  <------  PA5       SPI时钟
@@ -48,9 +47,9 @@ NC   空脚
 +5V <------  5.0V      5V供电
 GND	------ - GND       地
 DRDY------>  PC9       准备就绪
-CS    <------PB12       SPI_CS
-DIN   <------PC2       SPI_MOSI
-DOUT------>  PC3       SPI_MISO
+CS    <------PB0       SPI_CS
+DIN   <------PC2       SPI_MISO
+DOUT------>  PC3       SPI_MOSI
 SCLK  <------PB10      SPI时钟
 GND  ------- GND       地
 //-PDWN  <------  PB0       掉电控制
@@ -107,7 +106,7 @@ RDATAC, RESET, SYNC 命令之后，需要延迟 24 * tCLK = 3.12uS;
 
 #define RCC_CS 		RCC_AHB1Periph_GPIOB
 #define PORT_CS		GPIOB	
-#define PIN_CS		GPIO_Pin_12
+#define PIN_CS		GPIO_Pin_0
 
 #define RCC_RESET 	RCC_AHB1Periph_GPIOC
 #define PORT_RESET	GPIOC
@@ -263,7 +262,6 @@ static const uint8_t s_tabDataRate[ADS1256_DRATE_MAX] =
 */
 void InitADS1256(void)
 {
-	SPI_InitTypeDef  SPI_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 
@@ -272,27 +270,16 @@ void InitADS1256(void)
 	CS_1();
 	SCK_0();		/* SPI总线空闲时，钟线是低电平 */
 	DI_1();
-	
+
 
 	/* 打开GPIO时钟 */
 	RCC_AHB1PeriphClockCmd(RCC_CS | RCC_DIN | RCC_DOUT | RCC_SCK | RCC_DRDY | RCC_RESET, ENABLE);
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+
 	/* 配置几个推完输出IO */
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;		/* 设为输出口 */
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
-
-	GPIO_InitStructure.GPIO_Pin = PIN_CS;
-	GPIO_Init(PORT_CS, &GPIO_InitStructure);
-
-	GPIO_InitStructure.GPIO_Pin = PIN_RESET;
-	GPIO_Init(PORT_RESET, &GPIO_InitStructure);
-
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;		
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;	/* IO口最大速度 */
 
 	GPIO_InitStructure.GPIO_Pin = PIN_SCK;
 	GPIO_Init(PORT_SCK, &GPIO_InitStructure);
@@ -300,9 +287,12 @@ void InitADS1256(void)
 	GPIO_InitStructure.GPIO_Pin = PIN_DIN;
 	GPIO_Init(PORT_DIN, &GPIO_InitStructure);
 
-	GPIO_InitStructure.GPIO_Pin = PIN_DOUT;
-	GPIO_Init(PORT_DOUT, &GPIO_InitStructure);
-	
+	GPIO_InitStructure.GPIO_Pin = PIN_CS;
+	GPIO_Init(PORT_CS, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = PIN_RESET;
+	GPIO_Init(PORT_RESET, &GPIO_InitStructure);
+
 	//GPIO_InitStructure.GPIO_Pin = PIN_PWDN;
 	//GPIO_Init(PORT_PWDN, &GPIO_InitStructure);
 
@@ -312,24 +302,13 @@ void InitADS1256(void)
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 无需上下拉电阻 */
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
 
-	
+	GPIO_InitStructure.GPIO_Pin = PIN_DOUT;
+	GPIO_Init(PORT_DOUT, &GPIO_InitStructure);
 
 	GPIO_InitStructure.GPIO_Pin = PIN_DRDY;
 	GPIO_Init(PORT_DRDY, &GPIO_InitStructure);
 
-	/* SPI2 configuration */
-	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex; //SPI1设置为两线全双工
-	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;                    //设置SPI2为主模式
-	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;                  //SPI发送接收8位帧结构
-	SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;                   //串行时钟在不操作时，时钟为低电平
-	SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;                 //第一个时钟沿开始采样数据
-	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;                  //NSS信号由软件（使用SSI位）管理
-	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256; //定义波特率预分频的值:波特率预分频值为8
-	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;       //数据传输从MSB位开始
-	SPI_InitStructure.SPI_CRCPolynomial = 7;         //CRC值计算的多项式
-	SPI_Init(SPI2, &SPI_InitStructure);
-	/* Enable SPI2  */
-	SPI_Cmd(SPI2, ENABLE);
+
 	//ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_1000SPS);	/* 配置ADC参数： 增益1:1, 数据输出速率 1KHz */
 }
 
@@ -372,10 +351,10 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 		the PGA (bits 0-2 of ADCON register), DR (bits 7-0 in the DRATE register) or BUFEN (bit 1 in the STATUS register)
 		values.
 
+
 		Bit 1 BUFEN: Analog Input Buffer Enable
 		0 = Buffer Disabled (default)
 		1 = Buffer Enabled
-
 		Bit 0 DRDY :  Data Ready (Read Only)
 		This bit duplicates the state of the DRDY pin.
 
@@ -433,8 +412,6 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 
 	//bsp_DelayUS(50);
 	Delay(50);
-	//added by dongbo huang
-	
 }
 
 /*
@@ -454,7 +431,7 @@ static void ADS1256_DelaySCLK(void)
 	取 10 以上，可以正常工作， 低电平400ns 高定400ns <--- 稳定
 	*/
 	//for (i = 0; i < 10; i++);
-	Delay(5);
+	Delay(50);
 }
 
 /*
@@ -472,7 +449,7 @@ static void ADS1256_DelayDATA(void)
 	最小 50 个tCLK = 50 * 0.13uS = 6.5uS
 	*/
 	//bsp_DelayUS(10);	/* 最小延迟 6.5uS, 此处取10us */
-	Delay(7);
+	Delay(10);
 }
 
 /*
@@ -513,7 +490,7 @@ static void ADS1256_Send8Bit(uint8_t _data)
 	uint8_t i;
 
 	/* 连续发送多个字节时，需要延迟一下 */
-	ADS1256_DelaySCLK();
+	ADS1256_DelaySCLK();  //50us
 	ADS1256_DelaySCLK();
 
 	/*　ADS1256 要求 SCL高电平和低电平持续时间最小 200ns  */
@@ -818,18 +795,18 @@ static int32_t ADS1256_ReadData(void)
 *	返 回 值: 无
 *********************************************************************************************************
 */
-int32_t ADS1256_ReadAdc(void)
+int32_t ADS1256_ReadAdc(uint8_t _ch)
 {
 	/* ADS1256 数据手册第21页 */
 
-//#if 0	/* 对于30Ksps 采样速率 */
+#if 0	/* 对于30Ksps 采样速率 */
 	int32_t read;
 
 	while (DRDY_IS_LOW());	/* 等待 DRDY 高 */
 	while (!DRDY_IS_LOW());	/* 等待 DRDY 低 */
 
-	//ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
-	//Delay(5);
+	ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
+	Delay(5);
 
 	ADS1256_WriteCmd(CMD_SYNC);
 	Delay(5);
@@ -845,25 +822,25 @@ int32_t ADS1256_ReadAdc(void)
 	read = (int32_t)ADS1256_ReadData();
 
 	return read;
-//#else	
-//	//while (drdy_is_low());
-//
-//	/* ads1256 数据手册第21页 */
-//	ads1256_waitdrdy();		/* 等待 drdy = 0 */
-//
-//	ads1256_setchannal(_ch);	/* 切换模拟通道 */
-//	delay(5);
-//
-//	ads1256_writecmd(cmd_sync);
-//	delay(5);
-//
-//	ads1256_writecmd(cmd_wakeup);
-//	delay(25);
-//
-//	//ads1256_waitdrdy();		/* 等待 drdy = 0 */
-//
-//	return (int32_t)ads1256_readdata();
-//#endif	
+#else	
+	//while (DRDY_IS_LOW());
+
+	/* ADS1256 数据手册第21页 */
+	ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
+
+	ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
+	Delay(5);
+
+	ADS1256_WriteCmd(CMD_SYNC);
+	Delay(5);
+
+	ADS1256_WriteCmd(CMD_WAKEUP);
+	Delay(25);
+
+	//ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
+
+	return (int32_t)ADS1256_ReadData();
+#endif	
 }
 
 /*
@@ -912,9 +889,9 @@ void ADS1256_StartScan(void)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
-	ADS1256_SetChannal(0);
+
 	/* 开始扫描前, 清零结果缓冲区 */
-	/*{
+	{
 		uint8_t i;
 
 		g_tADS1256.Channel = 0;
@@ -923,7 +900,7 @@ void ADS1256_StartScan(void)
 		{
 			g_tADS1256.AdcNow[i] = 0;
 		}
-	}*/
+	}
 }
 
 /*
@@ -965,20 +942,19 @@ void ADS1256_StopScan(void)
 *********************************************************************************************************
 */
 //need to be edited
-int32_t ADS1256_GetAdc(void)
+int32_t ADS1256_GetAdc(uint8_t _ch)
 {
 	int32_t iTemp;
 
-	/*if (_ch > 7)
+	if (_ch > 7)
 	{
 		return 0;
-	}*/
+	}
 
 	//DISABLE_INT();  			/* 关中断 */
 	__disable_irq();
 
-	//iTemp = g_tADS1256.AdcNow[_ch];
-	iTemp = g_tADS1256.AdcNow[0];
+	iTemp = g_tADS1256.AdcNow[_ch];
 
 	//ENABLE_INT();  				/* 开中断 */
 	__enable_irq();
@@ -997,9 +973,9 @@ int32_t ADS1256_GetAdc(void)
 void ADS1256_ISR(void)
 {
 	/* 读取采集结构，保存在全局变量 */
-	//ADS1256_SetChannal(g_tADS1256.Channel);	/* 切换模拟通道 */
+	ADS1256_SetChannal(g_tADS1256.Channel);	/* 切换模拟通道 */
 	//bsp_DelayUS(5);
-	//Delay(5);
+	Delay(5);
 
 	ADS1256_WriteCmd(CMD_SYNC);
 	//bsp_DelayUS(5);
@@ -1008,20 +984,20 @@ void ADS1256_ISR(void)
 	ADS1256_WriteCmd(CMD_WAKEUP);
 	//bsp_DelayUS(25);
 	Delay(25);
-	g_tADS1256.AdcNow[0] = ADS1256_ReadData();
-	//if (g_tADS1256.Channel == 0)
-	//{
-	//	g_tADS1256.AdcNow[7] = ADS1256_ReadData();	/* 注意保存的是上一个通道的数据 */
-	//}
-	//else
-	//{
-	//	g_tADS1256.AdcNow[g_tADS1256.Channel - 1] = ADS1256_ReadData();	/* 注意保存的是上一个通道的数据 */
-	//}
 
-	//if (++g_tADS1256.Channel >= 8)
-	//{
-	//	g_tADS1256.Channel = 0;
-	//}
+	if (g_tADS1256.Channel == 0)
+	{
+		g_tADS1256.AdcNow[7] = ADS1256_ReadData();	/* 注意保存的是上一个通道的数据 */
+	}
+	else
+	{
+		g_tADS1256.AdcNow[g_tADS1256.Channel - 1] = ADS1256_ReadData();	/* 注意保存的是上一个通道的数据 */
+	}
+
+	if (++g_tADS1256.Channel >= 8)
+	{
+		g_tADS1256.Channel = 0;
+	}
 }
 
 
@@ -1055,3 +1031,4 @@ void EXTI9_5_IRQHandler(void)
 
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/
+

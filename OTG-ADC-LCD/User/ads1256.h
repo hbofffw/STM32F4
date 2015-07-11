@@ -1,28 +1,17 @@
-#ifndef __ADS1256_H_
-#define	__ADS1256_H_
-
-//***************************
-//		Pin assign	   	
-//		GPIOC10	---	RESET
-//		GPIOC11	--- DRDY
-//		GPIOB12	--- CS
-//		GPIOB13	--- SCK
-//		GPIOB14	--- DOUT
-//		GPIOB15	--- DIN
-//***************************					
-
-/*//FOR F401
-+5V <------  5.0V      5V供电
-GND	------ - GND       地
-DRDY------>  PC9       准备就绪
-CS    <------PB12       SPI_CS
-DIN   <------PC2       SPI_MOSI
-DOUT------>  PC3       SPI_MISO
-SCLK  <------PB10      SPI时钟
-GND  ------- GND       地
-//-PDWN  <------  PB0       掉电控制
-RST   <------PC4       复位信号
+/*
+*********************************************************************************************************
+*
+*	模块名称 : ADS1256 驱动模块(8通道带PGA的24位ADC)
+*	文件名称 : bsp_ads1256.h
+*
+*	Copyright (C), 2013-2014, 安富莱电子 www.armfly.com
+*
+*********************************************************************************************************
 */
+
+#ifndef _ADS1256_H
+#define _ADS1256_H
+
 #include "defines.h"
 #include "stm32f4xx.h"
 #include "misc.h"
@@ -36,6 +25,7 @@ RST   <------PC4       复位信号
 #include "stm32f4xx_exti.h"
 #include "stm32f4xx_syscfg.h"
 
+/* 增益选项 */
 typedef enum
 {
 	ADS1256_GAIN_1 = (0),	/* 增益1（缺省） */
@@ -47,6 +37,25 @@ typedef enum
 	ADS1256_GAIN_64 = (6),	/* 增益64 */
 }ADS1256_GAIN_E;
 
+/* 采样速率选项 */
+/* 数据转换率选择
+11110000 = 30,000SPS (default)
+11100000 = 15,000SPS
+11010000 = 7,500SPS
+11000000 = 3,750SPS
+10110000 = 2,000SPS
+10100001 = 1,000SPS
+10010010 = 500SPS
+10000010 = 100SPS
+01110010 = 60SPS
+01100011 = 50SPS
+01010011 = 30SPS
+01000011 = 25SPS
+00110011 = 15SPS
+00100011 = 10SPS
+00010011 = 5SPS
+00000011 = 2.5SPS
+*/
 typedef enum
 {
 	ADS1256_30000SPS = 0,
@@ -69,36 +78,27 @@ typedef enum
 	ADS1256_DRATE_MAX
 }ADS1256_DRATE_E;
 
+#define ADS1256_DRAE_COUNT = 15;
+
 typedef struct
 {
 	ADS1256_GAIN_E Gain;		/* 增益 */
 	ADS1256_DRATE_E DataRate;	/* 数据输出速率 */
 	int32_t AdcNow[8];			/* 8路ADC采集结果（实时）有符号数 */
-	uint8_t Channel;			/* 当前通道 */	
+	uint8_t Channel;			/* 当前通道 */
 }ADS1256_VAR_T;
 
-void SPI_Init2(void);
-
-extern u8  results1;
-extern u8  results2;
-extern u8  results3;
-void SPI_ADS1256_Init(void);
-void ADS1256_GPIO_init(void);
-void ADS1256_Init(void);
-void ADS_sum(void);
-u8 SPI_SendByte(u8 byte);
-int32_t ADS1256_ReadData(void);
-void ADS1256WREG(unsigned char regaddr, unsigned char databyte);
-void ADS1256_ResetHard(void);
+void InitADS1256(void);
 void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate);
-void ADS1256_SetChannal(uint8_t _ch);
-void ADS1256_SetDiffChannal(uint8_t _ch);
 
-void ADS1256_SetDiffChannal2(uint8_t _ch);
+uint8_t ADS1256_ReadChipID(void);
+int32_t ADS1256_ReadAdc(uint8_t _ch);
+void ADS1256_StartScan(void);
+void ADS1256_StopScan(void);
+int32_t ADS1256_GetAdc(uint8_t _ch);
 
 extern ADS1256_VAR_T g_tADS1256;
 
 #endif
 
-
-
+/***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/
