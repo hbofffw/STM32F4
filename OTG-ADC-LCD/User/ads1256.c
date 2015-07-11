@@ -113,23 +113,23 @@ u8 tabb[2];
 //#define ADS1256_GAIN_64     0x06 
 ////#define ADS1256_GAIN_64     0x07 
 
-////define drate codes 
-//#define ADS1256_DRATE_30000SPS   0xF0 
-//#define ADS1256_DRATE_15000SPS   0xE0 
-//#define ADS1256_DRATE_7500SPS   0xD0 
-//#define ADS1256_DRATE_3750SPS   0xC0 
-//#define ADS1256_DRATE_2000SPS   0xB0 
-//#define ADS1256_DRATE_1000SPS   0xA1 
-//#define ADS1256_DRATE_500SPS    0x92 
-//#define ADS1256_DRATE_100SPS    0x82 
-//#define ADS1256_DRATE_60SPS     0x72 
-//#define ADS1256_DRATE_50SPS     0x63 
-//#define ADS1256_DRATE_30SPS     0x53 
-//#define ADS1256_DRATE_25SPS     0x43 
-//#define ADS1256_DRATE_15SPS     0x33 
-//#define ADS1256_DRATE_10SPS     0x23 
-//#define ADS1256_DRATE_5SPS      0x13 
-//#define ADS1256_DRATE_2_5SPS    0x03
+//define drate codes 
+#define ADS1256_DRATE_30000SPS   0xF0 
+#define ADS1256_DRATE_15000SPS   0xE0 
+#define ADS1256_DRATE_7500SPS   0xD0 
+#define ADS1256_DRATE_3750SPS   0xC0 
+#define ADS1256_DRATE_2000SPS   0xB0 
+#define ADS1256_DRATE_1000SPS   0xA1 
+#define ADS1256_DRATE_500SPS    0x92 
+#define ADS1256_DRATE_100SPS    0x82 
+#define ADS1256_DRATE_60SPS     0x72 
+#define ADS1256_DRATE_50SPS     0x63 
+#define ADS1256_DRATE_30SPS     0x53 
+#define ADS1256_DRATE_25SPS     0x43 
+#define ADS1256_DRATE_15SPS     0x33 
+#define ADS1256_DRATE_10SPS     0x23 
+#define ADS1256_DRATE_5SPS      0x13 
+#define ADS1256_DRATE_2_5SPS    0x03
 
 ADS1256_VAR_T g_tADS1256;
 static const uint8_t s_tabDataRate[ADS1256_DRATE_MAX] =
@@ -167,8 +167,11 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 
 	ADS1256_WaitDRDY();
 
+	ADS1256_Send8Bit(ADS1256_CMD_SELFGCAL);
+	Delay(100);
+
 	{
-		uint8_t buf[4];		/* 暂存ADS1256 寄存器配置参数，之后连续写4个寄存器 */
+		//uint8_t buf[4];		/* 暂存ADS1256 寄存器配置参数，之后连续写4个寄存器 */
 
 		/* 状态寄存器定义
 		Bits 7-4 ID3, ID2, ID1, ID0  Factory Programmed Identification Bits (Read Only)
@@ -195,10 +198,10 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 
 		ACAL=1使能自校准功能。当 PGA，BUFEEN, DRATE改变时会启动自校准
 		*/
-		buf[0] = (0 << 3) | (1 << 2) | (1 << 1);
+		//buf[0] = (0 << 3) | (1 << 2) | (1 << 1);
 		//ADS1256_WriteReg(REG_STATUS, (0 << 3) | (1 << 2) | (1 << 1));
 
-		buf[1] = 0x08;	/* 高四位0表示AINP接 AIN0,  低四位8表示 AINN 固定接 AINCOM */
+		//buf[1] = 0x08;	/* 高四位0表示AINP接 AIN0,  低四位8表示 AINN 固定接 AINCOM */
 
 		/*	ADCON: A/D Control Register (Address 02h)
 		Bit 7 Reserved, always 0 (Read Only)
@@ -227,27 +230,30 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 		110 = 64
 		111 = 64
 		*/
-		buf[2] = (0 << 5) | (0 << 2) | (_gain << 1);
+		//buf[2] = (0 << 5) | (0 << 2) | (_gain << 1);
 		//ADS1256_WriteReg(REG_ADCON, (0 << 5) | (0 << 2) | (GAIN_1 << 1));	/* 选择1;1增益, 输入正负5V */
 
 		/* 因为切换通道和读数据耗时 123uS, 因此扫描中断模式工作时，最大速率 = DRATE_1000SPS */
-		buf[3] = s_tabDataRate[_drate];	// DRATE_10SPS;	/* 选择数据输出速率 */
+		//buf[3] = s_tabDataRate[_drate];	// DRATE_10SPS;	/* 选择数据输出速率 */
 
-		ADS_CS_LOW();	/* SPI片选 = 0 */
-		ADS1256_Send8Bit(ADS1256_CMD_WREG | 0);	/* 写寄存器的命令, 并发送寄存器地址 */
-		ADS1256_Send8Bit(0x03);			/* 寄存器个数 - 1, 此处3表示写4个寄存器 */
+		//ADS_CS_LOW();	/* SPI片选 = 0 */
+		//ADS1256_Send8Bit(ADS1256_CMD_WREG | 0);	/* 写寄存器的命令, 并发送寄存器地址 */
+		//ADS1256_Send8Bit(0x03);			/* 寄存器个数 - 1, 此处3表示写4个寄存器 */
 
-		ADS1256_Send8Bit(buf[0]);	/* 设置状态寄存器 */
-		ADS1256_Send8Bit(buf[1]);	/* 设置输入通道参数 */
-		ADS1256_Send8Bit(buf[2]);	/* 设置ADCON控制寄存器，增益 */
-		ADS1256_Send8Bit(buf[3]);	/* 设置输出数据速率 */
+		//ADS1256_Send8Bit(buf[0]);	/* 设置状态寄存器 */
+		//ADS1256_Send8Bit(buf[1]);	/* 设置输入通道参数 */
+		//ADS1256_Send8Bit(buf[2]);	/* 设置ADCON控制寄存器，增益 */
+		//ADS1256_Send8Bit(buf[3]);	/* 设置输出数据速率 */
 
-		ADS_CS_HIGH();	/* SPI片选 = 1 */
+		//ADS_CS_HIGH();	/* SPI片选 = 1 */
+
+		ADS1256WREG(ADS1256_STATUS, 0x04);   	//初始化STATUS reg  ID位为f,数据输出高位在先,自动校准开,输入缓冲关闭,DRDY高电平
+		// 	ADS1256_WriteReg(ADS1256_STATUS,0x06);  			 		//buff on	,模拟输入电压必须<AVDD-2V,否则，输出有误。ZHP 20131104
+		ADS1256WREG(ADS1256_MUX, ADS1256_MUXP_AIN0 + ADS1256_MUXN_AINCOM); //初始化MUX    reg  单端输入AIN0-AINCOM		ADS1256WREG(ADS1256_ADCON, ADS1256_GAIN_1);
+		ADS1256WREG(ADS1256_DRATE, ADS1256_DRATE_30000SPS);
+		ADS1256_Send8Bit(ADS1256_CMD_SELFGCAL);
+		Delay(100);
 	}
-
-	Delay(50);
-	ADS1256_SetChannal(0);
-	Delay(10);
 }
 
 /*
@@ -542,9 +548,9 @@ int32_t ADS1256_ReadData(void)
 
 	//ADS1256_Send8Bit(ADS1256_CMD_SYNC);
 	//Delay(5);
-	ADS1256_Send8Bit(ADS1256_CMD_WAKEUP);
-	Delay(5);
-	ADS_CS_LOW();
+	//ADS1256_Send8Bit(ADS1256_CMD_WAKEUP);
+	//Delay(5);
+	//ADS_CS_LOW();
 	ADS1256_Send8Bit(ADS1256_CMD_RDATA);
 	Delay(7);               //min=50*(1/fCLKIN)=50*(1/7.68MHZ)=6500ns;max=whatever
 	/*for (i = 0; i < 3; i++)
@@ -559,7 +565,7 @@ int32_t ADS1256_ReadData(void)
 	sum = ADS1256_Recive8Bit() << 16;
 	sum += ADS1256_Recive8Bit() << 8;
 	sum += ADS1256_Recive8Bit() << 0;
-	ADS_CS_HIGH();
+	//ADS_CS_HIGH();
 	/* 负数进行扩展。24位有符号数扩展为32位有符号数 */
 	if (sum & 0x800000)
 	{
@@ -601,6 +607,9 @@ void ADS1256_SetChannal(uint8_t _ch)
 		return;
 	}
 	ADS1256WREG(ADS1256_MUX, (_ch << 4) | (1 << 3));	/* Bit3 = 1, AINN 固定接 AINCOM */
+	ADS1256_WaitDRDY();
+	ADS1256_Send8Bit(ADS1256_CMD_SYNC);
+	ADS1256_Send8Bit(ADS1256_CMD_WAKEUP);
 }
 
 /*
