@@ -58,7 +58,7 @@ int main(void) {
 	uint8_t c;
 	uint8_t s;
 	int32_t adc[8];
-	int32_t adct[1000];
+	int32_t adct[100];
 	int32_t adctest;
 	int32_t volt[8];
 	uint8_t i;
@@ -209,15 +209,19 @@ int main(void) {
 				do
 				{
 					TM_DELAY_SetTime(0);
-					adctest = ADS1256_ReadAdc();// ADS1256_GetAdc(0);
-					count++;
+					adct[count++] = ADS1256_ReadAdc();// ADS1256_GetAdc(0);
+					//count++;
 					//Delay(1000);
 					while ((TM_DELAY_Time() <= 64));   //ÐÄÌø¸ÄÎª 1/64 ms
-				} while (count < 1000);
+				} while (count < 100);
 
 				ADS1256_StopScan();
-				printf("there are %d samples\r\n", count);
-				printf("data sampled: %d\r\n", adctest);
+				for (i = 0; i < 100; i++)
+				{
+					printf("%d, ", adct[i]);
+				}
+				printf("\r\nthere are %d samples\r\n", count);
+				//printf("data sampled: %d\r\n", adctest);
 			}
 			if (c == '2')
 			{
