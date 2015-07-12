@@ -433,7 +433,7 @@ static void ADS1256_DelaySCLK(void)
 	取 10 以上，可以正常工作， 低电平400ns 高定400ns <--- 稳定
 	*/
 	//for (i = 0; i < 10; i++);
-	Delay(20);
+	Delay(50);
 }
 
 /*
@@ -532,7 +532,8 @@ static uint8_t ADS1256_Recive8Bit(void)
 	for (i = 0; i < 8; i++)
 	{
 		SCK_1();
-		ADS1256_DelaySCLK();
+		//ADS1256_DelaySCLK();
+		Delay(10);
 		read = read << 1;
 		SCK_0();
 		if (DO_IS_HIGH())

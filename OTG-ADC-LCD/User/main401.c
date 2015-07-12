@@ -94,13 +94,13 @@ int main(void) {
 		id = ADS1256_ReadChipID();
 		if (id != 3)
 		{
-			printf("Error, ADS1256 Chip ID = 0x%X\r\n", id);
+		printf("Error, ADS1256 Chip ID = 0x%X\r\n", id);
 		}
 		else
 		{
-			printf("Ok, ADS1256 Chip ID = 0x%X\r\n", id);
+		printf("Ok, ADS1256 Chip ID = 0x%X\r\n", id);
 		}
-	}*/
+		}*/
 	ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_30000SPS); /* 配置ADC参数： 增益1:1, 数据输出速率 2KHz */
 	//ADS1256_StartScan(); 
 	//ADS1256_SetChannal(0);
@@ -110,6 +110,7 @@ int main(void) {
 		//	//printf("ADC channel 4/3: %4d/%4d \n", TM_ADC_Read(ADC1, ADC_Channel_4), TM_ADC_Read(ADC1, ADC_Channel_3));
 		//	Delayms(50);
 		//}
+		adctest = 0;
 		s = TM_USART_Getc(USART1);
 
 		if (s)
@@ -162,13 +163,13 @@ int main(void) {
 				count = 0;
 				number = 0;
 				TM_DELAY_SetTime(0);
-				do 
+				do
 				{
 					TM_DISCO_LedToggle(TM_DISCO_LED_PINS);
 					count++;
 					Delay(1000);
-				} while (TM_DELAY_Time()<=1000);
-				
+				} while (TM_DELAY_Time() <= 32000);
+
 				//while (1)
 				//{
 				//	TM_DELAY_SetTime(0);
@@ -196,20 +197,95 @@ int main(void) {
 				//		
 				//	//}
 				//}
-				
+
 				printf("timer test: %d\r\n", count);
 			}
-			if (c == 't')
+			if (c == '1')
 			{
+				printf("start sampling...\r\n");
 				ADS1256_StartScan();
 				count = 0;
-				TM_DELAY_SetTime(0);
+
 				do
 				{
+					TM_DELAY_SetTime(0);
 					adctest = ADS1256_ReadAdc();// ADS1256_GetAdc(0);
 					count++;
 					//Delay(1000);
-				} while (TM_DELAY_Time() <= 1000);
+					while ((TM_DELAY_Time() <= 64));   //心跳改为 1/64 ms
+				} while (count < 1000);
+
+				ADS1256_StopScan();
+				printf("there are %d samples\r\n", count);
+				printf("data sampled: %d\r\n", adctest);
+			}
+			if (c == '2')
+			{
+				printf("start sampling...\r\n");
+				ADS1256_StartScan();
+				count = 0;
+
+				do
+				{
+					TM_DELAY_SetTime(0);
+					adctest = ADS1256_ReadAdc();// ADS1256_GetAdc(0);
+					count++;
+					//Delay(1000);
+					while ((TM_DELAY_Time() <= 32));   //心跳改为 1/64 ms
+				} while (count < 1000);
+
+				ADS1256_StopScan();
+				printf("there are %d samples\r\n", count);
+				printf("data sampled: %d\r\n", adctest);
+			}
+			if (c == '4')
+			{
+				printf("start sampling...\r\n");
+				ADS1256_StartScan();
+				count = 0;
+
+				do
+				{
+					TM_DELAY_SetTime(0);
+					adctest = ADS1256_ReadAdc();// ADS1256_GetAdc(0);
+					count++;
+					//Delay(1000);
+					while ((TM_DELAY_Time() <= 16));   //心跳改为 1/64 ms
+				} while (count < 1000);
+
+				ADS1256_StopScan();
+				printf("there are %d samples\r\n", count);
+				printf("data sampled: %d\r\n", adctest);
+			}
+			if (c == '8')
+			{
+				printf("start sampling...\r\n");
+				ADS1256_StartScan();
+				count = 0;
+
+				do
+				{
+					TM_DELAY_SetTime(0);
+					adctest = ADS1256_ReadAdc();// ADS1256_GetAdc(0);
+					count++;
+					//Delay(1000);
+					while ((TM_DELAY_Time() <= 8));   //心跳改为 1/64 ms
+				} while (count < 1000);
+
+				ADS1256_StopScan();
+				printf("there are %d samples\r\n", count);
+				printf("data sampled: %d\r\n", adctest);
+			}
+			if (c == 'l')
+			{
+				printf("start sampling...\r\n");
+				ADS1256_StartScan();
+				TM_DELAY_SetTime(0);
+				do
+				{
+					adctest = ADS1256_ReadAdc();
+					count++;
+				} while (TM_DELAY_Time() <= 32000);
 				ADS1256_StopScan();
 				printf("there are %d samples\r\n", count);
 				printf("data sampled: %d\r\n", adctest);
