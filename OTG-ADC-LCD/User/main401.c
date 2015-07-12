@@ -58,7 +58,11 @@ int main(void) {
 	uint8_t c;
 	uint8_t s;
 	int32_t adc[8];
-	int32_t adct[100];
+	int32_t adct1[200];
+	/*int32_t adct2[200];
+	int32_t adct3[200];
+	int32_t adct4[200];
+	int32_t adct5[200];*/
 	int32_t adctest;
 	int32_t volt[8];
 	uint8_t i;
@@ -168,7 +172,7 @@ int main(void) {
 					TM_DISCO_LedToggle(TM_DISCO_LED_PINS);
 					count++;
 					Delay(1000);
-				} while (TM_DELAY_Time() <= 32000);
+				} while (TM_DELAY_Time() <= 64000);
 
 				//while (1)
 				//{
@@ -208,19 +212,33 @@ int main(void) {
 
 				do
 				{
+
 					TM_DELAY_SetTime(0);
-					adct[count++] = ADS1256_ReadAdc();// ADS1256_GetAdc(0);
+					adct1[count++] = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
+					//if (count < 200)
+					//{
+					//	adct1[count++] = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
+					//}
+					//else
+					//{
+					//	adct2[(count++) - 200] = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
+					//}
 					//count++;
 					//Delay(1000);
 					while ((TM_DELAY_Time() <= 64));   //ÐÄÌø¸ÄÎª 1/64 ms
-				} while (count < 100);
-
+				} while (count < 200);
 				ADS1256_StopScan();
-				for (i = 0; i < 100; i++)
-				{
-					printf("%d, ", adct[i]);
-				}
 				printf("\r\nthere are %d samples\r\n", count);
+				Delay(1000000);
+				for (i = 0; i < 200; i++)
+				{
+					printf("%d, ", adct1[i]);
+				}
+				/*for (i = 0; i < 200; i++)
+				{
+					printf("%d, ", adct2[i]);
+				}
+*/
 				//printf("data sampled: %d\r\n", adctest);
 			}
 			if (c == '2')

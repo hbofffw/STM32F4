@@ -540,6 +540,7 @@ static uint8_t ADS1256_Recive8Bit(void)
 		{
 			read++;
 		}
+		Delay(10);
 		//ADS1256_DelaySCLK();
 	}
 	return read;
