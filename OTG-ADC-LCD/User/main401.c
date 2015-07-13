@@ -31,6 +31,7 @@
 /* We need to implement own __FILE struct */
 /* FILE struct is used from __FILE */
 
+//int32_t adcsamples[1000];
 
 struct __FILE {
 
@@ -58,7 +59,7 @@ int main(void) {
 	uint8_t c;
 	uint8_t s;
 	int32_t adc[8];
-	int32_t adct1[200];
+	//int32_t adct1[200];
 	/*int32_t adct2[200];
 	int32_t adct3[200];
 	int32_t adct4[200];
@@ -214,7 +215,8 @@ int main(void) {
 				{
 
 					TM_DELAY_SetTime(0);
-					adct1[count++] = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
+					//adct1[count++] = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
+					adctest = ADS1256_ReadAdc();
 					//if (count < 200)
 					//{
 					//	adct1[count++] = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
@@ -232,7 +234,7 @@ int main(void) {
 				Delay(1000000);
 				for (i = 0; i < 200; i++)
 				{
-					printf("%d, ", adct1[i]);
+					printf("%d, ", adctest);
 				}
 				/*for (i = 0; i < 200; i++)
 				{
