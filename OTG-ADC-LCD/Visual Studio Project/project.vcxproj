@@ -82,6 +82,7 @@
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\..\00-STM32F429_LIBRARIES\README.md" />
     <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h" />
     <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h" />
     <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f40_41xxx.s" />
@@ -127,6 +128,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_dma.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_general.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_spi_dma.c" />
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\misc.c" />
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c" />
@@ -172,6 +174,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_dma.h" />
+    <ClInclude Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_general.h" />
     <ClInclude Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_spi_dma.h" />
     <ClInclude Include="..\User\oldads1256\old_ads1256.h" />
   </ItemGroup>

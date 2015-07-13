@@ -25,13 +25,20 @@
 #include "tm_stm32f4_adc.h"
 #include "tm_stm32f4_usart.h"
 #include "tm_stm32f4_spi.h"
+#include "tm_stm32f4_general.h"
 #include "ads1256.h"
 
-#include <stdio.h>
+#include "stdio.h"
+#include "string.h"
 /* We need to implement own __FILE struct */
 /* FILE struct is used from __FILE */
 
-//int32_t adcsamples[1000];
+int32_t adcsamples[40][200];
+//int32_t adcsample2[200];
+//int32_t adcsample3[200];
+//int32_t adcsample4[200];
+//int32_t adcsample5[200];
+
 
 struct __FILE {
 
@@ -59,6 +66,7 @@ int main(void) {
 	uint8_t c;
 	uint8_t s;
 	int32_t adc[8];
+	uint32_t val;
 	//int32_t adct1[200];
 	/*int32_t adct2[200];
 	int32_t adct3[200];
@@ -67,6 +75,7 @@ int main(void) {
 	int32_t adctest;
 	int32_t volt[8];
 	uint8_t i;
+	uint8_t j;
 	int count;
 	int number;
 	SystemInit();
@@ -80,6 +89,13 @@ int main(void) {
 	TM_USART_Init(USART1, TM_USART_PinsPack_1, 115200);
 	//usb
 	TM_USART_Init(USART2, TM_USART_PinsPack_1, 115200);
+	/*memset(adcsample1, 0x00, sizeof(adcsample1));
+	memset(adcsample2, 0x00 + sizeof(adcsample1), sizeof(adcsample2));*/
+	for (j = 0; j < 40; j++)
+	{
+		memset(adcsamples[j], 0x00 + sizeof(adcsamples[j])*j, sizeof(adcsamples[j]));
+	}
+	//val = TM_GENERAL_DWTCounterEnable();
 	//TM_SPI_Init(SPI1, TM_SPI_PinsPack_Custom);
 
 	/* Initialize ADC1 on channel 3, this is pin PA3 */
@@ -124,9 +140,9 @@ int main(void) {
 		}
 		c = TM_USART_Getc(USART2);
 		if (c) {
-			TM_USART_Putc(USART1, c);
+			//TM_USART_Putc(USART1, c);
 			/* If anything received, put it back to terminal */
-			TM_USART_Putc(USART1, c);
+			//TM_USART_Putc(USART1, c);
 			//printf("rdy");
 			if (c == 's')
 			{
@@ -162,17 +178,35 @@ int main(void) {
 					Delayms(300);
 				}
 			}
+			if (c == 't')
+			{
+				count = 0;
+				printf("start sampling...\r\n");
+				ADS1256_StartScan();
+				TM_DELAY_SetTime(0);
+				do 
+				{
+					adctest = ADS1256_ReadAdc();
+					count++;
+				} while (TM_DELAY_Time() <= 64000);
+				ADS1256_StopScan();
+				printf("there are %d samples\r\n", count);
+				printf("one sample is %d \r\n", adctest);
+			}
 			if (c == 'c')
 			{
 				printf("counting...\r\n");
 				count = 0;
 				number = 0;
 				TM_DELAY_SetTime(0);
+
 				do
 				{
+					//TM_GENERAL_DWTCounterSetValue(0);
 					TM_DISCO_LedToggle(TM_DISCO_LED_PINS);
 					count++;
 					Delay(1000);
+					//while (TM_GENERAL_DWTCounterGetValue() <= 10);
 				} while (TM_DELAY_Time() <= 64000);
 
 				//while (1)
@@ -211,36 +245,62 @@ int main(void) {
 				ADS1256_StartScan();
 				count = 0;
 
-				do
+				/*do
 				{
 
-					TM_DELAY_SetTime(0);
-					//adct1[count++] = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
-					adctest = ADS1256_ReadAdc();
-					//if (count < 200)
-					//{
-					//	adct1[count++] = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
-					//}
-					//else
-					//{
-					//	adct2[(count++) - 200] = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
-					//}
-					//count++;
-					//Delay(1000);
-					while ((TM_DELAY_Time() <= 64));   //心跳改为 1/64 ms
-				} while (count < 200);
+				TM_DELAY_SetTime(0);*/
+				//adct1[count++] = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
+				//adctest = ADS1256_ReadAdc();
+				//if (count < 200)
+				//{
+				//	adcsample1[count++] = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
+				//}
+				//else if (count>=200 && count<400)
+				//{
+				//	adcsample2[(count++) - 200] = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
+				//}
+				//else if (count>=400 && count < 600)
+				//{
+				//	adcsample3[(count++) - 400] = ADS1256_ReadAdc();
+				//}
+				for (j = 0; j < 5; j++)
+				{
+					for (i = 0; i < 200; i++)
+					{
+						TM_DELAY_SetTime(0);
+						adcsamples[j][i] = ADS1256_ReadAdc();
+						count++;
+						while ((TM_DELAY_Time() <= 64));   //心跳改为 1/64 ms
+					}
+				}
+				//count++;
+				//Delay(1000);
+
+				/*} while (count < 600);*/
 				ADS1256_StopScan();
 				printf("\r\nthere are %d samples\r\n", count);
-				Delay(1000000);
-				for (i = 0; i < 200; i++)
+				//Delay(1000000);
+				for (j = 0; j < 5; j++)
 				{
-					printf("%d, ", adctest);
+					for (i = 0; i < 200; i++)
+					{
+						printf("%d, ", adcsamples[j][i]);
+					}
 				}
+				printf("\r\n");
 				/*for (i = 0; i < 200; i++)
 				{
-					printf("%d, ", adct2[i]);
+				printf("%d, ", adcsample1[i]);
 				}
-*/
+				for (i = 0; i < 200; i++)
+				{
+				printf("%d, ", adcsample2[i]);
+				}
+				for (i = 0; i < 200; i++)
+				{
+				printf("%d, ", adcsample3[i]);
+				}
+				printf("\r\n");*/
 				//printf("data sampled: %d\r\n", adctest);
 			}
 			if (c == '2')

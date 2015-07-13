@@ -162,6 +162,9 @@
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c">
       <Filter>源文件\STD_Periph_Drivers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_general.c">
+      <Filter>源文件\TM</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h">
@@ -290,6 +293,9 @@
     <None Include="Readme.txt">
       <Filter>项目说明</Filter>
     </None>
+    <None Include="..\..\00-STM32F429_LIBRARIES\README.md">
+      <Filter>源文件\TM</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\User\oldads1256\old_ads1256.h">
@@ -299,6 +305,9 @@
       <Filter>源文件\TM</Filter>
     </ClInclude>
     <ClInclude Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_dma.h">
+      <Filter>源文件\TM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_general.h">
       <Filter>源文件\TM</Filter>
     </ClInclude>
   </ItemGroup>
