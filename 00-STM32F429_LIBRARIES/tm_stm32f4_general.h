@@ -3,7 +3,7 @@
  * @email   tilen@majerle.eu
  * @website http://stm32f4-discovery.com
  * @link    http://stm32f4-discovery.com/2015/03/library-54-general-library-for-stm32f4xx-devices
- * @version v1.3
+ * @version v1.4
  * @ide     Keil uVision
  * @license GNU GPL v3
  * @brief   GENERAL library for STM32F4xx devices
@@ -28,7 +28,7 @@
 @endverbatim
  */
 #ifndef TM_GENERAL_H
-#define TM_GENERAL_H 130
+#define TM_GENERAL_H 140
 
 /* C++ detection */
 #ifdef __cplusplus
@@ -64,6 +64,10 @@ extern C {
  * \par Changelog
  *
 @verbatim
+ Version 1.4
+  - June 20, 2015
+  - Changed interrupt enable/disable functions. They now supports nested interrupt disabling
+ 
  Version 1.3
   - April 13, 2015
   - Added float number operations
@@ -192,18 +196,29 @@ TM_GENERAL_ResetSource_t TM_GENERAL_GetResetSource(uint8_t reset_flags);
  * @brief  Disables all interrupts in system
  * @param  None
  * @retval None
- * @note   Defined as macro for faster execution
  */
-#define TM_GENERAL_DisableInterrupts()   __disable_irq()
+void TM_GENERAL_DisableInterrupts(void);
 
 /**
  * @brief  Enables interrupts in system.
- * @note   Only defined interrupts in NVIC are enabled
+ * @note   This function has nesting support. This means that if you call @ref TM_GENERAL_DisableInterrupts() 4 times,
+ *         then you have to call this function also 4 times to enable interrupts.
  * @param  None
- * @retval None
- * @note   Defined as macro for faster execution
+ * @retval Interrupt enabled status:
+ *            - 0: Interrupts were not enabled
+ *            - > 0: Interrupts were enabled
  */
-#define TM_GENERAL_EnableInterrupts()   __enable_irq()
+uint8_t TM_GENERAL_EnableInterrupts(void);
+
+/**
+ * @brief  Checks if code execution is inside active IRQ
+ * @param  None
+ * @retval IRQ Execution status:
+ *            - 0: Code execution is not inside IRQ, thread mode
+ *            - > 0: Code execution is inside IRQ, IRQ mode
+ * @note   Defines as macro for faster execution
+ */
+#define TM_GENERAL_IsIRQMode()               (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)
 
 /**
  * @brief  Gets specific clock speed value from STM32F4xx device
@@ -218,7 +233,7 @@ uint32_t TM_GENERAL_GetClockSpeed(TM_GENERAL_Clock_t clock);
  * @retval None
  * @note   Defined as macro for faster execution
  */
-#define TM_GENERAL_GetSystemClockMHz()    ((uint16_t)(SystemCoreClock * (float)0.000001))
+#define TM_GENERAL_GetSystemClockMHz()       ((uint16_t)(SystemCoreClock * (float)0.000001))
 
 /**
  * @brief  Enables DWT counter in Cortex-M4 core
@@ -239,7 +254,7 @@ uint8_t TM_GENERAL_DWTCounterEnable(void);
  * @retval None
  * @note   Defined as macro for faster execution
  */
-#define TM_GENERAL_DWTCounterDisable()    (DWT->CTRL &= ~0x00000001)
+#define TM_GENERAL_DWTCounterDisable()       (DWT->CTRL &= ~0x00000001)
 
 /**
  * @brief  Gets current DWT counter value
@@ -247,7 +262,7 @@ uint8_t TM_GENERAL_DWTCounterEnable(void);
  * @retval DWT counter value
  * @note   Defined as macro for faster execution
  */
-#define TM_GENERAL_DWTCounterGetValue()  (DWT->CYCCNT)
+#define TM_GENERAL_DWTCounterGetValue()      (DWT->CYCCNT)
 
 /**
  * @brief  Sets DWT counter value
@@ -255,7 +270,7 @@ uint8_t TM_GENERAL_DWTCounterEnable(void);
  * @retval None
  * @note   Defined as macro for faster execution
  */
-#define TM_GENERAL_DWTCounterSetValue(x)  (DWT->CYCCNT = (x))
+#define TM_GENERAL_DWTCounterSetValue(x)     (DWT->CYCCNT = (x))
 
 /**
  * @brief  Delays for amount of microseconds using DWT counter
@@ -271,9 +286,7 @@ static __INLINE void TM_GENERAL_DWTCounterDelayus(uint32_t micros) {
 	micros -= 12;
 	
 	/* Wait till done */
-	while ((TM_GENERAL_DWTCounterGetValue() - c) < micros) {
-		/* Do nothing */
-	}
+	while ((TM_GENERAL_DWTCounterGetValue() - c) < micros);
 }
 
 /**
@@ -290,22 +303,8 @@ static __INLINE void TM_GENERAL_DWTCounterDelayms(uint32_t millis) {
 	millis -= 12;
 	
 	/* Wait till done */
-	while ((TM_GENERAL_DWTCounterGetValue() - c) < millis) {
-		/* Do nothing */
-	}
+	while ((TM_GENERAL_DWTCounterGetValue() - c) < millis);
 }
-
-/**
- * @brief  Checks if number is power of 2
- * @note   It can be used to determine if number has more than just one bit set
- *         If only one bit is set, function will return > 0 because this is power of 2.
- * @param  number: Number to check if it is power of 2
- * @retval Is power of 2 status:
- *            - 0: Number if not power of 2
- *            - > 0: Number is power of 2
- * @note   Defined as macro for faster execution
- */
-#define TM_GENERAL_IsNumberPowerOfTwo(number)    (number && !(number & (number - 1)))
 
 /**
  * @brief  Checks if number is odd or even
@@ -315,7 +314,7 @@ static __INLINE void TM_GENERAL_DWTCounterDelayms(uint32_t millis) {
  *            - > 0: Number is even
  * @note   Defined as macro for faster execution
  */
-#define TM_GENERAL_IsNumberEven(number)    ((number & 1) == 0)
+#define TM_GENERAL_IsNumberEven(number)          ((number & 1) == 0)
 
 /**
  * @brief  Converts float coded number into integer and decimal part
@@ -339,9 +338,21 @@ void TM_GENERAL_ConvertFloat(TM_GENERAL_Float_t* Float_Struct, float Number, uin
 float TM_GENERAL_RoundFloat(float Number, uint8_t decimals);
 
 /**
+ * @brief  Checks if number is power of 2
+ * @note   It can be used to determine if number has more than just one bit set
+ *         If only one bit is set, function will return > 0 because this is power of 2.
+ * @param  number: Number to check if it is power of 2
+ * @retval Is power of 2 status:
+ *            - 0: Number if not power of 2
+ *            - > 0: Number is power of 2
+ * @note   Defined as macro for faster execution
+ */
+#define TM_GENERAL_IsNumberPowerOfTwo(number)    (number && !(number & (number - 1)))
+
+/**
  * @brief  Calculates next power of 2 from given number
  * @param  number: Input number to be calculated
- * @param  Number with next power of 2
+ * @retval Number with next power of 2
  *         Example:
  *            - Input number: 450
  *            - Next power of 2 is: 512 = 2^9
@@ -349,13 +360,21 @@ float TM_GENERAL_RoundFloat(float Number, uint8_t decimals);
 uint32_t TM_GENERAL_NextPowerOf2(uint32_t number);
 
 /**
- * @brief  Software reset callback.
- *         Function is called before software reset occurs.
+ * @brief  Forces processor to jump to Hard-fault handler
+ * @note   Function tries to call function at zero location in memory which causes hard-fault
+ * @param  None
+ * @retval None
+ */
+void TM_GENERAL_ForceHardFaultError(void);
+
+/**
+ * @brief  System reset callback.
+ * @note   Function is called before software reset occurs.
  * @param  None
  * @retval None
  * @note   With __weak parameter to prevent link errors if not defined by user
  */
-__weak void TM_GENERAL_SoftwareResetCallback(void);
+void TM_GENERAL_SystemResetCallback(void);
 
 /**
  * @}

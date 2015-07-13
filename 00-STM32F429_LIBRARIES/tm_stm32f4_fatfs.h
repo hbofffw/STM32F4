@@ -168,7 +168,7 @@ CD		PB6			Card detect pin. Pin low when card detected
  * 
  * WP and CD pins are now enabled with default configuration.
  *
- *	Add lines below to your defines.h file only if you want to overwrite default pin settings:
+ * Add lines below to your defines.h file only if you want to overwrite default pin settings:
  *
 @verbatim
 //Default CD pin			
@@ -347,7 +347,7 @@ f_open(&fil, "USB:my_file.txt", FA...);
  * - SDCARD: <b>SD</b>; Drive number 0
  * - USB DRIVE: <b>USB</b>; Drive number 1
  * - SDRAM: <b>SDRAM</b>; Drive number 2
- * - SPI FLASH: <b>SPIFLASH</b>; Drive number 3; Low level driver not implemented yet
+ * - SPI FLASH: <b>SPIFLASH</b>; Drive number 3; Low level driver is not implemented yet
  *
  * Example for opening files:
  *
@@ -436,6 +436,7 @@ f_open(&fil, "SD:my_file_sd.txt", FA...);
 #include "defines.h"
 #include "tm_stm32f4_gpio.h"
 #include "ff.h"
+#include "diskio.h"
 
 /**
  * @defgroup TM_FATFS_Macros
@@ -463,6 +464,9 @@ f_open(&fil, "SD:my_file_sd.txt", FA...);
  * @{
  */
 
+/**
+ * @brief  FATFS size structure
+ */
 typedef struct {
 	uint32_t TotalSize; /*!< Total size of memory */
 	uint32_t FreeSize;  /*!< Free size of memory */
@@ -509,7 +513,7 @@ FRESULT TM_FATFS_USBDriveSize(uint32_t* total, uint32_t* free);
 /**
  * @brief  Truncates beginning of file
  *
- * Example
+ * Example:
  *	- You have a file, its content is: "abcdefghijklmnoprstuvwxyz",
  *	- You want to truncate first 5 bytes,
  *	- Call @ref TM_FATFS_TruncateBeginning(&opened_file, 5);
@@ -525,8 +529,7 @@ FRESULT TM_FATFS_TruncateBeginning(FIL* fil, uint32_t index);
 /**
  * @brief  Checks card detect pin (if activated) if card is inserted
  * @note   Pin must be set low in order to get card inserted, otherwise card is not inserted
- *
- * @note   Card detect pin must be activated in to get this functionality to work
+ * @note   Card detect pin must be activated in order to get this functionality to work
  * @param  None
  * @retval Card detected status:
  *            - 0: Card is not inserted

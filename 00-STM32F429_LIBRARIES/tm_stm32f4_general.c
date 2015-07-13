@@ -20,6 +20,7 @@
 
 /* System speed in MHz */
 uint16_t GENERAL_SystemSpeedInMHz = 0;
+static uint16_t InterruptDisabledCount = 0;
 
 /* Private functions */
 static uint32_t x_na_y(uint32_t x, uint8_t y) {
@@ -34,9 +35,33 @@ static uint32_t x_na_y(uint32_t x, uint8_t y) {
 	return output;
 }
 
+void TM_GENERAL_DisableInterrupts(void) {
+	/* Disable interrupts */
+	__disable_irq();
+	
+	/* Increase number of disable interrupt function calls */
+	InterruptDisabledCount++;
+}
+
+uint8_t TM_GENERAL_EnableInterrupts(void) {
+	/* Decrease number of disable interrupt function calls */
+	if (InterruptDisabledCount) {
+		InterruptDisabledCount--;
+	}
+	
+	/* Check if we are ready to enable interrupts */
+	if (!InterruptDisabledCount) {
+		/* Enable interrupts */
+		__enable_irq();
+	}
+	
+	/* Return interrupt enabled status */
+	return !InterruptDisabledCount;
+}
+
 void TM_GENERAL_SystemReset(void) {
 	/* Call user callback function */
-	TM_GENERAL_SoftwareResetCallback();
+	TM_GENERAL_SystemResetCallback();
 	
 	/* Perform a system software reset */
 	NVIC_SystemReset();
@@ -197,3 +222,19 @@ uint32_t TM_GENERAL_NextPowerOf2(uint32_t number) {
 	/* Return calculated number */
 	return number;
 }
+
+void TM_GENERAL_ForceHardFaultError(void) {
+	/* Create hard-fault-function typedef */
+	typedef void (*hff)(void);
+	hff hf_func = 0;
+	
+	/* Call function at zero location in memory = HARDFAULT */
+	hf_func();
+}
+
+__weak void TM_GENERAL_SystemResetCallback(void) {
+	/* NOTE: This function should not be modified, when the callback is needed,
+            the TM_GENERAL_SystemResetCallback could be implemented in the user file
+	*/
+}
+

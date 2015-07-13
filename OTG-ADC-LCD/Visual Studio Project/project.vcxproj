@@ -126,7 +126,10 @@
     <None Include="Readme.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_dma.c" />
+    <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_spi_dma.c" />
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\misc.c" />
+    <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c" />
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rcc.c" />
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_gpio.c" />
     <ClCompile Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_exti.c" />
@@ -168,6 +171,8 @@
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\usb_cdc_device\usbd_usr.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_dma.h" />
+    <ClInclude Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_spi_dma.h" />
     <ClInclude Include="..\User\oldads1256\old_ads1256.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

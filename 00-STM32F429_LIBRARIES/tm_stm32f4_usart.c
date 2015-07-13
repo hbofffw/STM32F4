@@ -199,13 +199,22 @@ uint8_t TM_USART_Getc(USART_TypeDef* USARTx) {
 	TM_USART_t* u = TM_USART_INT_GetUsart(USARTx);
 	
 	/* Check if we have any data in buffer */
-	if (u->Num > 0) {
+	if (u->Num > 0 || u->In != u->Out) {
+		/* Check overflow */
 		if (u->Out == u->Size) {
 			u->Out = 0;
 		}
-		c = *(u->Buffer + u->Out);
+		
+		/* Read character */
+		c = u->Buffer[u->Out];
+		
+		/* Increase output pointer */
 		u->Out++;
-		u->Num--;
+		
+		/* Decrease number of elements */
+		if (u->Num) {
+			u->Num--;
+		}
 	}
 	
 	/* Return character */
@@ -234,6 +243,7 @@ uint16_t TM_USART_Gets(USART_TypeDef* USARTx, char* buffer, uint16_t bufsize) {
 	while (i < (bufsize - 1)) {
 		/* We have available data */
 		buffer[i] = (char) TM_USART_Getc(USARTx);
+		
 		/* Check for end of string */
 		if ((uint8_t)buffer[i] == (uint8_t)u->StringDelimiter) {
 			/* Done */
@@ -255,7 +265,7 @@ uint8_t TM_USART_BufferEmpty(USART_TypeDef* USARTx) {
 	TM_USART_t* u = TM_USART_INT_GetUsart(USARTx);
 	
 	/* Check if number of characters is zero in buffer */
-	return (u->Num == 0);
+	return (u->Num == 0 && u->In == u->Out);
 }
 
 uint8_t TM_USART_BufferFull(USART_TypeDef* USARTx) {

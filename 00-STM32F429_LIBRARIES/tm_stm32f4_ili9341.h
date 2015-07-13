@@ -3,7 +3,7 @@
  * @email   tilen@majerle.eu
  * @website http://stm32f4-discovery.com
  * @link    http://stm32f4-discovery.com/2014/04/library-08-ili9341-lcd-on-stm32f429-discovery-board/
- * @version v1.2
+ * @version v1.3
  * @ide     Keil uVision
  * @license GNU GPL v3
  * @brief   ILI9341 library for STM32F4xx with SPI communication, without LTDC hardware
@@ -28,7 +28,7 @@
 @endverbatim
  */
 #ifndef TM_ILI9341_H
-#define TM_ILI9341_H 120
+#define TM_ILI9341_H 130
 
 /**
  * @addtogroup TM_STM32F4xx_Libraries
@@ -45,33 +45,33 @@
  * \par Default pinout
  *
 @verbatim
-ILI9341			STM32F4xx		DESCRIPTION
+ILI9341      STM32F4xx    DESCRIPTION
 		
-SDO (MISO)		PF8				Output from LCD for SPI.	Not used, can be left
-LED				3.3V			Backlight
-SCK				PF7				SPI clock
-SDI (MOSI)		PF9				SPI master output
-WRX or D/C		PD13			Data/Command register
-RESET			PD12			Reset LCD
-CS				PC2				Chip select for SPI
-GND				GND				Ground
-VCC				3.3V			Positive power supply
+SDO (MISO    PF8          Output from LCD for SPI.	Not used, can be left
+LED          3.3V         Backlight
+SCK          PF7          SPI clock
+SDI (MOSI)   PF9          SPI master output
+WRX or D/C   PD13         Data/Command register
+RESET        PD12         Reset LCD
+CS           PC2          Chip select for SPI
+GND          GND          Ground
+VCC          3.3V         Positive power supply
 @endverbatim
  *		
  * All pins can be changed in your defines.h file
  *		
 @verbatim
 //Default SPI used is SPI5. Check my SPI library for other pinouts
-#define ILI9341_SPI 				SPI5
-#define ILI9341_SPI_PINS			TM_SPI_PinsPack_1
+#define ILI9341_SPI           SPI5
+#define ILI9341_SPI_PINS      TM_SPI_PinsPack_1
 		
 //Default CS pin. Edit this in your defines.h file
-#define ILI9341_CS_PORT				GPIOC
-#define ILI9341_CS_PIN				GPIO_PIN_2
+#define ILI9341_CS_PORT       GPIOC
+#define ILI9341_CS_PIN        GPIO_PIN_2
 		
 //Default D/C (or WRX) pin. Edit this in your defines.h file
-#define ILI9341_WRX_PORT			GPIOD
-#define ILI9341_WRX_PIN				GPIO_PIN_13
+#define ILI9341_WRX_PORT      GPIOD
+#define ILI9341_WRX_PIN       GPIO_PIN_13
 @endverbatim
  *
  * Reset pin can be disabled, if you need GPIOs for other purpose.
@@ -94,6 +94,10 @@ VCC				3.3V			Positive power supply
  * \par Changelog
  *
 @verbatim
+ Version 1.3
+  - June 06, 2015
+  - Added support for SPI DMA for faster refreshing
+ 
  Version 1.2
   - March 14, 2015
   - Added support for new GPIO system
@@ -112,6 +116,8 @@ VCC				3.3V			Positive power supply
  - STM32F4xx SPI
  - defines.h
  - TM SPI
+ - TM DMA
+ - TM SPI DMA
  - TM FONTS
  - TM GPIO
 @endverbatim
@@ -121,9 +127,11 @@ VCC				3.3V			Positive power supply
 #include "stm32f4xx_rcc.h"
 #include "stm32f4xx_gpio.h"
 #include "defines.h"
-#include "tm_stm32f4_spi.h"
 #include "tm_stm32f4_fonts.h"
 #include "tm_stm32f4_gpio.h"
+#include "tm_stm32f4_spi.h"
+#include "tm_stm32f4_dma.h"
+#include "tm_stm32f4_spi_dma.h"
 
 /**
  * @defgroup TM_ILI9341_Macros
@@ -135,43 +143,43 @@ VCC				3.3V			Positive power supply
  * @brief  This SPI pins are used on STM32F429-Discovery board
  */
 #ifndef ILI9341_SPI
-#define ILI9341_SPI 				SPI5
-#define ILI9341_SPI_PINS			TM_SPI_PinsPack_1
+#define ILI9341_SPI           SPI5
+#define ILI9341_SPI_PINS      TM_SPI_PinsPack_1
 #endif
 
 /**
  * @brief  CS PIN for SPI, used as on STM32F429-Discovery board
  */
 #ifndef ILI9341_CS_PIN
-#define ILI9341_CS_PORT				GPIOC
-#define ILI9341_CS_PIN				GPIO_PIN_2
+#define ILI9341_CS_PORT       GPIOC
+#define ILI9341_CS_PIN        GPIO_PIN_2
 #endif
 
 /**
  * @brief  WRX PIN for data/command, used as on STM32F429-Discovery board
  */
 #ifndef ILI9341_WRX_PIN
-#define ILI9341_WRX_PORT			GPIOD
-#define ILI9341_WRX_PIN				GPIO_PIN_13
+#define ILI9341_WRX_PORT      GPIOD
+#define ILI9341_WRX_PIN       GPIO_PIN_13
 #endif
 
 /**
  * @brief  RESET for LCD
  */
 #ifndef ILI9341_RST_PIN
-#define ILI9341_RST_PORT			GPIOD
-#define ILI9341_RST_PIN				GPIO_PIN_12
+#define ILI9341_RST_PORT      GPIOD
+#define ILI9341_RST_PIN       GPIO_PIN_12
 #endif
 
 /* LCD settings */
-#define ILI9341_WIDTH 				240
-#define ILI9341_HEIGHT				320
-#define ILI9341_PIXEL				76800
+#define ILI9341_WIDTH        240
+#define ILI9341_HEIGHT       320
+#define ILI9341_PIXEL        76800
 
 /* Colors */
 #define ILI9341_COLOR_WHITE			0xFFFF
 #define ILI9341_COLOR_BLACK			0x0000
-#define ILI9341_COLOR_RED			0xF800
+#define ILI9341_COLOR_RED       0xF800
 #define ILI9341_COLOR_GREEN			0x07E0
 #define ILI9341_COLOR_GREEN2		0xB723
 #define ILI9341_COLOR_BLUE			0x001F

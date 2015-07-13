@@ -3,7 +3,7 @@
  * @email   tilen@majerle.eu
  * @website http://stm32f4-discovery.com
  * @link    http://stm32f4-discovery.com/2014/06/library-17-nrf24l01-stm32f4xx/
- * @version v1.1
+ * @version v1.1.1
  * @ide     Keil uVision
  * @license GNU GPL v3
  * @brief   Library template 
@@ -28,7 +28,7 @@
 @endverbatim
  */
 #ifndef TM_NRF24L01_H
-#define TM_NRF24L01_H 110
+#define TM_NRF24L01_H 111
 
 /* C++ detection */
 #ifdef __cplusplus
@@ -91,6 +91,10 @@ IRQ			Not used	Interrupt pin. Goes low when active. Pin functionality is active,
  * \par Changelog
  *
 @verbatim
+ Versio 1.1.1
+  - June 21, 2015
+  - Fixed buf with pin configuration
+  
  Version 1.1
   - March 11, 2015
   - Added support for my new GPIO system
@@ -142,9 +146,9 @@ IRQ			Not used	Interrupt pin. Goes low when active. Pin functionality is active,
 #endif
 
 /* Pins configuration */
-#define NRF24L01_CE_LOW				TM_GPIO_SetPinHigh(NRF24L01_CE_PORT, NRF24L01_CE_PIN)
+#define NRF24L01_CE_LOW				TM_GPIO_SetPinLow(NRF24L01_CE_PORT, NRF24L01_CE_PIN)
 #define NRF24L01_CE_HIGH			TM_GPIO_SetPinHigh(NRF24L01_CE_PORT, NRF24L01_CE_PIN)
-#define NRF24L01_CSN_LOW			TM_GPIO_SetPinHigh(NRF24L01_CSN_PORT, NRF24L01_CSN_PIN)
+#define NRF24L01_CSN_LOW			TM_GPIO_SetPinLow(NRF24L01_CSN_PORT, NRF24L01_CSN_PIN)
 #define NRF24L01_CSN_HIGH			TM_GPIO_SetPinHigh(NRF24L01_CSN_PORT, NRF24L01_CSN_PIN)
 
 /**
@@ -184,6 +188,17 @@ typedef enum {
 	TM_NRF24L01_OutputPower_M6dBm,  /*!< Output power set to -6dBm */
 	TM_NRF24L01_OutputPower_0dBm    /*!< Output power set to 0dBm */
 } TM_NRF24L01_OutputPower_t;
+
+/* Clear interrupt flags */
+#define NRF24L01_CLEAR_INTERRUPTS   do { TM_NRF24L01_WriteRegister(0x07, 0x70); } while (0)
+
+/* Gets interrupt status from device */
+#define NRF24L01_GET_INTERRUPTS     TM_NRF24L01_GetStatus()
+
+/* Interrupt masks */
+#define NRF24L01_IRQ_DATA_READY     0x40 /*!< Data ready for receive */
+#define NRF24L01_IRQ_TRAN_OK        0x20 /*!< Transmission went OK */
+#define NRF24L01_IRQ_MAX_RT         0x10 /*!< Max retransmissions reached, last transmission failed */
 
 /**
  * @}
@@ -312,6 +327,9 @@ void TM_NRF24L01_SetRF(TM_NRF24L01_DataRate_t DataRate, TM_NRF24L01_OutputPower_
  * @retval Status register from NRF
  */
 uint8_t TM_NRF24L01_GetStatus(void);
+
+/* Private */
+void TM_NRF24L01_WriteRegister(uint8_t reg, uint8_t value);
 
 /**
  * @}

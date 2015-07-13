@@ -71,9 +71,6 @@
 #endif
 #endif
 
-#ifndef FATFS_USE_
-
-
 typedef enum
 {
 	/**
@@ -212,19 +209,19 @@ typedef struct {
  * @brief SD Card Status
  */
 typedef struct {
-        __IO uint8_t DAT_BUS_WIDTH;__IO uint8_t SECURED_MODE;__IO uint16_t SD_CARD_TYPE;__IO uint32_t SIZE_OF_PROTECTED_AREA;__IO uint8_t SPEED_CLASS;__IO uint8_t PERFORMANCE_MOVE;__IO uint8_t AU_SIZE;__IO uint16_t ERASE_SIZE;__IO uint8_t ERASE_TIMEOUT;__IO uint8_t ERASE_OFFSET;
+	__IO uint8_t DAT_BUS_WIDTH;__IO uint8_t SECURED_MODE;__IO uint16_t SD_CARD_TYPE;__IO uint32_t SIZE_OF_PROTECTED_AREA;__IO uint8_t SPEED_CLASS;__IO uint8_t PERFORMANCE_MOVE;__IO uint8_t AU_SIZE;__IO uint16_t ERASE_SIZE;__IO uint8_t ERASE_TIMEOUT;__IO uint8_t ERASE_OFFSET;
 } SD_CardStatus;
 
 /** 
  * @brief SD Card information
  */
 typedef struct {
-        SD_CSD SD_csd;
-        SD_CID SD_cid;
-        uint64_t CardCapacity; /*!< Card Capacity */
-        uint32_t CardBlockSize; /*!< Card Block Size */
-        uint16_t RCA;
-        uint8_t CardType;
+	SD_CSD SD_csd;
+	SD_CID SD_cid;
+	uint64_t CardCapacity; /*!< Card Capacity */
+	uint32_t CardBlockSize; /*!< Card Block Size */
+	uint16_t RCA;
+	uint8_t CardType;
 } SD_CardInfo;
 
 /**
@@ -478,6 +475,9 @@ typedef struct {
  */
 #define SDIO_SEND_IF_COND               ((uint32_t)0x00000008)
 
+/* SDIO data block size */
+#define SDIO_DATABLOCKSIZE              ((uint32_t)((9 << 4)))
+
 extern void SD_LowLevel_DeInit (void);
 extern void SD_LowLevel_Init (void);
 extern void SD_LowLevel_DMA_TxConfig (uint32_t *BufferSRC, uint32_t BufferSize);
@@ -512,9 +512,6 @@ extern void SD_ProcessDMAIRQ (void);
 extern SD_Error SD_WaitReadOperation (void);
 extern SD_Error SD_WaitWriteOperation (void);
 extern SD_Error SD_HighSpeed (void);
-
-
-#endif 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 
