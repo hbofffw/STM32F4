@@ -95,7 +95,28 @@ int main(void) {
 	{
 		memset(adcsamples[j], 0x00 + sizeof(adcsamples[j])*j, sizeof(adcsamples[j]));
 	}
-	//val = TM_GENERAL_DWTCounterEnable();
+
+	/* Get system reset source and clear flags after read */
+	printf("System reset source: %d\r\n", (uint8_t)TM_GENERAL_GetResetSource(1));
+
+	/* Get system reset source and clear flags after read */
+	/* You should see number which corresponds to "None", because we cleared flags in statement above */
+	printf("System reset source: %d\r\n", (uint8_t)TM_GENERAL_GetResetSource(1));
+
+	/* Get system core and PCLK1 (Peripheral Clock 1, APB1) clocks */
+	printf("System core clock: %u Hz; PCLK1 clock: %u Hz\r\n",
+		TM_GENERAL_GetClockSpeed(TM_GENERAL_Clock_SYSCLK),
+		TM_GENERAL_GetClockSpeed(TM_GENERAL_Clock_PCLK1)
+		);
+	val = TM_GENERAL_DWTCounterEnable();
+	if (val != 0)
+	{
+		printf("DWT counter started! \r\n");
+	}
+	else
+	{
+		printf("DWT counter not started! \r\n");
+	}
 	//TM_SPI_Init(SPI1, TM_SPI_PinsPack_Custom);
 
 	/* Initialize ADC1 on channel 3, this is pin PA3 */
@@ -186,9 +207,11 @@ int main(void) {
 				TM_DELAY_SetTime(0);
 				do 
 				{
+					//TM_GENERAL_DWTCounterSetValue(0);
 					adctest = ADS1256_ReadAdc();
 					count++;
-				} while (TM_DELAY_Time() <= 64000);
+					//while (TM_GENERAL_DWTCounterGetValue() < 84000);
+				}  while (TM_DELAY_Time() < 1000);
 				ADS1256_StopScan();
 				printf("there are %d samples\r\n", count);
 				printf("one sample is %d \r\n", adctest);
@@ -202,12 +225,12 @@ int main(void) {
 
 				do
 				{
-					//TM_GENERAL_DWTCounterSetValue(0);
-					TM_DISCO_LedToggle(TM_DISCO_LED_PINS);
+					TM_GENERAL_DWTCounterSetValue(0);
+					//TM_DISCO_LedToggle(TM_DISCO_LED_PINS);
 					count++;
-					Delay(1000);
-					//while (TM_GENERAL_DWTCounterGetValue() <= 10);
-				} while (TM_DELAY_Time() <= 64000);
+					//Delay(1000);
+					while (TM_GENERAL_DWTCounterGetValue() < 84000);
+				} while (TM_DELAY_Time() < 1000);
 
 				//while (1)
 				//{
@@ -267,10 +290,11 @@ int main(void) {
 				{
 					for (i = 0; i < 200; i++)
 					{
-						TM_DELAY_SetTime(0);
+						//TM_DELAY_SetTime(0);
+						TM_GENERAL_DWTCounterSetValue(0);
 						adcsamples[j][i] = ADS1256_ReadAdc();
 						count++;
-						while ((TM_DELAY_Time() <= 64));   //心跳改为 1/64 ms
+						while (TM_GENERAL_DWTCounterGetValue() < 84000);   //心跳改为 1/64 ms
 					}
 				}
 				//count++;

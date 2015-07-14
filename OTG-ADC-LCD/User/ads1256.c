@@ -413,7 +413,7 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 	}
 
 	//bsp_DelayUS(50);
-	
+
 }
 
 /*
@@ -524,22 +524,41 @@ static void ADS1256_Send8Bit(uint8_t _data)
 */
 static uint8_t ADS1256_Recive8Bit(void)
 {
+	uint8_t j;
 	uint8_t i;
 	uint8_t read = 0;
 
 	//ADS1256_DelaySCLK();
 	/*　ADS1256 要求 SCL高电平和低电平持续时间最小 200ns  */
-	for (i = 0; i < 8; i++)
+	for (j = 0; j < 2; j++)
 	{
-		SCK_1();
-		//ADS1256_DelaySCLK();
-		Delay(5);
-		read = read << 1;
-		SCK_0();
-		if (DO_IS_HIGH())
+		Delay(50);
+		for (i = 0; i < 4; i++)
 		{
-			read++;
+			SCK_1();
+			Delay(1);
+			read = read << 1;
+			SCK_0();
+			Delay(1);
+			if (DO_IS_HIGH())
+			{
+				read++;
+			}
 		}
+		//ADS1256_DelaySCLK();
+		
+		/*if (i == 0)
+		{*/
+			
+		//	Delay(30);
+		//}
+			/*read = read << 1;
+
+				SCK_0();*/
+
+
+		
+
 		//Delay(10);
 		//ADS1256_DelaySCLK();
 	}
@@ -803,7 +822,7 @@ int32_t ADS1256_ReadAdc(void)
 {
 	/* ADS1256 数据手册第21页 */
 
-//#if 0	/* 对于30Ksps 采样速率 */
+	//#if 0	/* 对于30Ksps 采样速率 */
 	int32_t read;
 
 	//while (!DRDY_IS_LOW());	/*单次转换时， 等待 DRDY 高； 连续转换时，等待 DRDY 低 */
@@ -826,25 +845,25 @@ int32_t ADS1256_ReadAdc(void)
 	//read = (int32_t)ADS1256_ReadData();
 
 	return read;
-//#else	
-//	//while (DRDY_IS_LOW());
-//
-//	/* ADS1256 数据手册第21页 */
-//	ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
-//
-//	//ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
-//	//Delay(5);
-//
-//	//ADS1256_WriteCmd(CMD_SYNC);
-//	//Delay(5);
-//
-//	//ADS1256_WriteCmd(CMD_WAKEUP);
-//	//Delay(25);
-//
-//	//ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
-//
-//	return (int32_t)ADS1256_ReadData();
-//#endif	
+	//#else	
+	//	//while (DRDY_IS_LOW());
+	//
+	//	/* ADS1256 数据手册第21页 */
+	//	ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
+	//
+	//	//ADS1256_SetChannal(_ch);	/* 切换模拟通道 */
+	//	//Delay(5);
+	//
+	//	//ADS1256_WriteCmd(CMD_SYNC);
+	//	//Delay(5);
+	//
+	//	//ADS1256_WriteCmd(CMD_WAKEUP);
+	//	//Delay(25);
+	//
+	//	//ADS1256_WaitDRDY();		/* 等待 DRDY = 0 */
+	//
+	//	return (int32_t)ADS1256_ReadData();
+	//#endif	
 }
 
 /*
@@ -868,36 +887,36 @@ void ADS1256_StartScan(void)
 	//while (!DRDY_IS_LOW());
 	ADS1256_Send8Bit(CMD_RDATAC);	/* 读数据的命令 */
 	//Delay(50);
-		/* SPI片选 = 0 */
-//	EXTI_InitTypeDef   EXTI_InitStructure;
-//	NVIC_InitTypeDef   NVIC_InitStructure;
-//
-//	/* 使能SYSCFG时钟 */
-//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-//
-//	/* 连接 EXTI Line9 到 PE9 引脚 */
-//#if defined (TM_DISCO_STM32F4_DISCOVERY)
-//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource9);
-//#elif defined (TM_DISCO_NUCLEO_F401)
-//	/* 连接 EXTI Line9 到 PC9 引脚 */
-//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource9);
-//#endif
-//	/* 配置 EXTI LineXXX */
-//	EXTI_InitStructure.EXTI_Line = EXTI_Line9;
-//	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-//	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;	/* 下降沿(等待 DRDY 由1变0的时刻) */
-//	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-//	EXTI_Init(&EXTI_InitStructure);
-//
-//	/* 设置NVIC优先级分组为Group2：0-3抢占式优先级，0-3的响应式优先级 */
-//	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-//
-//	/* 中断优先级配置 最低优先级 这里一定要分开的设置中断，不能够合并到一个里面设置 */
-//	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x03;
-//	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
-//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-//	NVIC_Init(&NVIC_InitStructure);
+	/* SPI片选 = 0 */
+	//	EXTI_InitTypeDef   EXTI_InitStructure;
+	//	NVIC_InitTypeDef   NVIC_InitStructure;
+	//
+	//	/* 使能SYSCFG时钟 */
+	//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+	//
+	//	/* 连接 EXTI Line9 到 PE9 引脚 */
+	//#if defined (TM_DISCO_STM32F4_DISCOVERY)
+	//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource9);
+	//#elif defined (TM_DISCO_NUCLEO_F401)
+	//	/* 连接 EXTI Line9 到 PC9 引脚 */
+	//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource9);
+	//#endif
+	//	/* 配置 EXTI LineXXX */
+	//	EXTI_InitStructure.EXTI_Line = EXTI_Line9;
+	//	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	//	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;	/* 下降沿(等待 DRDY 由1变0的时刻) */
+	//	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+	//	EXTI_Init(&EXTI_InitStructure);
+	//
+	//	/* 设置NVIC优先级分组为Group2：0-3抢占式优先级，0-3的响应式优先级 */
+	//	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+	//
+	//	/* 中断优先级配置 最低优先级 这里一定要分开的设置中断，不能够合并到一个里面设置 */
+	//	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+	//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x03;
+	//	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
+	//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	//	NVIC_Init(&NVIC_InitStructure);
 
 	/* 开始扫描前, 清零结果缓冲区 */
 	/*{
@@ -907,9 +926,9 @@ void ADS1256_StartScan(void)
 
 		for (i = 0; i < 8; i++)
 		{
-			g_tADS1256.AdcNow[i] = 0;
+		g_tADS1256.AdcNow[i] = 0;
 		}
-	}*/
+		}*/
 }
 
 /*
@@ -925,24 +944,24 @@ void ADS1256_StopScan(void)
 	while (!DRDY_IS_LOW());
 	ADS1256_Send8Bit(CMD_SDATAC);
 	CS_1();
-//	EXTI_InitTypeDef   EXTI_InitStructure;
-//	//	NVIC_InitTypeDef   NVIC_InitStructure;
-//
-//	/* 配置 EXTI LineXXX */
-//	EXTI_InitStructure.EXTI_Line = EXTI_Line9;
-//	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-//	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;	/* 下降沿(等待 DRDY 由1变0的时刻) */
-//	EXTI_InitStructure.EXTI_LineCmd = DISABLE;		/* 禁止 */
-//	EXTI_Init(&EXTI_InitStructure);
-//
-//#if 0			
-//	/* 中断优先级配置 最低优先级 这里一定要分开的设置中断，不能够合并到一个里面设置 */
-//	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x03;
-//	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
-//	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;		/* 禁止 */
-//	NVIC_Init(&NVIC_InitStructure);
-//#endif
+	//	EXTI_InitTypeDef   EXTI_InitStructure;
+	//	//	NVIC_InitTypeDef   NVIC_InitStructure;
+	//
+	//	/* 配置 EXTI LineXXX */
+	//	EXTI_InitStructure.EXTI_Line = EXTI_Line9;
+	//	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	//	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;	/* 下降沿(等待 DRDY 由1变0的时刻) */
+	//	EXTI_InitStructure.EXTI_LineCmd = DISABLE;		/* 禁止 */
+	//	EXTI_Init(&EXTI_InitStructure);
+	//
+	//#if 0			
+	//	/* 中断优先级配置 最低优先级 这里一定要分开的设置中断，不能够合并到一个里面设置 */
+	//	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+	//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x03;
+	//	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
+	//	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;		/* 禁止 */
+	//	NVIC_Init(&NVIC_InitStructure);
+	//#endif
 }
 
 /*
@@ -960,7 +979,7 @@ int32_t ADS1256_GetAdc(uint8_t _ch)
 
 	/*if (_ch > 7)
 	{
-		return 0;
+	return 0;
 	}*/
 
 	//DISABLE_INT();  			/* 关中断 */

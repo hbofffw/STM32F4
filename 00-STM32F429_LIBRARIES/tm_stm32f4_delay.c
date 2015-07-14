@@ -89,7 +89,7 @@ void TM_DELAY_Init(void) {
 	TM_DELAY_INT_InitTIM();
 #else
 	/* Set Systick interrupt every 1ms */
-	if (SysTick_Config(SystemCoreClock / 64000)) {
+	if (SysTick_Config(SystemCoreClock / 1000)) {
 		/* Capture error */
 		while (1);
 	}
