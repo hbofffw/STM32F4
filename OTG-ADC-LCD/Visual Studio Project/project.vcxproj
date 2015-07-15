@@ -152,6 +152,8 @@
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_spi.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_stmpe811.c" />
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_usart.c" />
+    <ClCompile Include="..\..\ADS1256_Driver_single_channel\ads1256_new.c" />
+    <ClCompile Include="..\..\ADS1256_Driver_single_channel\ads1256_spi.c" />
     <ClCompile Include="..\User\main.c" />
     <ClCompile Include="..\User\oldads1256\old_ads1256.c" />
     <ClCompile Include="..\User\stm32f4xx_it.c" />
@@ -176,6 +178,8 @@
     <ClInclude Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_dma.h" />
     <ClInclude Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_general.h" />
     <ClInclude Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_spi_dma.h" />
+    <ClInclude Include="..\..\ADS1256_Driver_single_channel\ads1256_new.h" />
+    <ClInclude Include="..\..\ADS1256_Driver_single_channel\ads1256_spi.h" />
     <ClInclude Include="..\User\oldads1256\old_ads1256.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

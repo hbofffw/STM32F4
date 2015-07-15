@@ -476,7 +476,7 @@ static void ADS1256_ResetHard(void)
 
 	//bsp_DelayUS(5);
 	Delay(5);
-	//ADS1256_WaitDRDY();	/* 等待 DRDY变为0, 此过程实测: 630us */
+	ADS1256_WaitDRDY();	/* 等待 DRDY变为0, 此过程实测: 630us */
 }
 
 /*
@@ -530,38 +530,22 @@ static uint8_t ADS1256_Recive8Bit(void)
 
 	//ADS1256_DelaySCLK();
 	/*　ADS1256 要求 SCL高电平和低电平持续时间最小 200ns  */
-	for (j = 0; j < 2; j++)
+	//SCK_1();
+	//Delay(10);
+	for (i = 0; i < 8; i++)
 	{
-		Delay(50);
-		for (i = 0; i < 4; i++)
+		read = read << 1;
+		SCK_1();
+		Delay(10);
+		if (DO_IS_HIGH())
 		{
-			SCK_1();
-			Delay(1);
-			read = read << 1;
-			SCK_0();
-			Delay(1);
-			if (DO_IS_HIGH())
-			{
-				read++;
-			}
+			read++;
 		}
-		//ADS1256_DelaySCLK();
-		
-		/*if (i == 0)
-		{*/
-			
-		//	Delay(30);
-		//}
-			/*read = read << 1;
-
-				SCK_0();*/
-
-
-		
-
-		//Delay(10);
-		//ADS1256_DelaySCLK();
+		SCK_0();
+		Delay(10);
 	}
+	//SCK_0();
+	//Delay(10);
 	return read;
 }
 
@@ -886,6 +870,7 @@ void ADS1256_StartScan(void)
 	CS_0();
 	//while (!DRDY_IS_LOW());
 	ADS1256_Send8Bit(CMD_RDATAC);	/* 读数据的命令 */
+	Delay(10);
 	//Delay(50);
 	/* SPI片选 = 0 */
 	//	EXTI_InitTypeDef   EXTI_InitStructure;

@@ -165,6 +165,12 @@
     <ClCompile Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_general.c">
       <Filter>源文件\TM</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\ADS1256_Driver_single_channel\ads1256_new.c">
+      <Filter>源文件\User</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ADS1256_Driver_single_channel\ads1256_spi.c">
+      <Filter>源文件\User</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h">
@@ -309,6 +315,12 @@
     </ClInclude>
     <ClInclude Include="..\..\00-STM32F429_LIBRARIES\tm_stm32f4_general.h">
       <Filter>源文件\TM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ADS1256_Driver_single_channel\ads1256_new.h">
+      <Filter>源文件\User</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ADS1256_Driver_single_channel\ads1256_spi.h">
+      <Filter>源文件\User</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
