@@ -20,6 +20,7 @@
 #include "ads1256.h"
 //#include "tm_stm32f4_usb_vcp.h"
 #include "tm_stm32f4_spi.h"
+#include "tm_stm32f4_general.h"
 
 
 //#define SOFT_SPI		/* 定义此行表示使用GPIO模拟SPI接口 */
@@ -52,7 +53,7 @@ DIN   <------PC2       SPI_MISO
 DOUT------>  PC3       SPI_MOSI
 SCLK  <------PB10      SPI时钟
 GND  ------- GND       地
-//-PDWN  <------  PB0       掉电控制
+//-PDWN  <------  PB2       掉电控制
 RST   <------PC4       复位信号
 */
 
@@ -112,9 +113,9 @@ RDATAC, RESET, SYNC 命令之后，需要延迟 24 * tCLK = 3.12uS;
 #define PORT_RESET	GPIOC
 #define PIN_RESET	GPIO_Pin_4
 
-//#define RCC_PWDN 	RCC_AHB1Periph_GPIOB
-//#define PORT_PWDN	GPIOB
-//#define PIN_PWDN	GPIO_Pin_0
+#define RCC_PWDN 	RCC_AHB1Periph_GPIOB
+#define PORT_PWDN	GPIOB
+#define PIN_PWDN	GPIO_Pin_2
 
 #define RCC_DRDY 	RCC_AHB1Periph_GPIOC
 #define PORT_DRDY	GPIOC
@@ -143,9 +144,9 @@ RDATAC, RESET, SYNC 命令之后，需要延迟 24 * tCLK = 3.12uS;
 #define PORT_RESET	GPIOC
 #define PIN_RESET	GPIO_Pin_5
 
-//#define RCC_PWDN 	RCC_AHB1Periph_GPIOB
-//#define PORT_PWDN	GPIOB 
-//#define PIN_PWDN	GPIO_Pin_0
+#define RCC_PWDN 	RCC_AHB1Periph_GPIOB
+#define PORT_PWDN	GPIOB 
+#define PIN_PWDN	GPIO_Pin_2
 
 #define RCC_DRDY 	RCC_AHB1Periph_GPIOE
 #define PORT_DRDY	GPIOE
@@ -156,8 +157,8 @@ RDATAC, RESET, SYNC 命令之后，需要延迟 24 * tCLK = 3.12uS;
 #define PIN_DOUT	GPIO_Pin_6
 #endif
 /* 定义口线置0和置1的宏 */
-//#define PWDN_0()	GPIO_ResetBits(PORT_PWDN, PIN_PWDN)
-//#define PWDN_1()	GPIO_SetBits(PORT_PWDN, PIN_PWDN)
+#define PWDN_0()	GPIO_ResetBits(PORT_PWDN, PIN_PWDN)
+#define PWDN_1()	GPIO_SetBits(PORT_PWDN, PIN_PWDN)
 
 #define RESET_0()	GPIO_ResetBits(PORT_RESET, PIN_RESET)
 #define RESET_1()	GPIO_SetBits(PORT_RESET, PIN_RESET)
@@ -170,6 +171,10 @@ RDATAC, RESET, SYNC 命令之后，需要延迟 24 * tCLK = 3.12uS;
 
 #define DI_0()		GPIO_ResetBits(PORT_DIN, PIN_DIN)
 #define DI_1()		GPIO_SetBits(PORT_DIN, PIN_DIN)
+
+//added by dongbo
+//#define SCK_IS_HIGH()	(GPIO_ReadInputDataBit(PORT_SCK, PIN_SCK) == Bit_SET)
+//#define SCK_IS_LOW()	(GPIO_ReadInputDataBit(PORT_SCK, PIN_SCK) == Bit_RESET)
 
 #define DO_IS_HIGH()	(GPIO_ReadInputDataBit(PORT_DOUT, PIN_DOUT) == Bit_SET)
 
@@ -266,23 +271,20 @@ void InitADS1256(void)
 
 
 	RESET_1();
-	//PWDN_1();
+	PWDN_1();
 	CS_1();
 	SCK_0();		/* SPI总线空闲时，钟线是低电平 */
 	DI_1();
 
 
 	/* 打开GPIO时钟 */
-	RCC_AHB1PeriphClockCmd(RCC_CS | RCC_DIN | RCC_DOUT | RCC_SCK | RCC_DRDY | RCC_RESET, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_CS | RCC_DIN | RCC_DOUT | RCC_SCK | RCC_DRDY | RCC_RESET | RCC_PWDN, ENABLE);
 
 	/* 配置几个推完输出IO */
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;		/* 设为输出口 */
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
-
-	GPIO_InitStructure.GPIO_Pin = PIN_SCK;
-	GPIO_Init(PORT_SCK, &GPIO_InitStructure);
 
 	GPIO_InitStructure.GPIO_Pin = PIN_DIN;
 	GPIO_Init(PORT_DIN, &GPIO_InitStructure);
@@ -293,8 +295,16 @@ void InitADS1256(void)
 	GPIO_InitStructure.GPIO_Pin = PIN_RESET;
 	GPIO_Init(PORT_RESET, &GPIO_InitStructure);
 
-	//GPIO_InitStructure.GPIO_Pin = PIN_PWDN;
-	//GPIO_Init(PORT_PWDN, &GPIO_InitStructure);
+	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;		/* 设为输入输出口 */
+	//GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
+	//GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
+	//GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
+
+	GPIO_InitStructure.GPIO_Pin = PIN_SCK;
+	GPIO_Init(PORT_SCK, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = PIN_PWDN;
+	GPIO_Init(PORT_PWDN, &GPIO_InitStructure);
 
 	/* 配置GPIO为浮动输入模式(实际上CPU复位后就是输入状态) */
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;		/* 设为输入口 */
@@ -393,7 +403,7 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 		110 = 64
 		111 = 64
 		*/
-		buf[2] = (0 << 5) | (0 << 2) | (_gain << 1);
+		buf[2] = (1 << 5) | (0 << 2) | (_gain << 1);
 		//ADS1256_WriteReg(REG_ADCON, (0 << 5) | (0 << 2) | (GAIN_1 << 1));	/* 选择1;1增益, 输入正负5V */
 
 		/* 因为切换通道和读数据耗时 123uS, 因此扫描中断模式工作时，最大速率 = DRATE_1000SPS */
@@ -408,10 +418,10 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 		ADS1256_Send8Bit(buf[2]);	/* 设置ADCON控制寄存器，增益 */
 		ADS1256_Send8Bit(buf[3]);	/* 设置输出数据速率 */
 		ADS1256_Send8Bit(CMD_SELFCAL);
-		Delay(100);
+		//Delay(100);
 		CS_1();	/* SPI片选 = 1 */
 	}
-
+	Delay(50);
 	//bsp_DelayUS(50);
 
 }
@@ -470,9 +480,10 @@ static void ADS1256_ResetHard(void)
 	Delay(5);
 	RESET_1();
 
-	//PWDN_0();			/* 进入掉电 同步*/
+	PWDN_0();			/* 进入掉电 同步*/
+	//Delay(2);
 	//bsp_DelayUS(2);	
-	//PWDN_1();			/* 退出掉电 */
+	PWDN_1();			/* 退出掉电 */
 
 	//bsp_DelayUS(5);
 	Delay(5);
@@ -534,15 +545,21 @@ static uint8_t ADS1256_Recive8Bit(void)
 	//Delay(10);
 	for (i = 0; i < 8; i++)
 	{
-		read = read << 1;
+		//TM_GENERAL_DWTCounterSetValue(0);
 		SCK_1();
-		Delay(10);
+		//while (TM_GENERAL_DWTCounterGetValue() < 84);
+		Delay(20);
+		//while (SCK_IS_LOW());
+		read = read << 1;
+		//TM_GENERAL_DWTCounterSetValue(0);
+		SCK_0();
 		if (DO_IS_HIGH())
 		{
 			read++;
 		}
-		SCK_0();
-		Delay(10);
+		//while (TM_GENERAL_DWTCounterGetValue() < 84);
+		Delay(20);
+		//while (SCK_IS_HIGH());
 	}
 	//SCK_0();
 	//Delay(10);

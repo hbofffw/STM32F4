@@ -27,7 +27,8 @@
 #include "tm_stm32f4_spi.h"
 #include "tm_stm32f4_general.h"
 #include "ads1256.h"
-
+#include "tm_stm32f4_gpio.h"
+#include "stm32f4xx_gpio.h"
 #include "stdio.h"
 #include "string.h"
 /* We need to implement own __FILE struct */
@@ -67,6 +68,7 @@ int main(void) {
 	uint8_t s;
 	int32_t adc[8];
 	uint32_t val;
+	GPIO_InitTypeDef GPIO_InitStructure;
 	//int32_t adct1[200];
 	/*int32_t adct2[200];
 	int32_t adct3[200];
@@ -79,6 +81,14 @@ int main(void) {
 	int count;
 	int number;
 	SystemInit();
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;		/* 设为输出口 */
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
 
 	/* Initialize LED's. Make sure to check settings for your board in tm_stm32f4_disco.h file */
 	TM_DISCO_LedInit();
@@ -209,9 +219,9 @@ int main(void) {
 				{
 					//TM_GENERAL_DWTCounterSetValue(0);
 					adctest = ADS1256_ReadAdc();
-					count++;
+					//count++;
 					//while (TM_GENERAL_DWTCounterGetValue() < 84000);
-				}  while (TM_DELAY_Time() < 1000);
+				} while (1); //(TM_DELAY_Time() < 1000);
 				ADS1256_StopScan();
 				printf("there are %d samples\r\n", count);
 				printf("one sample is %d \r\n", adctest);
@@ -221,16 +231,26 @@ int main(void) {
 				printf("counting...\r\n");
 				count = 0;
 				number = 0;
-				TM_DELAY_SetTime(0);
+				//TM_DELAY_SetTime(0);
 
 				do
 				{
 					TM_GENERAL_DWTCounterSetValue(0);
-					//TM_DISCO_LedToggle(TM_DISCO_LED_PINS);
-					count++;
+					TM_DISCO_LedToggle(TM_DISCO_LED_PINS);
+					/*if (count == 0)
+					{
+					GPIO_SetBits(GPIOB, GPIO_Pin_9);
+					count = 1;
+					}
+					else
+					{
+					GPIO_ResetBits(GPIOB, GPIO_Pin_9);
+					count = 0;
+					}*/
+					//count++;
 					//Delay(1000);
 					while (TM_GENERAL_DWTCounterGetValue() < 84000);
-				} while (TM_DELAY_Time() < 1000);
+				} while (1);//(TM_DELAY_Time() < 1000);
 
 				//while (1)
 				//{
