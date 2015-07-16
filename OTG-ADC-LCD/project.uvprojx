@@ -609,6 +609,11 @@
               <FileType>1</FileType>
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_tim.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1709,6 +1714,11 @@
               <FileType>1</FileType>
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_tim.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2766,6 +2776,11 @@
               <FileType>1</FileType>
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_tim.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3779,6 +3794,11 @@
               <FileName>stm32f4xx_dma.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_tim.c</FilePath>
             </File>
           </Files>
         </Group>

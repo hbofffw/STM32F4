@@ -96,7 +96,7 @@ int32_t ADS1256_ReadAdc(void);
 void ADS1256_StartScan(void);
 void ADS1256_StopScan(void);
 int32_t ADS1256_GetAdc(uint8_t _ch);
-
+uint8_t SPI_SendByte(uint8_t byte);
 extern ADS1256_VAR_T g_tADS1256;
 
 #endif

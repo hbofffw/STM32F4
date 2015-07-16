@@ -31,6 +31,7 @@
 #include "stm32f4xx_gpio.h"
 #include "stdio.h"
 #include "string.h"
+#include "stm32f4xx_tim.h"
 /* We need to implement own __FILE struct */
 /* FILE struct is used from __FILE */
 
@@ -69,6 +70,7 @@ int main(void) {
 	int32_t adc[8];
 	uint32_t val;
 	GPIO_InitTypeDef GPIO_InitStructure;
+	TIM_TimeBaseInitTypeDef ShortDelayTimer;
 	//int32_t adct1[200];
 	/*int32_t adct2[200];
 	int32_t adct3[200];
@@ -81,13 +83,23 @@ int main(void) {
 	int count;
 	int number;
 	SystemInit();
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;		/* 设为输出口 */
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	//RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;		/* 设为输出口 */
+	//GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
+	//GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
+	//GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
+	//GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
+	//GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+	
+	ShortDelayTimer.TIM_Prescaler = 1;
+	ShortDelayTimer.TIM_CounterMode = TIM_CounterMode_Up;
+	ShortDelayTimer.TIM_Period = 0xFFFFFFFF;
+	ShortDelayTimer.TIM_ClockDivision = TIM_CKD_DIV1;
+	ShortDelayTimer.TIM_RepetitionCounter = 0;
+	TIM_TimeBaseInit(TIM2, &ShortDelayTimer);
+	TIM_Cmd(TIM2, ENABLE);
 
 
 	/* Initialize LED's. Make sure to check settings for your board in tm_stm32f4_disco.h file */
@@ -221,7 +233,7 @@ int main(void) {
 					adctest = ADS1256_ReadAdc();
 					//count++;
 					//while (TM_GENERAL_DWTCounterGetValue() < 84000);
-				} while (1); //(TM_DELAY_Time() < 1000);
+				} while (1);//(TM_DELAY_Time() < 1000);
 				ADS1256_StopScan();
 				printf("there are %d samples\r\n", count);
 				printf("one sample is %d \r\n", adctest);
@@ -232,25 +244,27 @@ int main(void) {
 				count = 0;
 				number = 0;
 				//TM_DELAY_SetTime(0);
-
-				do
-				{
-					TM_GENERAL_DWTCounterSetValue(0);
-					TM_DISCO_LedToggle(TM_DISCO_LED_PINS);
-					/*if (count == 0)
-					{
-					GPIO_SetBits(GPIOB, GPIO_Pin_9);
-					count = 1;
-					}
-					else
-					{
-					GPIO_ResetBits(GPIOB, GPIO_Pin_9);
-					count = 0;
-					}*/
-					//count++;
-					//Delay(1000);
-					while (TM_GENERAL_DWTCounterGetValue() < 84000);
-				} while (1);//(TM_DELAY_Time() < 1000);
+				TIM_SetCounter(TIM2, 0);
+				Delay(1000000);
+				printf("Now tim counter is %d\r\n", TIM_GetCounter(TIM2));
+				//do
+				//{
+				//	TM_GENERAL_DWTCounterSetValue(0);
+				//	TM_DISCO_LedToggle(TM_DISCO_LED_PINS);
+				//	/*if (count == 0)
+				//	{
+				//	GPIO_SetBits(GPIOB, GPIO_Pin_9);
+				//	count = 1;
+				//	}
+				//	else
+				//	{
+				//	GPIO_ResetBits(GPIOB, GPIO_Pin_9);
+				//	count = 0;
+				//	}*/
+				//	count++;
+				//	//Delay(1000);
+				//	//while (TM_GENERAL_DWTCounterGetValue() < 84000);
+				//} while (TM_DELAY_Time() < 1000);
 
 				//while (1)
 				//{

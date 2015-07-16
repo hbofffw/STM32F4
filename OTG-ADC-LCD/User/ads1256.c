@@ -269,7 +269,9 @@ void InitADS1256(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 
-
+#ifdef HARD_SPI
+	SPI_InitTypeDef  SPI_InitStructure;
+#endif
 	RESET_1();
 	PWDN_1();
 	CS_1();
@@ -279,6 +281,13 @@ void InitADS1256(void)
 
 	/* 打开GPIO时钟 */
 	RCC_AHB1PeriphClockCmd(RCC_CS | RCC_DIN | RCC_DOUT | RCC_SCK | RCC_DRDY | RCC_RESET | RCC_PWDN, ENABLE);
+#ifdef HARD_SPI
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+
+	GPIO_PinAFConfig(PORT_DIN, PIN_DIN, GPIO_AF_SPI2);
+	GPIO_PinAFConfig(PORT_DOUT, PIN_DOUT, GPIO_AF_SPI2);
+	GPIO_PinAFConfig(PORT_SCK, PIN_SCK, GPIO_AF_SPI2);
+#endif
 
 	/* 配置几个推完输出IO */
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;		/* 设为输出口 */
@@ -286,25 +295,72 @@ void InitADS1256(void)
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
 
-	GPIO_InitStructure.GPIO_Pin = PIN_DIN;
-	GPIO_Init(PORT_DIN, &GPIO_InitStructure);
-
 	GPIO_InitStructure.GPIO_Pin = PIN_CS;
 	GPIO_Init(PORT_CS, &GPIO_InitStructure);
 
+	GPIO_InitStructure.GPIO_Pin = PIN_PWDN;
+	GPIO_Init(PORT_PWDN, &GPIO_InitStructure);
+
 	GPIO_InitStructure.GPIO_Pin = PIN_RESET;
 	GPIO_Init(PORT_RESET, &GPIO_InitStructure);
-
+#ifdef HARD_SPI
+	/* 配置几个推完输出IO */
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;		/* 设为输出口 */
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
+	GPIO_InitStructure.GPIO_Pin = PIN_SCK;
+	GPIO_Init(PORT_SCK, &GPIO_InitStructure);
 	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;		/* 设为输入输出口 */
 	//GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
 	//GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
 	//GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
 
+	//GPIO_InitStructure.GPIO_Pin = PIN_DOUT;
+	//GPIO_Init(PORT_DOUT, &GPIO_InitStructure);
+
+	//GPIO_InitStructure.GPIO_Pin = PIN_DIN;
+	//GPIO_Init(PORT_DIN, &GPIO_InitStructure);
+
+	//GPIO_InitStructure.GPIO_Pin = PIN_SCK;
+	//GPIO_Init(PORT_SCK, &GPIO_InitStructure);
+
+	/* 配置GPIO为浮动输入模式(实际上CPU复位后就是输入状态) */
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;		/* 设为输入口 */
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 无需上下拉电阻 */
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
+
+
+
+
+
+	GPIO_InitStructure.GPIO_Pin = PIN_DRDY;
+	GPIO_Init(PORT_DRDY, &GPIO_InitStructure);
+
+
+	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
+	SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
+	SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;
+	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
+	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;//SPI_BaudRatePrescaler_64;
+	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
+	SPI_InitStructure.SPI_CRCPolynomial = 7;
+
+	SPI_Init(SPI2, &SPI_InitStructure);
+
+	//SPI_I2S_ITConfig(SPI1, SPI_I2S_IT_TXE, ENABLE);
+	//SPI_I2S_ITConfig(SPI1, SPI_I2S_IT_RXNE, ENABLE);
+	
+	SPI_Cmd(SPI2, ENABLE);
+#else
+	GPIO_InitStructure.GPIO_Pin = PIN_DIN;
+	GPIO_Init(PORT_DIN, &GPIO_InitStructure);
+
 	GPIO_InitStructure.GPIO_Pin = PIN_SCK;
 	GPIO_Init(PORT_SCK, &GPIO_InitStructure);
-
-	GPIO_InitStructure.GPIO_Pin = PIN_PWDN;
-	GPIO_Init(PORT_PWDN, &GPIO_InitStructure);
 
 	/* 配置GPIO为浮动输入模式(实际上CPU复位后就是输入状态) */
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;		/* 设为输入口 */
@@ -317,7 +373,8 @@ void InitADS1256(void)
 
 	GPIO_InitStructure.GPIO_Pin = PIN_DRDY;
 	GPIO_Init(PORT_DRDY, &GPIO_InitStructure);
-
+#endif
+	
 
 	//ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_1000SPS);	/* 配置ADC参数： 增益1:1, 数据输出速率 1KHz */
 }
@@ -410,6 +467,14 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 		buf[3] = s_tabDataRate[_drate];	// DRATE_10SPS;	/* 选择数据输出速率 */
 
 		CS_0();	/* SPI片选 = 0 */
+#ifdef HARD_SPI
+		SPI_SendByte(CMD_WREG | 0);
+		SPI_SendByte(0x03);
+		SPI_SendByte(buf[0]);
+		SPI_SendByte(buf[1]);
+		SPI_SendByte(buf[2]);
+		SPI_SendByte(buf[3]);
+#else
 		ADS1256_Send8Bit(CMD_WREG | 0);	/* 写寄存器的命令, 并发送寄存器地址 */
 		ADS1256_Send8Bit(0x03);			/* 寄存器个数 - 1, 此处3表示写4个寄存器 */
 
@@ -417,7 +482,8 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 		ADS1256_Send8Bit(buf[1]);	/* 设置输入通道参数 */
 		ADS1256_Send8Bit(buf[2]);	/* 设置ADCON控制寄存器，增益 */
 		ADS1256_Send8Bit(buf[3]);	/* 设置输出数据速率 */
-		ADS1256_Send8Bit(CMD_SELFCAL);
+#endif		
+		//ADS1256_Send8Bit(CMD_SELFCAL);
 		//Delay(100);
 		CS_1();	/* SPI片选 = 1 */
 	}
@@ -425,6 +491,20 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 	//bsp_DelayUS(50);
 
 }
+
+
+uint8_t SPI_SendByte(uint8_t byte)
+{
+	/* Loop while DR register in not emplty */
+	SPI_I2S_SendData(SPI2, byte);
+	/* Wait to receive a byte */
+	while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET);
+	/* Send byte through the SPI2 peripheral */
+	while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_RXNE) == RESET);
+	/* Return the byte read from the SPI bus */
+	return SPI_I2S_ReceiveData(SPI2);
+}
+
 
 /*
 *********************************************************************************************************
@@ -461,7 +541,7 @@ static void ADS1256_DelayDATA(void)
 	最小 50 个tCLK = 50 * 0.13uS = 6.5uS
 	*/
 	//bsp_DelayUS(10);	/* 最小延迟 6.5uS, 此处取10us */
-	Delay(1);
+	Delay(10);
 }
 
 /*
@@ -578,10 +658,16 @@ static uint8_t ADS1256_Recive8Bit(void)
 static void ADS1256_WriteReg(uint8_t _RegID, uint8_t _RegValue)
 {
 	CS_0();	/* SPI片选 = 0 */
+#ifdef HARD_SPI
+	SPI_SendByte(CMD_WREG | _RegID);
+	SPI_SendByte(0x00);
+	SPI_SendByte(_RegValue);
+#else
 	ADS1256_Send8Bit(CMD_WREG | _RegID);	/* 写寄存器的命令, 并发送寄存器地址 */
 	ADS1256_Send8Bit(0x00);		/* 寄存器个数 - 1, 此处写1个寄存器 */
 
 	ADS1256_Send8Bit(_RegValue);	/* 发送寄存器值 */
+#endif
 	CS_1();	/* SPI片选 = 1 */
 }
 
@@ -599,12 +685,20 @@ static uint8_t ADS1256_ReadReg(uint8_t _RegID)
 	uint8_t read;
 
 	CS_0();	/* SPI片选 = 0 */
+#ifdef HARD_SPI
+	SPI_SendByte(CMD_RREG | _RegID);
+	SPI_SendByte(0x00);
+	Delay(10);
+	read = SPI_SendByte(0x00);
+#else
 	ADS1256_Send8Bit(CMD_RREG | _RegID);	/* 写寄存器的命令, 并发送寄存器地址 */
 	ADS1256_Send8Bit(0x00);	/* 寄存器个数 - 1, 此处读1个寄存器 */
 
 	ADS1256_DelayDATA();	/* 必须延迟才能读取芯片返回数据 */
 
 	read = ADS1256_Recive8Bit();	/* 读寄存器值 */
+#endif
+	
 	CS_1();	/* SPI片选 = 1 */
 
 	return read;
@@ -788,18 +882,36 @@ static void ADS1256_WaitDRDY(void)
 static int32_t ADS1256_ReadData(void)
 {
 	uint32_t read = 0;
+	uint32_t r = 0;
+	int i = 0;
 
-	//CS_0();	/* SPI片选 = 0 */
+	
 
 	//ADS1256_Send8Bit(CMD_RDATA);	/* 读数据的命令 */
 
 	//ADS1256_DelayDATA();	/* 必须延迟才能读取芯片返回数据 */
 
 	/* 读采样结果，3个字节，高字节在前 */
+#ifdef HARD_SPI
+	//CS_0();	/* SPI片选 = 0 */
+	//SPI_SendByte(CMD_RDATA);
+	////ADS1256_DelayDATA();	/* 必须延迟才能读取芯片返回数据 */
+	//Delay(10);
+	for (i = 0; i < 3; i++)
+	{
+		read = read << 8;
+		r = SPI_SendByte(0);
+		read |= r;
+	}
+	Delay(10);
+	//CS_1();
+#else
+
 	read = ADS1256_Recive8Bit() << 16;
 	read += ADS1256_Recive8Bit() << 8;
 	read += ADS1256_Recive8Bit() << 0;
-
+#endif
+	
 	//CS_1();	/* SPI片选 = 1 */
 
 	/* 负数进行扩展。24位有符号数扩展为32位有符号数 */
@@ -886,7 +998,11 @@ void ADS1256_StartScan(void)
 {
 	CS_0();
 	//while (!DRDY_IS_LOW());
+#ifdef HARD_SPI	
+	SPI_SendByte(CMD_RDATAC);
+#else
 	ADS1256_Send8Bit(CMD_RDATAC);	/* 读数据的命令 */
+#endif
 	Delay(10);
 	//Delay(50);
 	/* SPI片选 = 0 */
@@ -944,7 +1060,11 @@ void ADS1256_StartScan(void)
 void ADS1256_StopScan(void)
 {
 	while (!DRDY_IS_LOW());
+#ifdef HARD_SPI
+	SPI_SendByte(CMD_SDATAC);
+#else
 	ADS1256_Send8Bit(CMD_SDATAC);
+#endif
 	CS_1();
 	//	EXTI_InitTypeDef   EXTI_InitStructure;
 	//	//	NVIC_InitTypeDef   NVIC_InitStructure;
