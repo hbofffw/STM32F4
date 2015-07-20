@@ -224,16 +224,17 @@ int main(void) {
 			if (c == 't')
 			{
 				count = 0;
+				adctest = 0;
 				printf("start sampling...\r\n");
 				ADS1256_StartScan();
 				TM_DELAY_SetTime(0);
 				do 
 				{
-					//TM_GENERAL_DWTCounterSetValue(0);
+					TM_GENERAL_DWTCounterSetValue(0);
 					adctest = ADS1256_ReadAdc();
-					//count++;
-					//while (TM_GENERAL_DWTCounterGetValue() < 84000);
-				} while (1);//(TM_DELAY_Time() < 1000);
+					count++;
+					while (TM_GENERAL_DWTCounterGetValue() < 84000);
+				} while (1);// (TM_DELAY_Time() < 1000);
 				ADS1256_StopScan();
 				printf("there are %d samples\r\n", count);
 				printf("one sample is %d \r\n", adctest);
@@ -243,28 +244,28 @@ int main(void) {
 				printf("counting...\r\n");
 				count = 0;
 				number = 0;
-				//TM_DELAY_SetTime(0);
-				TIM_SetCounter(TIM2, 0);
+				TM_DELAY_SetTime(0);
+				/*TIM_SetCounter(TIM2, 0);
 				Delay(1000000);
-				printf("Now tim counter is %d\r\n", TIM_GetCounter(TIM2));
-				//do
-				//{
-				//	TM_GENERAL_DWTCounterSetValue(0);
-				//	TM_DISCO_LedToggle(TM_DISCO_LED_PINS);
-				//	/*if (count == 0)
-				//	{
-				//	GPIO_SetBits(GPIOB, GPIO_Pin_9);
-				//	count = 1;
-				//	}
-				//	else
-				//	{
-				//	GPIO_ResetBits(GPIOB, GPIO_Pin_9);
-				//	count = 0;
-				//	}*/
-				//	count++;
-				//	//Delay(1000);
-				//	//while (TM_GENERAL_DWTCounterGetValue() < 84000);
-				//} while (TM_DELAY_Time() < 1000);
+				printf("Now tim counter is %d\r\n", TIM_GetCounter(TIM2));*/
+				do
+				{
+					TM_GENERAL_DWTCounterSetValue(0);
+					TM_DISCO_LedToggle(TM_DISCO_LED_PINS);
+					/*if (count == 0)
+					{
+					GPIO_SetBits(GPIOB, GPIO_Pin_9);
+					count = 1;
+					}
+					else
+					{
+					GPIO_ResetBits(GPIOB, GPIO_Pin_9);
+					count = 0;
+					}*/
+					count++;
+					//Delay(1000);
+					//while (TM_GENERAL_DWTCounterGetValue() < 84000);
+				} while (TM_DELAY_Time() < 1000);
 
 				//while (1)
 				//{
