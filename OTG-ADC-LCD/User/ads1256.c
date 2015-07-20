@@ -26,6 +26,7 @@
 //#define SOFT_SPI		/* 定义此行表示使用GPIO模拟SPI接口 */
 #define HARD_SPI		/* 定义此行表示使用CPU的硬件SPI接口 */
 
+
 /*
 ADS1256模块可以直接插到STM32-V5开发板CN26排母(2*6P 2.54mm)接口上.
 
@@ -907,6 +908,7 @@ static int32_t ADS1256_ReadData(void)
 	//SPI_SendByte(CMD_RDATA);
 	////ADS1256_DelayDATA();	/* 必须延迟才能读取芯片返回数据 */
 	//Delay(6);
+	while (!DRDY_IS_LOW());
 	for (i = 0; i < 3; i++)
 	{
 		read = read << 8;

@@ -32,36 +32,65 @@
 #include "stdio.h"
 #include "string.h"
 #include "stm32f4xx_tim.h"
+#include "tm_stm32f4_stdio.h"
 /* We need to implement own __FILE struct */
 /* FILE struct is used from __FILE */
 
 int32_t adcsamples[40][200];
-//int32_t adcsample2[200];
-//int32_t adcsample3[200];
-//int32_t adcsample4[200];
-//int32_t adcsample5[200];
 
 
-struct __FILE {
 
-	int dummy;
-};
+//struct __FILE {
+//
+//	int dummy;
+//};
 
 
 /* You need this if you want use printf */
 /* Struct FILE is implemented in stdio.h */
-FILE __stdout;
+//FILE __stdout;
+//
+//int fputc(int ch, FILE *f) {
+//	/* Do your stuff here */
+//	/* Send your custom byte */
+//	/* Send byte to USART */
+//	TM_USART_Putc(USART2, ch);
+//	//TM_USB_VCP_Putc((uint8_t)ch);
+//	/* If everything is OK, you have to return character written */
+//	return ch;
+//	/* If character is not correct, you can return EOF (-1) to stop writing */
+//	//return -1;
+//}
 
-int fputc(int ch, FILE *f) {
-	/* Do your stuff here */
-	/* Send your custom byte */
-	/* Send byte to USART */
-	TM_USART_Putc(USART2, ch);
-	//TM_USB_VCP_Putc((uint8_t)ch);
-	/* If everything is OK, you have to return character written */
+FILE USART1_Stream;
+/* Output stream for USART1 function references */
+int USART1_Stream_OutputFunction(int ch, FILE* f);
+/* Input stream for USART1 function references */
+int USART1_Stream_InputFunction(FILE* f);
+
+
+/* Handle stdout actions = default name and can not be changed */
+int TM_STDIO_StdoutHandler(int ch, FILE* f) {
+	/* Send data to USART1 */
+	TM_USART_Putc(USART2, (char)ch);
+
+	/* Return ch, it means OK */
 	return ch;
-	/* If character is not correct, you can return EOF (-1) to stop writing */
+	/* If you want to return error, then you have to send EOF (-1) */
 	//return -1;
+}
+
+/* Handle stdin actions */
+int TM_STDIO_StdinHandler(FILE* f) {
+	/* If any data at USART, return them */
+	/* Do your custom implementation here when string ends */
+	if (!TM_USART_BufferEmpty(USART2)) {
+		return (int)TM_USART_Getc(USART2);
+	}
+
+	/* End of data, string is valid */
+	/* You have to send -1 at the end of string */
+	return -1;
 }
 
 int main(void) {
@@ -71,11 +100,6 @@ int main(void) {
 	uint32_t val;
 	GPIO_InitTypeDef GPIO_InitStructure;
 	TIM_TimeBaseInitTypeDef ShortDelayTimer;
-	//int32_t adct1[200];
-	/*int32_t adct2[200];
-	int32_t adct3[200];
-	int32_t adct4[200];
-	int32_t adct5[200];*/
 	int32_t adctest;
 	int32_t volt[8];
 	uint8_t i;
@@ -83,13 +107,7 @@ int main(void) {
 	int count;
 	int number;
 	SystemInit();
-	//RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;		/* 设为输出口 */
-	//GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
-	//GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
-	//GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
-	//GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
-	//GPIO_Init(GPIOB, &GPIO_InitStructure);
+
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 	
@@ -111,8 +129,14 @@ int main(void) {
 	TM_USART_Init(USART1, TM_USART_PinsPack_1, 115200);
 	//usb
 	TM_USART_Init(USART2, TM_USART_PinsPack_1, 115200);
+
+	//usart output function
+	TM_STDIO_SetOutputFunction(&USART1_Stream, USART1_Stream_OutputFunction);
+	//input function
+	TM_STDIO_SetInputFunction(&USART1_Stream, USART1_Stream_InputFunction);
 	/*memset(adcsample1, 0x00, sizeof(adcsample1));
 	memset(adcsample2, 0x00 + sizeof(adcsample1), sizeof(adcsample2));*/
+
 	for (j = 0; j < 40; j++)
 	{
 		memset(adcsamples[j], 0x00 + sizeof(adcsamples[j])*j, sizeof(adcsamples[j]));
@@ -236,8 +260,8 @@ int main(void) {
 					while (TM_GENERAL_DWTCounterGetValue() < 84000);
 				} while (1);// (TM_DELAY_Time() < 1000);
 				ADS1256_StopScan();
-				printf("there are %d samples\r\n", count);
-				printf("one sample is %d \r\n", adctest);
+				fprintf(&USART1_Stream, "there are %d samples\r\n", count);
+				fprintf(&USART1_Stream, "one sample is %d \r\n", adctest);
 			}
 			if (c == 'c')
 			{
@@ -337,16 +361,16 @@ int main(void) {
 
 				/*} while (count < 600);*/
 				ADS1256_StopScan();
-				printf("\r\nthere are %d samples\r\n", count);
+				fprintf(&USART1_Stream, "\r\nthere are %d samples\r\n", count);
 				//Delay(1000000);
 				for (j = 0; j < 5; j++)
 				{
 					for (i = 0; i < 200; i++)
 					{
-						printf("%d, ", adcsamples[j][i]);
+						fprintf(&USART1_Stream, "%d, ", adcsamples[j][i]);
 					}
 				}
-				printf("\r\n");
+				fprintf(&USART1_Stream, "\r\n");
 				/*for (i = 0; i < 200; i++)
 				{
 				printf("%d, ", adcsample1[i]);
@@ -460,4 +484,26 @@ int main(void) {
 //		TM_GPIO_InitAlternate(GPIOA, GPIO_PIN_7 | GPIO_PIN_6 | GPIO_PIN_5, TM_GPIO_OType_PP, TM_GPIO_PuPd_NOPULL, TM_GPIO_Speed_Medium, GPIO_AF_SPI1);
 //	}
 //}
+/* USART1 output stream handler = custom function name, linked with USART2 stream in the beginning of main() function */
+int USART1_Stream_OutputFunction(int ch, FILE* f) {
+	/* Send char via USART2 */
+	TM_USART_Putc(USART1, (char)ch);
+
+	/* Return ch, it means OK */
+	return ch;
+	/* If you want to return error, then you have to send EOF (-1) */
+	//return -1;
+}
+/* Handle USART1 stream input = custom function name, linked with USART2 stream in the beginning of main() function */
+int USART1_Stream_InputFunction(FILE* f) {
+	/* If any data at USART, return them */
+	/* Do your custom implementation here when string ends */
+	if (!TM_USART_BufferEmpty(USART1)) {
+		return (int)TM_USART_Getc(USART1);
+	}
+
+	/* End of data, string is valid */
+	/* You have to send -1 at the end of string */
+	return -1;
+}
 
