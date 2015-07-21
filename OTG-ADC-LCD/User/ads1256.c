@@ -355,7 +355,7 @@ void InitADS1256(void)
 	////SPI_I2S_ITConfig(SPI1, SPI_I2S_IT_RXNE, ENABLE);
 	//
 	//SPI_Cmd(SPI2, ENABLE);
-	TM_SPI_InitFull(SPI2, TM_SPI_PinsPack_1, SPI_BaudRatePrescaler_64, TM_SPI_Mode_1, SPI_Mode_Master, SPI_FirstBit_MSB);
+	TM_SPI_InitFull(SPI2, TM_SPI_PinsPack_1, SPI_BaudRatePrescaler_16, TM_SPI_Mode_1, SPI_Mode_Master, SPI_FirstBit_MSB);
 
 	
 #else
@@ -916,7 +916,7 @@ static int32_t ADS1256_ReadData(void)
 		read |= r;
 		//Delay(5);
 	}
-	//Delay(10);
+	Delay(10);
 	//CS_1();
 #else
 
@@ -928,10 +928,10 @@ static int32_t ADS1256_ReadData(void)
 	//CS_1();	/* SPI片选 = 1 */
 
 	/* 负数进行扩展。24位有符号数扩展为32位有符号数 */
-	if (read & 0x800000)
+	/*if (read & 0x800000)
 	{
 		read += 0xFF000000;
-	}
+	}*/
 
 	return (int32_t)read;
 }
@@ -1079,6 +1079,7 @@ void ADS1256_StopScan(void)
 #else
 	ADS1256_Send8Bit(CMD_SDATAC);
 #endif
+	while (DRDY_IS_LOW());
 	CS_1();
 	//	EXTI_InitTypeDef   EXTI_InitStructure;
 	//	//	NVIC_InitTypeDef   NVIC_InitStructure;

@@ -36,7 +36,7 @@
 /* We need to implement own __FILE struct */
 /* FILE struct is used from __FILE */
 
-int32_t adcsamples[40][200];
+int32_t adcsamples[100][200];
 
 
 
@@ -137,7 +137,7 @@ int main(void) {
 	/*memset(adcsample1, 0x00, sizeof(adcsample1));
 	memset(adcsample2, 0x00 + sizeof(adcsample1), sizeof(adcsample2));*/
 
-	for (j = 0; j < 40; j++)
+	for (j = 0; j < 100; j++)
 	{
 		memset(adcsamples[j], 0x00 + sizeof(adcsamples[j])*j, sizeof(adcsamples[j]));
 	}
@@ -213,6 +213,7 @@ int main(void) {
 			//printf("rdy");
 			if (c == 's')
 			{
+				c = 0;
 				ADS1256_StartScan();
 				for (i = 0; i < 8; i++)
 				{
@@ -247,21 +248,39 @@ int main(void) {
 			}
 			if (c == 't')
 			{
-				count = 0;
-				adctest = 0;
 				printf("start sampling...\r\n");
 				ADS1256_StartScan();
-				TM_DELAY_SetTime(0);
-				do 
+				c = 0;
+				count = 0;
+				//TM_DELAY_SetTime(0);
+				for (j = 0; j < 40; j++)
 				{
-					TM_GENERAL_DWTCounterSetValue(0);
-					adctest = ADS1256_ReadAdc();
-					count++;
-					while (TM_GENERAL_DWTCounterGetValue() < 84000);
-				} while (1);// (TM_DELAY_Time() < 1000);
+					for (i = 0; i < 200; i++)
+					{
+						//TM_DELAY_SetTime(0);
+						TM_GENERAL_DWTCounterSetValue(0);
+						adcsamples[j][i] = ADS1256_ReadAdc();
+						while (TM_GENERAL_DWTCounterGetValue() < 4200);
+						count++;
+						//if (TM_DELAY_Time()>=1000)
+						//	break;
+						//if (TM_GENERAL_DWTCounterGetValue() < 84000);   //心跳改为 1/64 ms
+					}
+				}
 				ADS1256_StopScan();
-				fprintf(&USART1_Stream, "there are %d samples\r\n", count);
-				fprintf(&USART1_Stream, "one sample is %d \r\n", adctest);
+				printf("\r\nthere are %d samples\r\n", count);
+				//fprintf(&USART1_Stream, "\r\nthere are %d samples\r\n", count);
+				//Delay(1000000);
+				for (j = 0; j < 40; j++)
+				{
+					for (i = 0; i < 200; i++)
+					{
+						printf("%d ", adcsamples[j][i]);
+						/*fprintf(&USART1_Stream, "%d, ", adcsamples[j][i]);*/
+					}
+				}
+				printf("\r\n");
+				//fprintf(&USART1_Stream, "\r\n");
 			}
 			if (c == 'c')
 			{
@@ -291,60 +310,14 @@ int main(void) {
 					//while (TM_GENERAL_DWTCounterGetValue() < 84000);
 				} while (TM_DELAY_Time() < 1000);
 
-				//while (1)
-				//{
-				//	TM_DELAY_SetTime(0);
-				//	//TM_DISCO_LedToggle(LED_GREEN);
-				//	++count;
-				//	if (count>=1000)
-				//	{
-				//		break;
-				//	/}
-				//	while (TM_DELAY_Time() < 1);
-				//	//{
-				//		/*TM_DELAY_SetTime2(0);
-				//		while (1){
-				//		if (TM_DELAY_Time2() >= 1)
-				//		{
-				//		count++;
-				//		break;
-				//		}
-				//		}*/
-				//		/*if (++count == 433)
-				//		{
-				//		number++;
-				//		count = 0;
-				//		}*/
-				//		
-				//	//}
-				//}
-
 				printf("timer test: %d\r\n", count);
 			}
 			if (c == '1')
 			{
 				printf("start sampling...\r\n");
 				ADS1256_StartScan();
+				c = 0;
 				count = 0;
-
-				/*do
-				{
-
-				TM_DELAY_SetTime(0);*/
-				//adct1[count++] = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
-				//adctest = ADS1256_ReadAdc();
-				//if (count < 200)
-				//{
-				//	adcsample1[count++] = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
-				//}
-				//else if (count>=200 && count<400)
-				//{
-				//	adcsample2[(count++) - 200] = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
-				//}
-				//else if (count>=400 && count < 600)
-				//{
-				//	adcsample3[(count++) - 400] = ADS1256_ReadAdc();
-				//}
 				for (j = 0; j < 5; j++)
 				{
 					for (i = 0; i < 200; i++)
@@ -356,54 +329,54 @@ int main(void) {
 						while (TM_GENERAL_DWTCounterGetValue() < 84000);   //心跳改为 1/64 ms
 					}
 				}
-				//count++;
-				//Delay(1000);
-
-				/*} while (count < 600);*/
 				ADS1256_StopScan();
-				fprintf(&USART1_Stream, "\r\nthere are %d samples\r\n", count);
+				printf("\r\nthere are %d samples\r\n", count);
+				//fprintf(&USART1_Stream, "\r\nthere are %d samples\r\n", count);
 				//Delay(1000000);
 				for (j = 0; j < 5; j++)
 				{
 					for (i = 0; i < 200; i++)
 					{
-						fprintf(&USART1_Stream, "%d, ", adcsamples[j][i]);
+						printf("%d ", adcsamples[j][i]);
+						/*fprintf(&USART1_Stream, "%d, ", adcsamples[j][i]);*/
 					}
 				}
-				fprintf(&USART1_Stream, "\r\n");
-				/*for (i = 0; i < 200; i++)
-				{
-				printf("%d, ", adcsample1[i]);
-				}
-				for (i = 0; i < 200; i++)
-				{
-				printf("%d, ", adcsample2[i]);
-				}
-				for (i = 0; i < 200; i++)
-				{
-				printf("%d, ", adcsample3[i]);
-				}
-				printf("\r\n");*/
-				//printf("data sampled: %d\r\n", adctest);
+				printf("\r\n");
+				//fprintf(&USART1_Stream, "\r\n");
 			}
 			if (c == '2')
 			{
 				printf("start sampling...\r\n");
 				ADS1256_StartScan();
+				c = 0;
 				count = 0;
 
-				do
+				for (j = 0; j < 10; j++)
 				{
-					TM_DELAY_SetTime(0);
-					adctest = ADS1256_ReadAdc();// ADS1256_GetAdc(0);
-					count++;
-					//Delay(1000);
-					while ((TM_DELAY_Time() <= 32));   //心跳改为 1/64 ms
-				} while (count < 1000);
+					for (i = 0; i < 200; i++)
+					{
+						//TM_DELAY_SetTime(0);
+						TM_GENERAL_DWTCounterSetValue(0);
+						adcsamples[j][i] = ADS1256_ReadAdc();
+						count++;
+						while (TM_GENERAL_DWTCounterGetValue() < 42000);   //1/2ms
+					}
+				}
 
 				ADS1256_StopScan();
-				printf("there are %d samples\r\n", count);
-				printf("data sampled: %d\r\n", adctest);
+				printf("\r\nthere are %d samples\r\n", count);
+				//fprintf(&USART1_Stream, "\r\nthere are %d samples\r\n", count);
+				//Delay(1000000);
+				for (j = 0; j < 10; j++)
+				{
+					for (i = 0; i < 200; i++)
+					{
+						printf("%d ", adcsamples[j][i]);
+						//fprintf(&USART1_Stream, "%d, ", adcsamples[j][i]);
+					}
+				}
+				printf("\r\n");
+				//fprintf(&USART1_Stream, "\r\n");
 			}
 			if (c == '4')
 			{
@@ -411,18 +384,32 @@ int main(void) {
 				ADS1256_StartScan();
 				count = 0;
 
-				do
+				for (j = 0; j < 20; j++)
 				{
-					TM_DELAY_SetTime(0);
-					adctest = ADS1256_ReadAdc();// ADS1256_GetAdc(0);
-					count++;
-					//Delay(1000);
-					while ((TM_DELAY_Time() <= 16));   //心跳改为 1/64 ms
-				} while (count < 1000);
+					for (i = 0; i < 200; i++)
+					{
+						//TM_DELAY_SetTime(0);
+						TM_GENERAL_DWTCounterSetValue(0);
+						adcsamples[j][i] = ADS1256_ReadAdc();
+						count++;
+						while (TM_GENERAL_DWTCounterGetValue() < 21000);   //1/2ms
+					}
+				}
 
 				ADS1256_StopScan();
-				printf("there are %d samples\r\n", count);
-				printf("data sampled: %d\r\n", adctest);
+				printf("\r\nthere are %d samples\r\n", count);
+				//fprintf(&USART1_Stream, "\r\nthere are %d samples\r\n", count);
+				//Delay(1000000);
+				for (j = 0; j < 20; j++)
+				{
+					for (i = 0; i < 200; i++)
+					{
+						printf("%d ", adcsamples[j][i]);
+						//fprintf(&USART1_Stream, "%d, ", adcsamples[j][i]);
+					}
+				}
+				printf("\r\n");
+				//fprintf(&USART1_Stream, "\r\n");
 			}
 			if (c == '8')
 			{
@@ -430,18 +417,32 @@ int main(void) {
 				ADS1256_StartScan();
 				count = 0;
 
-				do
+				for (j = 0; j < 40; j++)
 				{
-					TM_DELAY_SetTime(0);
-					adctest = ADS1256_ReadAdc();// ADS1256_GetAdc(0);
-					count++;
-					//Delay(1000);
-					while ((TM_DELAY_Time() <= 8));   //心跳改为 1/64 ms
-				} while (count < 1000);
+					for (i = 0; i < 200; i++)
+					{
+						//TM_DELAY_SetTime(0);
+						TM_GENERAL_DWTCounterSetValue(0);
+						adcsamples[j][i] = ADS1256_ReadAdc();
+						count++;
+						while (TM_GENERAL_DWTCounterGetValue() < 10500);   //1/2ms
+					}
+				}
 
 				ADS1256_StopScan();
-				printf("there are %d samples\r\n", count);
-				printf("data sampled: %d\r\n", adctest);
+				printf("\r\nthere are %d samples\r\n", count);
+				//fprintf(&USART1_Stream, "\r\nthere are %d samples\r\n", count);
+				//Delay(1000000);
+				for (j = 0; j < 40; j++)
+				{
+					for (i = 0; i < 200; i++)
+					{
+						printf("%d ", adcsamples[j][i]);
+						//fprintf(&USART1_Stream, "%d, ", adcsamples[j][i]);
+					}
+				}
+				printf("\r\n");
+				//fprintf(&USART1_Stream, "\r\n");
 			}
 			if (c == 'l')
 			{
@@ -459,10 +460,7 @@ int main(void) {
 			}
 			if (c == 'r')
 			{
-				ADS1256_StartScan();
-				adctest = ADS1256_ReadAdc(); //ADS1256_GetAdc(0);
-				printf("data sampled: %d\r\n", adctest);
-				ADS1256_StopScan();
+				fprintf(&USART1_Stream, "I find u %c\r\n", c);
 			}
 			//if (c=='l')
 			//{
