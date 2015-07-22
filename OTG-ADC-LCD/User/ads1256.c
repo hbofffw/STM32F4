@@ -46,6 +46,18 @@ NC   空脚
 
 
 //FOR F401
+SPI1
+DRDY------>  PB9       准备就绪
+CS    <------PB1       SPI_CS
+DIN   <------PA7       SPI_MOSI
+DOUT------>  PA6       SPI_MISO
+SCLK  <------PA5      SPI时钟
+GND  ------- GND       地
+//-PDWN  <------  PB2       掉电控制
+RST   <------PC5       复位信号
+
+
+SPI2
 +5V <------  5.0V      5V供电
 GND	------ - GND       地
 DRDY------>  PC9       准备就绪
@@ -56,6 +68,18 @@ SCLK  <------PB10      SPI时钟
 GND  ------- GND       地
 //-PDWN  <------  PB2       掉电控制
 RST   <------PC4       复位信号
+
+
+
+SPI3
+DRDY------>  PA15       准备就绪
+CS    <------PB2       SPI_CS
+DIN   <------PC12       SPI_MOSI
+DOUT------>  PC11       SPI_MISO
+SCLK  <------PC10      SPI时钟
+GND  ------- GND       地
+//-PDWN  <------  PB2       掉电控制
+RST   <------PC0       复位信号
 */
 
 /*
@@ -106,21 +130,49 @@ RDATAC, RESET, SYNC 命令之后，需要延迟 24 * tCLK = 3.12uS;
 #define PORT_DIN	GPIOC	
 #define PIN_DIN		GPIO_Pin_3	
 
-#define RCC_CS 		RCC_AHB1Periph_GPIOB
-#define PORT_CS		GPIOB	
-#define PIN_CS		GPIO_Pin_0
+#define RCC_DOUT1	RCC_AHB1Periph_GPIOA
+#define PORT_DOUT1	GPIOA
+#define PIN_DOUT1	GPIO_Pin_6
 
-#define RCC_RESET 	RCC_AHB1Periph_GPIOC
-#define PORT_RESET	GPIOC
-#define PIN_RESET	GPIO_Pin_4
+#define RCC_CS1		RCC_AHB1Periph_GPIOB
+#define PORT_CS1	GPIOB
+#define PIN_CS1		GPIO_Pin_1
 
-#define RCC_PWDN 	RCC_AHB1Periph_GPIOB
-#define PORT_PWDN	GPIOB
-#define PIN_PWDN	GPIO_Pin_2
+#define RCC_CS2 	RCC_AHB1Periph_GPIOB
+#define PORT_CS2	GPIOB	
+#define PIN_CS2		GPIO_Pin_0
 
-#define RCC_DRDY 	RCC_AHB1Periph_GPIOC
-#define PORT_DRDY	GPIOC
-#define PIN_DRDY	GPIO_Pin_9
+#define RCC_CS3		RCC_AHB1Periph_GPIOB
+#define PORT_CS3	GPIOB
+#define PIN_CS3		GPIO_Pin_2
+
+#define RCC_RESET1 	RCC_AHB1Periph_GPIOC
+#define PORT_RESET1	GPIOC
+#define PIN_RESET1	GPIO_Pin_5
+
+#define RCC_RESET2 	RCC_AHB1Periph_GPIOC
+#define PORT_RESET2	GPIOC
+#define PIN_RESET2	GPIO_Pin_4
+
+#define RCC_RESET3 	RCC_AHB1Periph_GPIOC
+#define PORT_RESET3	GPIOC
+#define PIN_RESET3	GPIO_Pin_0
+
+#define RCC_PWDN2 	RCC_AHB1Periph_GPIOB
+#define PORT_PWDN2	GPIOB
+#define PIN_PWDN2	GPIO_Pin_2
+
+#define RCC_DRDY1 	RCC_AHB1Periph_GPIOB	
+#define PORT_DRDY1	GPIOB
+#define PIN_DRDY1	GPIO_Pin_9
+
+#define RCC_DRDY2 	RCC_AHB1Periph_GPIOC
+#define PORT_DRDY2	GPIOC
+#define PIN_DRDY2	GPIO_Pin_9
+
+#define RCC_DRDY3 	RCC_AHB1Periph_GPIOA
+#define PORT_DRDY3	GPIOA
+#define PIN_DRDY3	GPIO_Pin_15
 
 #define RCC_DOUT 	RCC_AHB1Periph_GPIOC		
 #define PORT_DOUT	GPIOC	
@@ -158,14 +210,14 @@ RDATAC, RESET, SYNC 命令之后，需要延迟 24 * tCLK = 3.12uS;
 #define PIN_DOUT	GPIO_Pin_6
 #endif
 /* 定义口线置0和置1的宏 */
-#define PWDN_0()	GPIO_ResetBits(PORT_PWDN, PIN_PWDN)
-#define PWDN_1()	GPIO_SetBits(PORT_PWDN, PIN_PWDN)
+#define PWDN2_0()	GPIO_ResetBits(PORT_PWDN2, PIN_PWDN2)
+#define PWDN2_1()	GPIO_SetBits(PORT_PWDN2, PIN_PWDN2)
 
-#define RESET_0()	GPIO_ResetBits(PORT_RESET, PIN_RESET)
-#define RESET_1()	GPIO_SetBits(PORT_RESET, PIN_RESET)
+#define RESET2_0()	GPIO_ResetBits(PORT_RESET2, PIN_RESET2)
+#define RESET2_1()	GPIO_SetBits(PORT_RESET2, PIN_RESET2)
 
-#define CS_0()		GPIO_ResetBits(PORT_CS, PIN_CS)
-#define CS_1()		GPIO_SetBits(PORT_CS, PIN_CS)
+#define CS2_0()		GPIO_ResetBits(PORT_CS2, PIN_CS2)
+#define CS2_1()		GPIO_SetBits(PORT_CS2, PIN_CS2)
 
 #define SCK_0()		GPIO_ResetBits(PORT_SCK, PIN_SCK)
 #define SCK_1()		GPIO_SetBits(PORT_SCK, PIN_SCK)
@@ -179,7 +231,7 @@ RDATAC, RESET, SYNC 命令之后，需要延迟 24 * tCLK = 3.12uS;
 
 #define DO_IS_HIGH()	(GPIO_ReadInputDataBit(PORT_DOUT, PIN_DOUT) == Bit_SET)
 
-#define DRDY_IS_LOW()	(GPIO_ReadInputDataBit(PORT_DRDY, PIN_DRDY) == Bit_RESET)
+#define DRDY_IS_LOW()	(GPIO_ReadInputDataBit(PORT_DRDY2, PIN_DRDY2) == Bit_RESET)
 
 //
 //#ifdef HARD_SPI		/* 硬件SPI */
@@ -273,18 +325,19 @@ void InitADS1256(void)
 #ifdef HARD_SPI
 	SPI_InitTypeDef  SPI_InitStructure;
 #endif
-	RESET_1();
-	PWDN_1();
-	CS_1();
+	RESET2_1();
+	PWDN2_1();
+	CS2_1();
 	SCK_0();		/* SPI总线空闲时，钟线是低电平 */
 	DI_1();
 
 
 	/* 打开GPIO时钟 */
-	RCC_AHB1PeriphClockCmd(RCC_CS | RCC_DIN | RCC_DOUT | RCC_SCK | RCC_DRDY | RCC_RESET | RCC_PWDN, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_CS2 | RCC_DIN | RCC_DOUT | RCC_SCK | RCC_DRDY2 | RCC_RESET2 | RCC_PWDN2, ENABLE);
 #ifdef HARD_SPI
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
-
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
 	
 #endif
 
@@ -294,14 +347,14 @@ void InitADS1256(void)
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 上下拉电阻不使能 */
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
 
-	GPIO_InitStructure.GPIO_Pin = PIN_CS;
-	GPIO_Init(PORT_CS, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = PIN_CS2;
+	GPIO_Init(PORT_CS2, &GPIO_InitStructure);
 
-	GPIO_InitStructure.GPIO_Pin = PIN_PWDN;
-	GPIO_Init(PORT_PWDN, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = PIN_PWDN2;
+	GPIO_Init(PORT_PWDN2, &GPIO_InitStructure);
 
-	GPIO_InitStructure.GPIO_Pin = PIN_RESET;
-	GPIO_Init(PORT_RESET, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = PIN_RESET2;
+	GPIO_Init(PORT_RESET2, &GPIO_InitStructure);
 #ifdef HARD_SPI
 	/* 配置几个推完输出IO */
 	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;		/* 设为输出口 */
@@ -335,8 +388,8 @@ void InitADS1256(void)
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		/* 设为推挽模式 */
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	/* 无需上下拉电阻 */
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	/* IO口最大速度 */
-	GPIO_InitStructure.GPIO_Pin = PIN_DRDY;
-	GPIO_Init(PORT_DRDY, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = PIN_DRDY2;
+	GPIO_Init(PORT_DRDY2, &GPIO_InitStructure);
 
 
 	//SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
@@ -469,7 +522,7 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 		/* 因为切换通道和读数据耗时 123uS, 因此扫描中断模式工作时，最大速率 = DRATE_1000SPS */
 		buf[3] = s_tabDataRate[_drate];	// DRATE_10SPS;	/* 选择数据输出速率 */
 
-		CS_0();	/* SPI片选 = 0 */
+		CS2_0();	/* SPI片选 = 0 */
 #ifdef HARD_SPI
 		SPI_SendByte(CMD_WREG | 0);
 		SPI_SendByte(0x03);
@@ -488,7 +541,7 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 #endif		
 		//ADS1256_Send8Bit(CMD_SELFCAL);
 		//Delay(100);
-		CS_1();	/* SPI片选 = 1 */
+		CS2_1();	/* SPI片选 = 1 */
 	}
 	Delay(50);
 	//bsp_DelayUS(50);
@@ -565,15 +618,15 @@ static void ADS1256_DelayDATA(void)
 static void ADS1256_ResetHard(void)
 {
 	/* ADS1256数据手册第7页 */
-	RESET_0();			/* 复位 */
+	RESET2_0();			/* 复位 */
 	//bsp_DelayUS(5);
 	Delay(5);
-	RESET_1();
+	RESET2_1();
 
-	PWDN_0();			/* 进入掉电 同步*/
+	PWDN2_0();			/* 进入掉电 同步*/
 	//Delay(2);
 	//bsp_DelayUS(2);	
-	PWDN_1();			/* 退出掉电 */
+	PWDN2_1();			/* 退出掉电 */
 
 	//bsp_DelayUS(5);
 	Delay(5);
@@ -694,7 +747,7 @@ static uint8_t ADS1256_ReadReg(uint8_t _RegID)
 {
 	uint8_t read;
 
-	CS_0();	/* SPI片选 = 0 */
+	CS2_0();	/* SPI片选 = 0 */
 #ifdef HARD_SPI
 	SPI_SendByte(CMD_RREG | _RegID);
 	SPI_SendByte(0x00);
@@ -710,7 +763,7 @@ static uint8_t ADS1256_ReadReg(uint8_t _RegID)
 	read = ADS1256_Recive8Bit();	/* 读寄存器值 */
 #endif
 	
-	CS_1();	/* SPI片选 = 1 */
+	CS2_1();	/* SPI片选 = 1 */
 
 	return read;
 }
@@ -725,9 +778,9 @@ static uint8_t ADS1256_ReadReg(uint8_t _RegID)
 */
 static void ADS1256_WriteCmd(uint8_t _cmd)
 {
-	CS_0();	/* SPI片选 = 0 */
+	CS2_0();	/* SPI片选 = 0 */
 	ADS1256_Send8Bit(_cmd);
-	CS_1();	/* SPI片选 = 1 */
+	CS2_1();	/* SPI片选 = 1 */
 }
 
 /*
@@ -908,7 +961,7 @@ static int32_t ADS1256_ReadData(void)
 	//SPI_SendByte(CMD_RDATA);
 	////ADS1256_DelayDATA();	/* 必须延迟才能读取芯片返回数据 */
 	//Delay(6);
-	while (!DRDY_IS_LOW());
+	//while (!DRDY_IS_LOW());
 	for (i = 0; i < 3; i++)
 	{
 		read = read << 8;
@@ -1011,7 +1064,7 @@ void ADS1256_StartScan(void)
 {
 	
 	while (!DRDY_IS_LOW());
-	CS_0();
+	CS2_0();
 #ifdef HARD_SPI	
 	SPI_SendByte(CMD_RDATAC);
 #else
@@ -1080,7 +1133,7 @@ void ADS1256_StopScan(void)
 	ADS1256_Send8Bit(CMD_SDATAC);
 #endif
 	while (DRDY_IS_LOW());
-	CS_1();
+	CS2_1();
 	//	EXTI_InitTypeDef   EXTI_InitStructure;
 	//	//	NVIC_InitTypeDef   NVIC_InitStructure;
 	//

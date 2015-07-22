@@ -121,7 +121,7 @@ int main(void) {
 
 
 	/* Initialize LED's. Make sure to check settings for your board in tm_stm32f4_disco.h file */
-	TM_DISCO_LedInit();
+	//TM_DISCO_LedInit();
 	//TM_DISCO_ButtonInit();
 	/*Delay init*/
 	TM_DELAY_Init();
@@ -253,14 +253,14 @@ int main(void) {
 				c = 0;
 				count = 0;
 				//TM_DELAY_SetTime(0);
-				for (j = 0; j < 40; j++)
+				for (j = 0; j < 5; j++)
 				{
 					for (i = 0; i < 200; i++)
 					{
 						//TM_DELAY_SetTime(0);
 						TM_GENERAL_DWTCounterSetValue(0);
 						adcsamples[j][i] = ADS1256_ReadAdc();
-						while (TM_GENERAL_DWTCounterGetValue() < 4200);
+						while (TM_GENERAL_DWTCounterGetValue() < 84000);
 						count++;
 						//if (TM_DELAY_Time()>=1000)
 						//	break;
@@ -271,7 +271,7 @@ int main(void) {
 				printf("\r\nthere are %d samples\r\n", count);
 				//fprintf(&USART1_Stream, "\r\nthere are %d samples\r\n", count);
 				//Delay(1000000);
-				for (j = 0; j < 40; j++)
+				for (j = 0; j < 5; j++)
 				{
 					for (i = 0; i < 200; i++)
 					{
