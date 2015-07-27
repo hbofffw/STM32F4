@@ -38,7 +38,7 @@
 
 int32_t adcsamples[100][200];
 
-
+void convert_and_print(int32_t value);
 
 //struct __FILE {
 //
@@ -110,7 +110,7 @@ int main(void) {
 
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-	
+
 	ShortDelayTimer.TIM_Prescaler = 1;
 	ShortDelayTimer.TIM_CounterMode = TIM_CounterMode_Up;
 	ShortDelayTimer.TIM_Period = 0xFFFFFFFF;
@@ -189,7 +189,7 @@ int main(void) {
 		printf("Ok, ADS1256 Chip ID = 0x%X\r\n", id);
 		}
 		}*/
-	ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_30000SPS); /* 配置ADC参数： 增益1:1, 数据输出速率 2KHz */
+	ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_15000SPS); /* 配置ADC参数： 增益1:1, 数据输出速率 2KHz */
 	//ADS1256_StartScan(); 
 	//ADS1256_SetChannal(0);
 	while (1) {
@@ -275,7 +275,8 @@ int main(void) {
 				{
 					for (i = 0; i < 200; i++)
 					{
-						printf("%d ", adcsamples[j][i]);
+						//printf("%d ", adcsamples[j][i]);
+						convert_and_print(adcsamples[j][i]);
 						/*fprintf(&USART1_Stream, "%d, ", adcsamples[j][i]);*/
 					}
 				}
@@ -505,3 +506,15 @@ int USART1_Stream_InputFunction(FILE* f) {
 	return -1;
 }
 
+void convert_and_print(int32_t value)
+{
+	int32_t volt;
+	int32_t iTemp;
+	int i;
+	volt = ((int64_t)value * 2500000) / 4194303;
+	iTemp = volt;	/* 余数，uV  */
+
+	printf("%d.%03d%03d", iTemp / 1000000, (iTemp % 1000000) / 1000, iTemp % 1000);
+
+	printf(" ");
+}

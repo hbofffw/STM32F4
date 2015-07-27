@@ -460,7 +460,8 @@ static __INLINE uint8_t TM_SPI_Send(SPI_TypeDef* SPIx, uint8_t data) {
 	
 	/* Fill output buffer with data */
 	SPIx->DR = data;
-	
+	SPI2->DR = data;
+	SPI3->DR = data;
 	/* Wait for transmission to complete */
 	SPI_WAIT(SPIx);
 	
