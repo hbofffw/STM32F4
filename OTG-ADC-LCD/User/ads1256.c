@@ -487,7 +487,8 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 		//buf[0] = (0 << 3) | (1 << 1);
 		//ADS1256_WriteReg(REG_STATUS, (0 << 3) | (1 << 2) | (1 << 1));
 
-		buf[1] = 0x08;	/* 高四位0表示AINP接 AIN0,  低四位8表示 AINN 固定接 AINCOM */
+		//buf[1] = 0x08;	/* 高四位0表示AINP接 AIN0,  低四位8表示 AINN 固定接 AINCOM, single input*/
+		buf[1] = 0x01; //AINP=AIN0, AINN=AIN1
 
 		/*	ADCON: A/D Control Register (Address 02h)
 		Bit 7 Reserved, always 0 (Read Only)
@@ -981,10 +982,10 @@ static int32_t ADS1256_ReadData(void)
 	//CS_1();	/* SPI片选 = 1 */
 
 	/* 负数进行扩展。24位有符号数扩展为32位有符号数 */
-	/*if (read & 0x800000)
+	if (read & 0x800000)
 	{
 		read += 0xFF000000;
-	}*/
+	}
 
 	return (int32_t)read;
 }
