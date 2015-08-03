@@ -193,11 +193,7 @@ int main(void) {
 	//ADS1256_StartScan(); 
 	//ADS1256_SetChannal(0);
 	while (1) {
-		//if (TM_DISCO_ButtonOnReleased())
-		//{
-		//	//printf("ADC channel 4/3: %4d/%4d \n", TM_ADC_Read(ADC1, ADC_Channel_4), TM_ADC_Read(ADC1, ADC_Channel_3));
-		//	Delayms(50);
-		//}
+		
 		adctest = 0;
 		s = TM_USART_Getc(USART1);
 
