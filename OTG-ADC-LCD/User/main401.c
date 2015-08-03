@@ -189,7 +189,7 @@ int main(void) {
 		printf("Ok, ADS1256 Chip ID = 0x%X\r\n", id);
 		}
 		}*/
-	ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_15000SPS); /* 配置ADC参数： 增益1:1, 数据输出速率 2KHz */
+	ADS1256_CfgADC(ADS1256_GAIN_64, ADS1256_15000SPS); /* 配置ADC参数： 增益1:1, 数据输出速率 2KHz */
 	//ADS1256_StartScan(); 
 	//ADS1256_SetChannal(0);
 	while (1) {
@@ -513,8 +513,14 @@ void convert_and_print(int32_t value)
 	int i;
 	volt = ((int64_t)value * 2500000) / 4194303;
 	iTemp = volt;	/* 余数，uV  */
-
-	printf("%d.%03d%03d", iTemp / 1000000, (iTemp % 1000000) / 1000, iTemp % 1000);
-
+	if (iTemp < 0)
+	{
+		iTemp = -iTemp;
+		printf("-%d.%03d%03d", iTemp / 1000000, (iTemp % 1000000) / 1000, iTemp % 1000);
+	}
+	else
+	{
+		printf("%d.%03d%03d", iTemp / 1000000, (iTemp % 1000000) / 1000, iTemp % 1000);
+	}	
 	printf(" ");
 }
