@@ -39,7 +39,6 @@
 int32_t adcsamples[100][200];
 
 void convert_and_print(int32_t value);
-
 //struct __FILE {
 //
 //	int dummy;
